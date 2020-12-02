@@ -49,8 +49,11 @@ def hard():
     t = [[(e[0], int(e[1:])) for e in l.split(",")] for l in t]
 
     A = lil_matrix(eye(N) * 0, dtype=np.int64)
-    D1 = lil_matrix(eye(N) * 0, dtype=np.int64)
-    D2 = lil_matrix(eye(N) * 0, dtype=np.int64)
+    D = [
+        0,
+        lil_matrix(eye(N) * 0, dtype=np.int64),
+        lil_matrix(eye(N) * 0, dtype=np.int64),
+    ]
 
     x = 1
     for l in t:
@@ -70,15 +73,11 @@ def hard():
                 if d == "R":
                     p[0] += 1
                 A[p[0], p[1]] = A[p[0], p[1]] | x
-                if x == 1:
-                    if D1[p[0], p[1]] == 0:
-                        D1[p[0], p[1]] = s
-                else:
-                    if D2[p[0], p[1]] == 0:
-                        D2[p[0], p[1]] = s
+                if D[x][p[0], p[1]] == 0:
+                    D[x][p[0], p[1]] = s
         x *= 2
 
-    D = D1 + D2
+    D = D[1] + D[2]
     print(D[A == x - 1].min())
 
 
