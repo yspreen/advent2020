@@ -9,6 +9,25 @@ lowerint = int(t[0])
 upperint = int(t[1])
 
 
+## Slower but less code:
+# def iter(check):
+#     n = 0
+#     for number in range(1000000):
+#         if not (lowerint <= number <= upperint):
+#             continue
+#         number = [int(i) for i in str(number + 1000000)[1:]]
+#         last_i = -1
+#         broken = False
+#         for i in number:
+#             if last_i > i:
+#                 broken = True
+#                 break
+#             last_i = i
+#         if not broken and check(number):
+#             n += 1
+#     print(n)
+
+
 def iter(check):
     n = 0
     for a in range(lower[0], upper[0] + 1):
