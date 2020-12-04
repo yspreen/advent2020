@@ -51,15 +51,13 @@ def easy():
 
 
 def hard():
-    san = Orbital.objects["SAN"]
-    you = Orbital.objects["YOU"]
-    san_str = san.root_chain_str
-    you_str = you.root_chain_str
+    san = Orbital.objects["SAN"].root_chain_str
+    you = Orbital.objects["YOU"].root_chain_str
 
-    san_str, you_str = remove_shared_prefix(san_str, you_str)
-    san_str = list(filter(lambda s: s == ".", san_str))
-    you_str = list(filter(lambda s: s == ".", you_str))
-    print(len(san_str) + len(you_str))
+    san, you = remove_shared_prefix(san, you)
+    san = list(filter(lambda s: s == ".", san))
+    you = list(filter(lambda s: s == ".", you))
+    print(len(san) + len(you))
 
 
 if __name__ == "__main__":
