@@ -5,13 +5,6 @@ import pathlib
 DIR = pathlib.Path(__file__).parent.absolute()
 
 
-def to_tuple(s):
-    row = int(s[:3], 2)
-    seat = int(s[-3:], 2)
-
-    return row, seat
-
-
 def seat_id(s):
     return int(s, 2)
 
