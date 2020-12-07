@@ -29,7 +29,7 @@ def checktypes(kv):
 
 
 def check(val):
-    with open("4/input.txt") as f:
+    with open("2020.4/input.txt") as f:
         t = f.read().replace("\r", "").replace(" ", "\n").split("\n\n")
     t = [l.split("\n") for l in t]
     if t[-1] == "":

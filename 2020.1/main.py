@@ -1,7 +1,7 @@
 def easy():
-    with open("1/input.txt") as f:
-        t = f.read().replace('\r', '').split('\n')
-    if t[-1] == '':
+    with open("2020.1/input.txt") as f:
+        t = f.read().replace("\r", "").split("\n")
+    if t[-1] == "":
         t.pop()
 
     t = [int(i) for i in t]
@@ -17,10 +17,12 @@ def easy():
                 return
             if a + b < 2020:
                 break
+
+
 def hard():
-    with open("1/input.txt") as f:
-        t = f.read().replace('\r', '').split('\n')
-    if t[-1] == '':
+    with open("2020.1/input.txt") as f:
+        t = f.read().replace("\r", "").split("\n")
+    if t[-1] == "":
         t.pop()
 
     t = [int(i) for i in t]
@@ -40,6 +42,7 @@ def hard():
                     return
                 if a + b + c < 2020:
                     break
+
 
 if __name__ == "__main__":
     easy()
