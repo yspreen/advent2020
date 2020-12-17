@@ -22,16 +22,6 @@ for k, v in lookup.items():
 def read():
     with open(DIR / "input.txt") as f:
         t = f.read().replace("\r", "")
-    #     t = """L.LL.LL.LL
-    # LLLLLLL.LL
-    # L.L.L..L..
-    # LLLL.LL.LL
-    # L.LL.LL.LL
-    # L.LLLLL.LL
-    # ..L.L.....
-    # LLLLLLLLLL
-    # L.LLLLLL.L
-    # L.LLLLL.LL"""
     t = t.split("\n")
     if t[-1] == "":
         t.pop()
@@ -69,14 +59,6 @@ def change_field(A, A_, i, j, Mask=None):
         A[i, j] = 3 - A[i, j]
 
 
-def fancyprint(end="\n"):
-    for row in A[1:-1]:
-        for e in row[1:-1]:
-            print(reverse_lookup[e], end="")
-        print()
-    print(end=end)
-
-
 def find_lookup_mask(A):
     Mask = [[list() for i in row] for row in A]
 
@@ -105,7 +87,6 @@ def easy():
     N, M = A.shape
 
     while change:
-        # fancyprint()
         change = False
 
         A_ = A.copy()
@@ -115,32 +96,16 @@ def easy():
     print(len(np.where(A == 2)[0]))
 
 
-def check_mask(A, Mask, x, y):
-    for i, row in enumerate(A[1:-1]):
-        for j, e in enumerate(row[1:-1]):
-            if (i + 1, j + 1) in list(zip(*Mask[x + 1][y + 1])):
-                print("x", end="")
-            elif i == x and j == y:
-                print("@", end="")
-            else:
-                print(reverse_lookup[e], end="")
-        print()
-    print()
-
-
 def hard():
     global change, A, A_
 
     A = read()
     Mask = find_lookup_mask(A)
-    # print(Mask[3][5])
-    # check_mask(A, Mask, 3, 5)
 
     N, M = A.shape
 
     change = True
     while change:
-        # fancyprint()
         change = False
 
         A_ = A.copy()
