@@ -50,33 +50,20 @@ A_ = A = read()
 change = True
 
 
-def change_field(A, A_, i, j):
+def change_field(A, A_, i, j, Mask=None):
     global change
 
     if A[i, j] == 0:  # .
         return
-    masked = A_[i - 1 : i + 2, j - 1 : j + 2]
+    if Mask is None:
+        masked = A_[i - 1 : i + 2, j - 1 : j + 2]
+    else:
+        masked = A_[Mask[i][j]]
     adj = len(np.where(masked == 2)[0])
     if A[i, j] == 1:  # L
         flip = adj == 0
     elif A[i, j] == 2:  # #
-        flip = adj >= 4 + 1  # center is part of mask
-    if flip:
-        change = True
-        A[i, j] = 3 - A[i, j]
-
-
-def change_field_masked(A, A_, Mask, i, j):
-    global change
-
-    if A[i, j] == 0:  # .
-        return
-    masked = A_[Mask[i][j]]
-    adj = len(np.where(masked == 2)[0])
-    if A[i, j] == 1:  # L
-        flip = adj == 0
-    elif A[i, j] == 2:  # #
-        flip = adj >= 5  # center is not part of mask
+        flip = adj >= 5
     if flip:
         change = True
         A[i, j] = 3 - A[i, j]
@@ -159,7 +146,7 @@ def hard():
         A_ = A.copy()
         for i in range(1, N - 1):
             for j in range(1, M - 1):
-                change_field_masked(A, A_, Mask, i, j)
+                change_field(A, A_, i, j, Mask)
     print(len(np.where(A == 2)[0]))
 
 
