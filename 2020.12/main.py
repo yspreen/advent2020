@@ -26,6 +26,15 @@ angle = {
 }
 
 
+def rotate(point, angle):
+    if angle == 0:
+        return
+    angle = (angle + 360) % 360
+    for _ in range(angle // 90):
+        point.reverse()
+        point[1] *= -1
+
+
 def read():
     with open(DIR / "input.txt") as f:
         t = f.read().replace("\r", "")
@@ -54,6 +63,19 @@ def move(i, p):
         p[1] += param * vector[1]
 
 
+def hardmove(i, ship, waypoint):
+    movement, param = t[i]
+    vector = lookup[movement]
+
+    rotate(waypoint, param * vector[2])
+    if vector[3]:
+        ship[0] += param * vector[3] * waypoint[0]
+        ship[1] += param * vector[3] * waypoint[1]
+    else:
+        waypoint[0] += param * vector[0]
+        waypoint[1] += param * vector[1]
+
+
 def easy():
     global t
 
@@ -65,7 +87,14 @@ def easy():
 
 
 def hard():
-    return
+    global t
+
+    ship = [0, 0]
+    waypoint = [-1, 10]
+
+    for i in range(len(t)):
+        hardmove(i, ship, waypoint)
+    print(sum(map(abs, ship[:2])))
 
 
 if __name__ == "__main__":
