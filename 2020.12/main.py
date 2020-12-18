@@ -27,8 +27,6 @@ angle = {
 
 
 def rotate(point, angle):
-    if angle == 0:
-        return
     angle = (angle + 360) % 360
     for _ in range(angle // 90):
         point.reverse()
