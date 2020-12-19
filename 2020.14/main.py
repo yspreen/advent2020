@@ -10,6 +10,21 @@ DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 
 
+def get_masks(m):
+    floating = m.count("X")
+    floating_one = m.replace("0", "1")
+    floating_zero = m.replace("1", "0")
+    floating_or = int(m.replace("X", "0"), 2)
+    masks = []
+    if floating == 0:
+        return [(int("1" * len(m), 2), floating_or)]
+    for replacements in list(product("01", repeat=floating)):
+        mask_one = int(floating_one.replace("X", "%s") % replacements, 2)
+        mask_zero = int(floating_zero.replace("X", "%s") % replacements, 2)
+        masks.append((mask_one, mask_zero | floating_or))
+    return masks
+
+
 def read():
     with open(DIR / "input.txt") as f:
         t = f.read().replace("\r", "")
@@ -45,7 +60,15 @@ def easy():
 
 
 def hard():
-    return
+    masks = []
+    mem = {}
+    for cmd, param in t:
+        if cmd == "mask":
+            masks = get_masks(param)
+            continue
+        for m_and, m_or in masks:
+            mem[(cmd & m_and) | m_or] = param
+    print(sum(mem.values()))
 
 
 if __name__ == "__main__":
