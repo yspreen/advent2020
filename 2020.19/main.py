@@ -96,8 +96,6 @@ def easy():
 
 def hard():
     global rules, lines
-    Rule.unresolved = set()
-    Rule.rules = {}
     rules, lines = read(True)
 
     match()
