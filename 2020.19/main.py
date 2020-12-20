@@ -46,7 +46,7 @@ class Rule:
             self.parsed = "%s+" % Rule.rules[42].parsed
         elif advanced and self.id == 11:
             parsed = "("
-            for i in range(1, 10):
+            for i in range(1, 6):  # max 5 recursions
                 parsed += "%s{%d}%s{%d}|" % (
                     Rule.rules[42].parsed,
                     i,
