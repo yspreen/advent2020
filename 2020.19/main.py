@@ -7,7 +7,6 @@ from math import prod
 from itertools import permutations, product
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 class Rule:
@@ -74,14 +73,10 @@ def read(advanced=False):
     while len(Rule.unresolved):
         for r in Rule.rules.values():
             r.resolve(advanced=advanced)
-    return rules, lines
+    return lines
 
 
-rules, lines = read()
-tick = mem = last_num = None
-
-
-def match():
+def match(lines):
     regex = Rule.rules[0].parsed
     match = 0
     for line in lines:
@@ -91,14 +86,11 @@ def match():
 
 
 def easy():
-    match()
+    match(read())
 
 
 def hard():
-    global rules, lines
-    rules, lines = read(True)
-
-    match()
+    match(read(True))
 
 
 if __name__ == "__main__":
