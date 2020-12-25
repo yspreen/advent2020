@@ -43,7 +43,6 @@ class Tile:
             Tile.sides[s].add(self.id)
 
     def set(self):
-        # print("set", self.id)
         if self.did_set:
             return
         self.did_set = True
@@ -62,18 +61,13 @@ class Tile:
             if d in [0, 3]:
                 topleft = False
         if topleft:
-            assert Tile.topleft == None
             Tile.topleft = self
 
     def place(self, dir, side, id):
-        if self.neighbors[dir] != None:
-            return
         tile = Tile.items[id]
         self.neighbors[dir] = tile
         mirror = (2 + 2 * (dir % 2)) - dir
-        # print(dir, "|", mirror)
         tile.rotate_until(side, mirror)
-        tile.neighbors[mirror] = self
         tile.set()
 
     def rotate_until(self, side, dir):
@@ -81,7 +75,6 @@ class Tile:
             self.rotate()
 
     def rotate(self, k=1):
-        assert not self.did_set
         for _ in range(k % 4):
             self.a = np.rot90(self.a)
             self.sides = self.sides[1:] + self.sides[:1]
@@ -106,7 +99,6 @@ class Tile:
 
     @classmethod
     def remove(cls, id):
-        # print("rem", id)
         tile = cls.items.get(id, None)
         if tile is None:
             return
@@ -129,18 +121,13 @@ def read():
 
 
 t = read()
-monster = """
-                  # 
+monster = """                  # 
 #    ##    ##    ###
- #  #  #  #  #  #   
-"""[
-    1:-1
-].split(
+ #  #  #  #  #  #   """.split(
     "\n"
 )
 monster = [[1 if j == "#" else 0 for j in l] for l in monster]
 monster = np.array(monster, dtype=np.int32)
-# print(monster)
 
 
 def easy():
@@ -176,29 +163,6 @@ def orientations(A):
 
 def hard():
     list(Tile.items.values())[0].set()
-    # counts = {}
-    # for tile in Tile.items.values():
-    #     count = tile.neighbors.count(None)
-    #     counts[count] = counts.get(count, 0) + 1
-    #     if count == 2:
-    #         print(tile.neighbors)
-    # print(tile.a)
-    # print(["{0:010b}".format(i) for i in tile.sides])
-    # print()
-    # print(counts)
-
-    # for tile in Tile.items.values():
-    #     for d in range(4):
-    #         if tile.neighbors[d] == None:
-    #             continue
-    #         mirror = (2 + 2 * (d % 2)) - d
-    #         assert tile.neighbors[d].neighbors[mirror] == tile
-    # for tile in Tile.items.values():
-    #     for d in range(4):
-    #         if tile.neighbors[d] == None:
-    #             continue
-    #         mirror = (2 + 2 * (d % 2)) - d
-    #         assert tile.neighbors[d].sides[mirror] == flipside(tile.sides[d])
     a = Tile.get_matrix()
     for A in orientations(a):
         matches = find_match(A, monster)
