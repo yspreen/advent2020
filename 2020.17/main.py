@@ -10,7 +10,7 @@ from itertools import permutations, product
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 
-N = 22
+N = 20
 
 
 def read():
@@ -25,16 +25,17 @@ t = read()
 
 def step(A):
     A_ = np.zeros_like(A, dtype=np.int32)
-    ranges = [range(1, N - 1) for _ in range(3)]
-    for x, y, z in product(*ranges):
-        middle = A[x, y, z]
-        cube = A[x - 1 : x + 2, y - 1 : y + 2, z - 1 : z + 2]
+    ranges = [range(1, N - 1) for _ in range(len(A.shape))]
+    for coords in product(*ranges):
+        middle = A[coords]
+        cube = tuple([slice(i - 1, i + 2, None) for i in list(coords)])
+        cube = A[cube]
         count = cube.sum()
         if middle == 1:
             state = count == 3 or count == 4
         else:
             state = count == 3
-        A_[x, y, z] = 1 if state else 0
+        A_[coords] = 1 if state else 0
     return A_
 
 
@@ -50,7 +51,14 @@ def easy():
 
 
 def hard():
-    return
+    A = np.zeros((N, N, N, N), dtype=np.int32)
+    A[N // 2 - 4 : N // 2 + 4, N // 2 - 4 : N // 2 + 4, N // 2, N // 2] = t
+
+    # fancyprint(A)
+    for _ in range(6):
+        A = step(A)
+        # fancyprint(A)
+    print(A.sum())
 
 
 def fancyprint(A):
