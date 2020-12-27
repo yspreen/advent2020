@@ -33,20 +33,6 @@ def read():
 t = read()
 
 
-def find_loop(pub, subject=7):
-    k = i = 1
-    while k != pub:
-        k = encrypt(k, subject, 1)
-        i += 1
-    return i - 1
-
-
-def encrypt(value, subject, loop):
-    for _ in range(loop):
-        value = (value * subject) % 20201227
-    return value
-
-
 def easy():
     invalids = 0
     for i, row in enumerate(t[2]):
@@ -73,7 +59,6 @@ def hard():
                 curr = rule[0] <= num <= rule[1]
                 if j % 2 == 1 and not (curr or last):
                     possible[t[0][j // 2]].discard(i)
-                    assert 0 <= i < 20
                 last = curr
     final = {}
     for _ in range(20):
