@@ -1,14 +1,8 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod
-from itertools import permutations, product
+from itertools import product
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 N = 20
 
@@ -41,9 +35,7 @@ def step(A):
 
 def do_stuff(dim):
     A = np.zeros((N,) * dim, dtype=np.int32)
-    index = [
-        N // 2,
-    ] * dim
+    index = [N // 2] * dim
     for i in [0, 1]:
         index[i] = slice(N // 2 - 4, N // 2 + 4, None)
     A[tuple(index)] = t
