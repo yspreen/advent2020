@@ -53,7 +53,7 @@ class Expression:
             for i, op in enumerate(line):
                 if op == "+":
                     line[i - 1] = int(line[i - 1]) + int(line[i + 1])
-                elif not has_plus and op == "*":
+                elif op == "**" or (not has_plus and op == "*"):
                     line[i - 1] = int(line[i - 1]) * int(line[i + 1])
                 else:
                     continue
@@ -78,34 +78,8 @@ class Expression:
         return self.value
 
 
-def calc(line):
-    sign = "+"
-    result = 0
-    while line:
-        op = line[0]
-        if op.startswith("("):
-            line[0] = line[0][1:]
-            op = str(calc(line))
-        else:
-            line.pop(0)
-        if op in ["*", "+"]:
-            sign = op
-        else:
-            num = op.replace(")", "")
-            num = int(num)
-            if sign == "+":
-                result += num
-            else:
-                result *= num
-        if op.endswith(")"):
-            line.insert(0, "0" + ")" * (op.count(")") - 1))
-            line.insert(0, "+")
-            return result
-    return result
-
-
 def easy():
-    print(sum([calc(i.split(" ")) for i in t]))
+    print(sum([Expression(i.replace("*", "**")).resolve() for i in t]))
 
 
 def hard():
