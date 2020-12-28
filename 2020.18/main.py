@@ -57,8 +57,7 @@ class Expression:
                     line[i - 1] = int(line[i - 1]) * int(line[i + 1])
                 else:
                     continue
-                del line[i]
-                del line[i]
+                del line[i : i + 2]
                 break
         return int(line[0])
 
