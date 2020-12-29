@@ -60,7 +60,8 @@ def score(A):
 
 
 def easy():
-    round()
+    while len(t[0]) and len(t[1]):
+        round()
     print(score(t[0] + t[1]))
 
 
