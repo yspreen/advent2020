@@ -66,13 +66,20 @@ def easy():
 
 
 def hard():
-    global t, N
+    global t, N, curr
     N, t = read(1000000)
+    curr = t.first
     for _ in range(10000000):
         move()
     while t.last.value != 1:
         t.rotate(1)
-    print(t[0] * t[1])
+
+    while True:
+        try:
+            print(lookup[1].next.value * lookup[1].next.next.value)
+            return
+        except:
+            t.rotate(1)
 
 
 if __name__ == "__main__":
