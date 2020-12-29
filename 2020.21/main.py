@@ -23,11 +23,11 @@ def read():
 s, t = read()
 
 allergens = set()
-foods = set()
+could_contain = foods = set()
 
 
 def easy():
-    global allergens, foods
+    global allergens, foods, could_contain
     for food, a in t:
         allergens |= set(a)
         foods |= set(food)
@@ -49,10 +49,13 @@ def easy():
             break
     contains_none = reduce(lambda a, b: a - b[1], could_contain.items(), set(foods))
     counter = reduce(lambda a, b: a + s.count(" " + b + " "), contains_none, 0)
+    print(counter)
 
 
 def hard():
-    return
+    food = list([(list(v)[0], k) for k, v in could_contain.items()])
+    food.sort(key=lambda i: i[1])
+    print(",".join([t[0] for t in food]))
 
 
 if __name__ == "__main__":
