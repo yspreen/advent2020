@@ -38,7 +38,7 @@ changes = [
 ]
 
 t = read()
-N = max([len(l) for l in t]) * 2
+N = max([len(l) for l in t]) * 2 + 100
 A = np.zeros((N, N), dtype=np.int32)
 
 
@@ -60,7 +60,24 @@ def easy():
 
 
 def hard():
-    return
+    global A
+    for _ in range(100):
+        A_ = A.copy()
+        for i, j in product(*[range(1, N - 1) for _ in range(2)]):
+            neighbors = 0
+            for ci, c in enumerate(changes):
+                j_ = j
+                if ci not in [0, 3]:
+                    j_ += i % 2
+                i_ = i + c[0]
+                j_ = j_ + c[1]
+                neighbors += A[i_, j_]
+            if A[i, j] and neighbors not in [1, 2]:
+                A_[i, j] = 0
+            if not A[i, j] and neighbors == 2:
+                A_[i, j] = 1
+        A = A_
+    print(A.sum())
 
 
 if __name__ == "__main__":
