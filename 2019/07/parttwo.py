@@ -62,9 +62,6 @@ class VM:
             return 2
         if ins == 4:
             self.outputs.append(a)
-            if self.loop_mode:
-                self.i += 2
-                return STOP
             return 2
         if ins == 5:
             if a != 0:
@@ -131,7 +128,6 @@ def hard():
         if a > m[0]:
             m = (a, p)
     print(*m)
-    return
 
 
 if __name__ == "__main__":
