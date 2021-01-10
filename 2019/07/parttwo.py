@@ -16,6 +16,9 @@ def digit(num, dig):
     return (num // dig) % 10
 
 
+STOP = -1
+
+
 class VM:
     def read(self):
         with open(DIR / "input.txt") as f:
@@ -44,7 +47,7 @@ class VM:
             pass
 
         if ins == 99:
-            return 0
+            return STOP
         if ins == 1:
             self.t[c] = a + b
             return 4
@@ -56,6 +59,9 @@ class VM:
             return 2
         if ins == 4:
             self.outputs.append(a)
+            if self.loop_mode:
+                self.i += 2
+                return STOP
             return 2
         if ins == 5:
             if a != 0:
@@ -73,7 +79,8 @@ class VM:
             return 4
 
     def calc(self):
-        while self.d != 0:
+        self.d = 0
+        while self.d != STOP:
             self.i += self.d
             self.d = self.op(self.i)
         return self.outputs
@@ -83,8 +90,14 @@ class VM:
         self.outputs = []
         self.inputs = list(inp)
 
-        self.i = -1
-        self.d = 1
+        self.i = self.d = 0
+        self.loop_mode = False
+
+
+class LoopVM:
+    def __init__(self, *inp):
+        super().__init__(*inp)
+        self.loop_mode = True
 
 
 def amp(*param):
