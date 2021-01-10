@@ -16,7 +16,7 @@ def digit(num, dig):
     return (num // dig) % 10
 
 
-STOP = -1
+STOP = -1.337
 
 
 class VM:
@@ -47,6 +47,7 @@ class VM:
             pass
 
         if ins == 99:
+            self.done = True
             return STOP
         if ins == 1:
             self.t[c] = a + b
@@ -55,6 +56,8 @@ class VM:
             self.t[c] = a * b
             return 4
         if ins == 3:
+            if self.loop_mode and not self.inputs:
+                return STOP
             self.t[a] = self.inputs.pop(0)
             return 2
         if ins == 4:
@@ -79,7 +82,10 @@ class VM:
             return 4
 
     def calc(self):
+        if self.done:
+            return []
         self.d = 0
+        self.outputs = []
         while self.d != STOP:
             self.i += self.d
             self.d = self.op(self.i)
@@ -92,24 +98,35 @@ class VM:
 
         self.i = self.d = 0
         self.loop_mode = False
+        self.done = False
 
 
-class LoopVM:
+class LoopVM(VM):
     def __init__(self, *inp):
         super().__init__(*inp)
         self.loop_mode = True
 
 
 def amp(*param):
-    a = 0
-    for p in param:
-        a = VM(p, a).calc()[0]
-    return a
+    vms = [LoopVM(p) for p in param]
+    vms[0].inputs.append(0)
+    n = len(param)
+    i = 0
+    E = []
+    while True:
+        a = vms[i].calc()
+        if i + 1 == n:
+            E.extend(a)
+            if vms[i].done:
+                return E[-1]
+        i += 1
+        i %= n
+        vms[i].inputs.extend(a)
 
 
 def hard():
     m = (0, 0)
-    for p in permutations(range(5)):
+    for p in permutations(range(5, 10)):
         a = amp(*p)
         if a > m[0]:
             m = (a, p)
