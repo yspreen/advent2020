@@ -1,2 +1,3 @@
 /.pyenv/
 .DS_Store
+*.pyc

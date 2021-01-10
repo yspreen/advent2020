@@ -114,7 +114,9 @@ def easy():
 
 
 def hard():
-    return
+    from parttwo import hard
+
+    hard()
 
 
 if __name__ == "__main__":
