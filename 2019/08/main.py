@@ -31,8 +31,18 @@ def easy():
     print(prod([len(np.where(t[m[1], :, :] == k)[0]) for k in range(1, 3)]))
 
 
+def prettyprint(t):
+    for r in t:
+        for e in r:
+            print("##" if e else "  ", end="")
+        print()
+
+
 def hard():
-    return
+    for l, y, x in product(*[range(n) for n in t.shape]):
+        if l > 0:
+            t[l, y, x] = t[l, y, x] if t[l - 1, y, x] == 2 else t[l - 1, y, x]
+    prettyprint(t[-1, :, :])
 
 
 if __name__ == "__main__":
