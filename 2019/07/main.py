@@ -104,7 +104,7 @@ class LoopVM(VM):
         self.loop_mode = True
 
 
-def amp(*param):
+def hard_amp(*param):
     vms = [LoopVM(p) for p in param]
     vms[0].inputs.append(0)
     n = len(param)
@@ -121,10 +121,10 @@ def amp(*param):
         vms[i].inputs.extend(a)
 
 
-def hard():
+def solve(func, offset=0):
     m = (0, 0)
-    for p in permutations(range(5, 10)):
-        a = amp(*p)
+    for p in permutations(range(offset, offset + 5)):
+        a = func(*p)
         if a > m[0]:
             m = (a, p)
     print(*m)
@@ -137,16 +137,6 @@ def easy_amp(*param):
     return a
 
 
-def easy():
-    m = (0, 0)
-    for p in permutations(range(5)):
-        a = amp(*p)
-        if a > m[0]:
-            m = (a, p)
-    print(*m)
-    return
-
-
 if __name__ == "__main__":
-    easy()
-    hard()
+    solve(easy_amp)
+    solve(hard_amp, 5)
