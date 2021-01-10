@@ -16,9 +16,6 @@ def digit(num, dig):
     return (num // dig) % 10
 
 
-STOP = -1.337
-
-
 class VM:
     def read(self):
         with open(DIR / "input.txt") as f:
@@ -48,7 +45,7 @@ class VM:
 
         if ins == 99:
             self.done = True
-            return STOP
+            return
         if ins == 1:
             self.t[c] = a + b
             return 4
@@ -56,8 +53,8 @@ class VM:
             self.t[c] = a * b
             return 4
         if ins == 3:
-            if self.loop_mode and not self.inputs:
-                return STOP
+            if not self.inputs:
+                return
             self.t[a] = self.inputs.pop(0)
             return 2
         if ins == 4:
@@ -83,7 +80,7 @@ class VM:
             return []
         self.d = 0
         self.outputs = []
-        while self.d != STOP:
+        while self.d is not None:
             self.i += self.d
             self.d = self.op(self.i)
         return self.outputs
@@ -94,31 +91,20 @@ class VM:
         self.inputs = list(inp)
 
         self.i = self.d = 0
-        self.loop_mode = False
         self.done = False
 
 
-class LoopVM(VM):
-    def __init__(self, *inp):
-        super().__init__(*inp)
-        self.loop_mode = True
-
-
 def hard_amp(*param):
-    vms = [LoopVM(p) for p in param]
-    vms[0].inputs.append(0)
+    vms = [VM(p) for p in param]
     n = len(param)
     i = 0
-    E = []
+    a = [0]
     while True:
-        a = vms[i].calc()
-        if i + 1 == n:
-            E.extend(a)
-            if vms[i].done:
-                return E[-1]
-        i += 1
-        i %= n
         vms[i].inputs.extend(a)
+        a = vms[i].calc()
+        if i + 1 == n and vms[i].done:
+            return a[-1]
+        i = (i + 1) % n
 
 
 def solve(func, offset=0):
