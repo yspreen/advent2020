@@ -36,12 +36,12 @@ class VM:
 
         try:
             a = self.t[i + 1]
-            b = self.t[i + 2]
-            c = self.t[i + 3]
             if mode_a == 0 and ins != 3:
                 a = self.t[a]
+            b = self.t[i + 2]
             if mode_b == 0:
                 b = self.t[b]
+            c = self.t[i + 3]
         except:
             # end of t.
             pass
