@@ -16,7 +16,7 @@ def read():
         t = f.read().split("\n")
     if t[-1] == "":
         t.pop()
-    return np.array([int(i) for i in t[0]], dtype=np.int32).reshape(-1, 6, 5)
+    return np.array([int(i) for i in t[0]], dtype=np.int32).reshape(-1, 6, 25)
 
 
 t = read()
@@ -29,13 +29,6 @@ def easy():
         if c < m[0]:
             m = (c, i)
     print(prod([len(np.where(t[m[1], :, :] == k)[0]) for k in range(1, 3)]))
-
-
-def prettyprint(t):
-    for r in t:
-        for e in r:
-            print("##" if e else "  ", end="")
-        print()
 
 
 OCR = {
@@ -58,12 +51,10 @@ OCR = {
 
 
 def ocr(t):
-    c = addon = ""
+    c = OCR[int("".join([str(i) for i in t[:, :5].reshape(-1)]), 2)]
     if t.shape[1] > 5:
-        addon = ocr(t[:, 5:])
-    print(int("".join([str(i) for i in t[:, :5].reshape(-1)]), 2))
-    prettyprint(t[:, :5])
-    return addon
+        c += ocr(t[:, 5:])
+    return c
 
 
 def hard():
@@ -74,11 +65,5 @@ def hard():
 
 
 if __name__ == "__main__":
-    # easy()
-
-    T = t
-    for i in range(T.shape[0]):
-        t = T[i, :, :].reshape(1, t.shape[1], t.shape[2])
-        hard()
-
-    # hard()
+    easy()
+    hard()
