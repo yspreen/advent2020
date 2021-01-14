@@ -4,7 +4,7 @@ import pathlib
 import json
 from functools import reduce
 from string import ascii_lowercase
-from math import prod, gcd
+from math import prod, gcd, atan2, pi as π
 from itertools import permutations, product
 
 DIR = pathlib.Path(__file__).parent.absolute()
@@ -37,11 +37,39 @@ def easy():
                 continue
             vector = get_vector(asteroid, other)
             vectors[i].add(vector)
-    print(max(map(len, vectors.values())))
+    i, m = sorted(list(vectors.items()), key=lambda i: -len(i[1]))[0]
+    print(len(m))
+    coord.append(coord.pop(i))
+
+
+def distance(a, b):
+    return abs(b[0] - a[0]) + abs(b[1] - a[1])
+
+
+def angle(b):
+    return (atan2(b[1], -b[0]) * (180 / π)) % 360
 
 
 def hard():
-    return
+    home = coord.pop()
+    vectors = {}
+    for j, asteroid in enumerate(coord):
+        vector = get_vector(home, asteroid)
+        vectors[vector] = vectors.get(vector, [])
+        vectors[vector].append(asteroid)
+    for v in vectors.keys():
+        vectors[v].sort(key=lambda i: distance(home, i))
+    order = sorted(list(vectors.keys()), key=lambda i: angle(i))
+    destroyed = 0
+    while True:
+        for vector in order:
+            if not vectors[vector]:
+                continue
+            removed = vectors[vector].pop(0)
+            destroyed += 1
+            if destroyed == 200:
+                print(removed[1] * 100 + removed[0])
+                return
 
 
 if __name__ == "__main__":
