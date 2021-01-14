@@ -147,10 +147,35 @@ def prettyprint(t):
         t = t[:-1, :]
     while t.sum(0)[-1] == 0:
         t = t[:, :-1]
-    for r in t:
-        for e in r:
-            print("##" if e else "  ", end="")
-        print()
+    if t.shape[1] % 5:
+        t = np.pad(t, ((0, 0), (0, 1)))
+    print(ocr(t))
+
+
+OCR = {
+    422148690: "A",
+    959335004: "B",
+    422068812: "C",
+    1024344606: "E",
+    1024344592: "F",
+    422074958: "G",
+    623856210: "H",
+    203491916: "J",
+    625758866: "K",
+    554189342: "L",
+    959017488: "P",
+    959017618: "R",
+    623462988: "U",
+    588583044: "Y",
+    1008869918: "Z",
+}
+
+
+def ocr(t):
+    c = OCR[int("".join([str(i) for i in t[:, :5].reshape(-1)]), 2)]
+    if t.shape[1] > 5:
+        c += ocr(t[:, 5:])
+    return c
 
 
 def easy():
