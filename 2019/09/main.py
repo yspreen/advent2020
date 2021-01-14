@@ -106,7 +106,7 @@ def easy():
 
 
 def hard():
-    return
+    print(VM(2).calc())
 
 
 if __name__ == "__main__":
