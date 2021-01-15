@@ -132,7 +132,6 @@ class VM:
                 self.blocks += 1
 
     def calc(self, *inp):
-        from time import sleep
 
         if self.done:
             return
@@ -167,6 +166,12 @@ class VM:
                 print(tiles[i], end="")
             print()
 
+    def trim(self):
+        while self.A[-3:, :].sum() == 0:
+            self.A = self.A[:-1, :]
+        while self.A[:, -3:].sum() == 0:
+            self.A = self.A[:, :-1]
+
 
 v = VM()
 
@@ -178,6 +183,7 @@ def easy():
 
 
 def hard():
+    v.trim()
     while not v.done:
         v.print()
         v.calc(getkey())
