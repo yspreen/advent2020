@@ -165,20 +165,23 @@ v = VM()
 def easy():
     v.calc()
     print(v.blocks)
-    input()
 
 
-def hard():
+def hard(show_game=False):
     from time import sleep
 
+    if show_game:
+        print("Press enter to start.")
+        input()
     v.trim()
     while not v.done:
-        v.print()
-        sleep(0.001)
+        if show_game:
+            v.print()
+            sleep(0.001)
         v.calc(getkey())
     print(v.score)
 
 
 if __name__ == "__main__":
     easy()
-    hard()
+    hard(True)
