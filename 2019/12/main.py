@@ -6,24 +6,19 @@ from functools import reduce
 from string import ascii_lowercase
 from math import prod, gcd
 from itertools import permutations, product
+from multiprocessing import Pool
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 
 
 class Moon:
-    items = []
-
-    states = set()
-    stepcount = 0
-
     def __init__(self, x, y, z):
         self.pos = np.array([x, y, z], np.int32)
         self.vel = np.zeros_like(self.pos, np.int32)
-        Moon.items.append(self)
 
-    def update_vel(self):
-        for moon in Moon.items:
+    def update_vel(self, items):
+        for moon in items:
             if moon == self:
                 continue
             for dim in range(3):
@@ -47,22 +42,19 @@ class Moon:
     def energy(self):
         return self.potential * self.kinetic
 
-    @classmethod
-    def get_energy(cls):
-        return sum([i.energy for i in cls.items])
 
-    @classmethod
-    def hash(cls, dim=-1):
-        a = [(i.pos if dim < 0 else [i.pos[dim]]) for i in cls.items]
-        a += [(i.vel if dim < 0 else [i.vel[dim]]) for i in cls.items]
-        a = np.concatenate(a)
-        return a.data.tobytes()
+def get_energy(items):
+    return sum([i.energy for i in items])
+
+
+def hash(items, dim=-1):
+    a = [(i.pos if dim < 0 else [i.pos[dim]]) for i in items]
+    a += [(i.vel if dim < 0 else [i.vel[dim]]) for i in items]
+    a = np.concatenate(a)
+    return a.data.tobytes()
 
 
 def read():
-    Moon.items = []
-    Moon.states = set()
-    Moon.stepcount = 0
     with open(DIR / "input.txt") as f:
         t = (
             f.read()
@@ -77,26 +69,26 @@ def read():
         )
     if t[-1] == "":
         t.pop()
-    t = [Moon(*[int(i) for i in l.split(",")]) for l in t]
+    return [Moon(*[int(i) for i in l.split(",")]) for l in t]
 
 
-def step(dim=-1):
-    Moon.stepcount += 1
-    for m in Moon.items:
-        m.update_vel()
-    for m in Moon.items:
+def step(items, states=set(), dim=-1):
+    for m in items:
+        m.update_vel(items)
+    for m in items:
         m.update_pos()
-    h = Moon.hash(dim=dim)
-    if h in Moon.states:
+    h = hash(items, dim=dim)
+    if h in states:
         return True
-    Moon.states.add(h)
+    states.add(h)
 
 
 def easy():
-    read()
+    items = read()
+    i = 0
     for _ in range(1000):
-        step()
-    print(Moon.get_energy())
+        step(items)
+    print(get_energy(items))
 
 
 def lcm(a):
@@ -106,15 +98,19 @@ def lcm(a):
     return l
 
 
+def find_constraint(dim):
+    items = read()
+    states = set([hash(items, dim=dim)])
+    i = 0
+    while True:
+        i += 1
+        if step(items, states, dim=dim):
+            return i
+
+
 def hard():
-    constraints = []
-    for dim in range(3):
-        read()
-        Moon.states.add(Moon.hash(dim=dim))
-        while True:
-            if step(dim=dim):
-                constraints.append(Moon.stepcount)
-                break
+    with Pool(3) as p:
+        constraints = p.map(find_constraint, [0, 1, 2])
     print(lcm(constraints))
 
 
