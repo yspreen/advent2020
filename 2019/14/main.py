@@ -32,32 +32,37 @@ class Element:
             row[1] = self.__class__.items[row[1]]
 
     def resolve(self, amount=1):
-        if amount <= 0:
-            return [], -amount
         k = (amount - 1) // self.amount + 1
         r = []
         for a, e in self.requirements:
             r.append([a * k, e])
-        return r, self.amount % amount
+        print(
+            "producing %d x %d %s, leaving %d spare (for %d needed)"
+            % (k, self.amount, self.id, k * self.amount - amount, amount)
+        )
+        return r, k * self.amount - amount
 
     @property
     def ore_req(self):
-        req = {}
-        spares = {}
-        for a, e in self.requirements:
-            req[e] = req.get(e, 0) + a
-        while len(req) > 1:
-            for k in list(req.keys()):
-                if k == ORE:
+        need = {e: a for a, e in self.requirements}
+        have = {}
+        while len(need) > 1:
+            for element, needed in need.items():
+                if element == ORE:
                     continue
-                new_req, spare = k.resolve(req[k])
-                spares[k] = spares.get(k, 0) + spare
-                for a, e in new_req:
-                    req[e] = req.get(e, 0) + a - spares.get(e, 0)
-                    spares[e] = 0
-                del req[k]
+                needed -= have.get(element, 0)
+                if needed <= 0:
+                    have[element] = -needed
+                    del need[element]
+                    break
+                have[element] = 0
+                added_needs, spare = element.resolve(needed)
+                have[element] = have.get(element, 0) + spare
+                for a, e in added_needs:
+                    need[e] = need.get(e, 0) + a
+                del need[element]
                 break
-        return req[ORE]
+        return need[ORE]
 
 
 ORE = Element("1 ORE => 1 ORE")
