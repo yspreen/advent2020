@@ -8,35 +8,21 @@ from math import prod
 from itertools import permutations, product
 
 
-def readkey():
-    import sys
-    import tty
-    import termios
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(3)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
-
-
 def getkey():
-    k = ""
-    while k == "":
-        k = readkey()
-    if k == "\x1b[C":
-        return 1
-    elif k == "\x1b[D":
-        return -1
-    # elif k == "\x1b[A":
-    #     print("up")
-    # elif k == "\x1b[B":
-    #     print("down")
-    else:
-        return 0
+    paddle = tiles.index("=")
+    ball = tiles.index("o")
+
+    try:
+        paddle = np.where(v.A == paddle)[1][0]
+        ball = np.where(v.A == ball)[1][0]
+
+        if paddle < ball:
+            return 1
+        if paddle > ball:
+            return -1
+    except:
+        pass
+    return 0
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
@@ -183,9 +169,12 @@ def easy():
 
 
 def hard():
+    from time import sleep
+
     v.trim()
     while not v.done:
         v.print()
+        sleep(0.001)
         v.calc(getkey())
     print(v.score)
 
