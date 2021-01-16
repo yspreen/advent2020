@@ -203,7 +203,7 @@ class VM:
                     print("o", end="")
                     continue
                 print("#" if e == 1 else " ", end="")
-            print("\r")
+            print()
 
 
 v = VM()
