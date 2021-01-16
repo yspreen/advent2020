@@ -198,12 +198,16 @@ class VM:
     def print(self):
         import os
 
+        print()
         for i, r in enumerate(self.A):
             for j, e in enumerate(r):
-                if (i, j) == (self.pos[0] + self.o, self.pos[1] + self.o):
-                    print("o", end="")
+                if (i, j) == (gas[0] + self.o, gas[1] + self.o):
+                    print("[]", end="")
                     continue
-                print("#" if e == 1 else " ", end="")
+                if (i, j) == (self.pos[0] + self.o, self.pos[1] + self.o):
+                    print("><", end="")
+                    continue
+                print("##" if e == 1 else "  ", end="")
             print()
 
 
@@ -223,20 +227,15 @@ def to(pos):
 def easy():
     current_goal = None
     while v.goals:
-        # v.print()
-
         if current_goal is None:
             current_goal = v.goals.pop()
-            # print("new goal: ", current_goal)
         if v.origins[current_goal][1] != tuple(v.pos):
-            # print("too far:  ", v.origins[current_goal][1], "!=", tuple(v.pos))
             v.move(flip(direction_to_heading[v.origins[tuple(v.pos)][0]]))
         else:
-            # print("neighbor: ", v.pos)
             v.move(to(current_goal))
             current_goal = None
 
-        # sleep(0.01)
+    v.print()
     pointer = tuple(gas)
     steps = 0
     while pointer != (1, 1):
