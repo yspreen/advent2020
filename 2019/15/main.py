@@ -2,7 +2,6 @@ import numpy as np
 import re
 import pathlib
 import json
-import random
 from functools import reduce
 from string import ascii_lowercase
 from math import prod
@@ -16,35 +15,6 @@ inf = float("inf")
 def digit(num, dig):
     dig = 10 ** dig
     return (num // dig) % 10
-
-
-def readkey():
-    import sys
-    import tty
-    import termios
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(3)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
-
-
-def getkey():
-    k = ""
-    while k == "":
-        k = readkey()
-    if k == "\x1b[C":
-        return 4
-    elif k == "\x1b[D":
-        return 3
-    elif k == "\x1b[A":
-        return 1
-    elif k == "\x1b[B":
-        return 2
 
 
 directions = [
@@ -194,21 +164,6 @@ class VM:
     @property
     def direction(self):
         return directions[self.h % 4]
-
-    def print(self):
-        import os
-
-        print()
-        for i, r in enumerate(self.A):
-            for j, e in enumerate(r):
-                if (i, j) == (gas[0] + self.o, gas[1] + self.o):
-                    print("[]", end="")
-                    continue
-                if (i, j) == (self.pos[0] + self.o, self.pos[1] + self.o):
-                    print("><", end="")
-                    continue
-                print("##" if e == 1 else "  ", end="")
-            print()
 
 
 v = VM()
