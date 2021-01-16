@@ -53,6 +53,8 @@ directions = [
     (1, 0),
     (0, -1),
 ]
+heading_to_direction = {1: 0, 2: 2, 3: 3, 4: 1}
+direction_to_heading = {v: k for k, v in heading_to_direction.items()}
 
 
 class VM:
@@ -121,6 +123,14 @@ class VM:
             self.r += a
             return 2
 
+    def add_goals(self):
+        for i, d in enumerate(directions):
+            newpos = tuple([p + d[j] for j, p in enumerate(self.pos)])
+            if newpos not in self.goals:
+                self.goals.append(newpos)
+            if self.origins.get(newpos, None) is None:
+                self.origins[newpos] = (i, tuple(self.pos))
+
     def draw(self):
         if len(self.outputs) != 1:
             return
@@ -128,19 +138,26 @@ class VM:
         newpos = [p + self.direction[i] for i, p in enumerate(self.pos)]
         if status > 0:
             self.pos = newpos
+            self.add_goals()
         else:
-            self.A[tuple(newpos)] = 1
+            self.setA(newpos, 1)
         if not (
-            0 < self.pos[0] < self.A.shape[0] - 1
-            and 0 < self.pos[1] < self.A.shape[1] - 1
+            0 < (self.pos[0] + self.o) < self.A.shape[0] - 1
+            and 0 < (self.pos[1] + self.o) < self.A.shape[1] - 1
         ):
             self.pad()
         if status == 2:
             self.done = True
 
     def move(self, heading):
-        self.h = {1: 0, 2: 2, 3: 3, 4: 1}[heading]
+        self.h = heading_to_direction[heading]
         self.calc(heading)
+
+    def getA(self, pos):
+        return self.A[pos[0] + self.o, pos[1] + self.o]
+
+    def setA(self, pos, v):
+        self.A[pos[0] + self.o, pos[1] + self.o] = v
 
     def calc(self, *inp):
         if self.done:
@@ -156,17 +173,19 @@ class VM:
     def pad(self):
         n = self.A.shape[0] // 2
         self.A = np.pad(self.A, ((n, n), (n, n)))
-        self.pos = [p + n for p in self.pos]
+        self.o += n
 
     def __init__(self):
         self.read()
         self.outputs = []
         self.inputs = []
 
-        self.h = self.i = self.d = self.r = 0
+        self.h = self.o = self.i = self.d = self.r = 0
         self.A = np.zeros((4, 4), np.int32)
         self.pos = [1, 1]
         self.done = False
+        self.goals = []
+        self.origins = {}
 
     @property
     def direction(self):
@@ -177,7 +196,7 @@ class VM:
 
         for i, r in enumerate(self.A):
             for j, e in enumerate(r):
-                if (i, j) == tuple(self.pos):
+                if (i, j) == (self.pos[0] + self.o, self.pos[1] + self.o):
                     print("o", end="")
                     continue
                 print("#" if e == 1 else " ", end="")
