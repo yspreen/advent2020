@@ -222,7 +222,7 @@ def to(pos):
 def easy():
     current_goal = None
     while not v.done:
-        v.print()
+        # v.print()
 
         if current_goal is None:
             current_goal = v.goals.pop()
@@ -235,8 +235,13 @@ def easy():
             v.move(to(current_goal))
             current_goal = None
 
-        sleep(0.01)
-    print(v.pos)
+        # sleep(0.01)
+    pointer = tuple(v.pos)
+    steps = 0
+    while pointer != (1, 1):
+        steps += 1
+        pointer = v.origins[pointer][1]
+    print(steps)
 
 
 def hard():
