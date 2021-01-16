@@ -55,6 +55,7 @@ directions = [
 ]
 heading_to_direction = {1: 0, 2: 2, 3: 3, 4: 1}
 direction_to_heading = {v: k for k, v in heading_to_direction.items()}
+gas = [0, 0]
 
 
 class VM:
@@ -148,7 +149,7 @@ class VM:
         ):
             self.pad()
         if status == 2:
-            self.done = True
+            gas[0], gas[1] = self.pos[0], self.pos[1]
 
     def move(self, heading):
         self.h = heading_to_direction[heading]
@@ -221,7 +222,7 @@ def to(pos):
 
 def easy():
     current_goal = None
-    while not v.done:
+    while v.goals:
         # v.print()
 
         if current_goal is None:
@@ -236,7 +237,7 @@ def easy():
             current_goal = None
 
         # sleep(0.01)
-    pointer = tuple(v.pos)
+    pointer = tuple(gas)
     steps = 0
     while pointer != (1, 1):
         steps += 1
