@@ -126,8 +126,9 @@ class VM:
     def add_goals(self):
         for i, d in enumerate(directions):
             newpos = tuple([p + d[j] for j, p in enumerate(self.pos)])
-            if newpos not in self.goals:
+            if newpos not in self.visited:
                 self.goals.append(newpos)
+                self.visited.append(newpos)
             if self.origins.get(newpos, None) is None:
                 self.origins[newpos] = (i, tuple(self.pos))
 
@@ -185,7 +186,9 @@ class VM:
         self.pos = [1, 1]
         self.done = False
         self.goals = []
+        self.visited = []
         self.origins = {}
+        self.add_goals()
 
     @property
     def direction(self):
@@ -206,13 +209,32 @@ class VM:
 v = VM()
 
 
+def flip(heading):
+    return heading + (heading % 2) - (1 - heading % 2)
+
+
+def to(pos):
+    direction = (pos[0] - v.pos[0], pos[1] - v.pos[1])
+    direction = directions.index(direction)
+    return direction_to_heading[direction]
+
+
 def easy():
+    current_goal = None
     while not v.done:
         v.print()
-        k = getkey()
-        if k is None:
-            return
-        v.move(k)
+
+        if current_goal is None:
+            current_goal = v.goals.pop()
+            # print("new goal: ", current_goal)
+        if v.origins[current_goal][1] != tuple(v.pos):
+            # print("too far:  ", v.origins[current_goal][1], "!=", tuple(v.pos))
+            v.move(flip(direction_to_heading[v.origins[tuple(v.pos)][0]]))
+        else:
+            # print("neighbor: ", v.pos)
+            v.move(to(current_goal))
+            current_goal = None
+
         sleep(0.01)
     print(v.pos)
 
