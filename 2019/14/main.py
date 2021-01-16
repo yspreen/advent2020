@@ -31,20 +31,17 @@ class Element:
         for row in self.requirements:
             row[1] = self.__class__.items[row[1]]
 
-    def resolve(self, amount=1):
+    def resolve(self, amount=1, decimal=False):
         k = (amount - 1) // self.amount + 1
+        if decimal:
+            k = amount / self.amount
         r = []
         for a, e in self.requirements:
             r.append([a * k, e])
-        print(
-            "producing %d x %d %s, leaving %d spare (for %d needed)"
-            % (k, self.amount, self.id, k * self.amount - amount, amount)
-        )
-        return r, k * self.amount - amount
+        return r, (0 if decimal else k * self.amount - amount)
 
-    @property
-    def ore_req(self):
-        need = {e: a for a, e in self.requirements}
+    def ore_req(self, num=1, decimal=False):
+        need = {e: a * num for a, e in self.requirements}
         have = {}
         while len(need) > 1:
             for element, needed in need.items():
@@ -56,13 +53,13 @@ class Element:
                     del need[element]
                     break
                 have[element] = 0
-                added_needs, spare = element.resolve(needed)
+                added_needs, spare = element.resolve(needed, decimal=decimal)
                 have[element] = have.get(element, 0) + spare
                 for a, e in added_needs:
                     need[e] = need.get(e, 0) + a
                 del need[element]
                 break
-        return need[ORE]
+        return need.get(ORE, 0)
 
 
 ORE = Element("1 ORE => 1 ORE")
@@ -81,11 +78,17 @@ read()
 
 
 def easy():
-    print(Element.items["FUEL"].ore_req)
+    print(Element.items["FUEL"].ore_req())
 
 
 def hard():
-    return
+    N = int(1e12)
+
+    i = int(Element.items["FUEL"].ore_req(1, True)) + 1
+    i = N // i
+    while Element.items["FUEL"].ore_req(i + 1) < N:
+        i += 1
+    print(i)
 
 
 if __name__ == "__main__":
