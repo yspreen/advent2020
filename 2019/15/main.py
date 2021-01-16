@@ -18,6 +18,35 @@ def digit(num, dig):
     return (num // dig) % 10
 
 
+def readkey():
+    import sys
+    import tty
+    import termios
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(3)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+
+def getkey():
+    k = ""
+    while k == "":
+        k = readkey()
+    if k == "\x1b[C":
+        return 4
+    elif k == "\x1b[D":
+        return 3
+    elif k == "\x1b[A":
+        return 1
+    elif k == "\x1b[B":
+        return 2
+
+
 directions = [
     (-1, 0),
     (0, 1),
@@ -144,13 +173,15 @@ class VM:
         return directions[self.h % 4]
 
     def print(self):
+        import os
+
         for i, r in enumerate(self.A):
             for j, e in enumerate(r):
                 if (i, j) == tuple(self.pos):
                     print("o", end="")
                     continue
                 print("#" if e == 1 else " ", end="")
-            print()
+            print("\r")
 
 
 v = VM()
@@ -158,8 +189,11 @@ v = VM()
 
 def easy():
     while not v.done:
-        v.move(random.randint(1, 4))
         v.print()
+        k = getkey()
+        if k is None:
+            return
+        v.move(k)
         sleep(0.01)
     print(v.pos)
 
