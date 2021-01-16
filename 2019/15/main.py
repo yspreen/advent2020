@@ -235,7 +235,6 @@ def easy():
             v.move(to(current_goal))
             current_goal = None
 
-    v.print()
     pointer = tuple(gas)
     steps = 0
     while pointer != (1, 1):
@@ -244,8 +243,29 @@ def easy():
     print(steps)
 
 
+def neighbors(pos):
+    n = []
+    for d in directions:
+        n.append((pos[0] + d[0], pos[1] + d[1]))
+    return n
+
+
 def hard():
-    return
+    p = (gas[0] + v.o, gas[1] + v.o)
+    cost = {p: 0}
+    visited = set(p)
+    goal = [p]
+
+    while goal:
+        p = goal.pop(0)
+        for n in neighbors(p):
+            if n in visited or v.A[n] == 1:
+                continue
+            cost[n] = cost[p] + 1
+            goal.append(n)
+            visited.add(n)
+
+    print(max(cost.values()))
 
 
 if __name__ == "__main__":
