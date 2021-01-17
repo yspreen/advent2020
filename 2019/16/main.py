@@ -12,37 +12,77 @@ DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 
 
-def read():
+def read(n=1):
     with open(DIR / "input.txt") as f:
-        t = f.read().split("\n")[0]
-    return [int(i) for i in t]
+        t = f.read().split("\n")[0] * n
+    return np.array([int(i) for i in t], np.int32)
 
 
 t = read()
+N = len(t)
+t_ = np.zeros_like(t)
 pattern = [0, 1, 0, -1]
-
 patterns = {}
+raw_patterns = {}
 
 
 def get_pattern(n):
+    # print("> ", n)
     if patterns.get(n, None) is None:
         patterns[n] = get_pattern_(n)
     return patterns[n]
 
 
-def get_pattern_(n):
+def get_pattern_raw(n):
+    if raw_patterns.get(n, None) is None:
+        if raw_patterns.get(n - 1, None) is None:
+            raw_patterns[n] = get_pattern_raw_(n)
+        else:
+            raw_patterns[n] = iterate(raw_patterns[n - 1])
+    return raw_patterns[n]
+
+
+def iterate(pattern):
+    pattern_ = np.zeros_like(pattern)
+    last = None
+    i = 0
+    for p in pattern:
+        pattern_[i] = p
+        i += 1
+        if i == N + 1:
+            break
+        if last != p:
+            pattern_[i] = p
+            i += 1
+            if i == N + 1:
+                break
+        last = p
+    return pattern_
+
+
+def get_pattern_raw_(n):
     p = [[i] * (n + 1) for i in pattern]
-    return [i for sublist in p * (len(t) // 3) for i in sublist][1 : len(t) + 1]
+    a = np.array(
+        [i for sublist in p * (len(t) // len(p) + 1) for i in sublist],
+        np.int32,
+    )
+    return a[: len(t) + 1]
+
+
+def get_pattern_(n):
+    a = get_pattern_raw(n)[1:]
+    plus = np.where(a == 1)
+    minus = np.where(a == -1)
+    return plus, minus
 
 
 def step():
-    global t
-    t_ = []
-    for i in range(len(t)):
-        p = get_pattern(i)
-        s = sum(map(prod, zip(t, p)))
-        t_.append(abs(s) % 10)
-    t = t_
+    global t, t_
+    for i in range(N):
+        plus, minus = get_pattern(i)
+        s = t[plus].sum() - t[minus].sum()
+        t_[i] = abs(s) % 10
+    t, t_ = t_, t
 
 
 def easy():
@@ -52,7 +92,15 @@ def easy():
 
 
 def hard():
-    return
+    global t, patterns, raw_patterns, N
+    patterns = {}
+    raw_patterns = {}
+    t = read(10000)
+    N = len(t)
+    for i in range(100):
+        # print(i)
+        step()
+    print("".join(map(str, t[:8])))
 
 
 if __name__ == "__main__":
