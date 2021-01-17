@@ -43,21 +43,19 @@ def get_pattern_raw(n):
 
 
 def iterate(pattern):
-    pattern_ = np.zeros_like(pattern)
-    last = None
-    i = 0
-    for p in pattern:
-        pattern_[i] = p
+    # print("i", N)
+    last = 0
+    i = -1
+    while True:
         i += 1
-        if i == N + 1:
+        if i >= N + 1:
             break
+        p = pattern[i]
         if last != p:
-            pattern_[i] = p
+            pattern = np.insert(pattern, i, last)[: N + 1]
             i += 1
-            if i == N + 1:
-                break
         last = p
-    return pattern_
+    return pattern
 
 
 def get_pattern_raw_(n):
