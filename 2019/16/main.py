@@ -15,12 +15,12 @@ inf = float("inf")
 def read(n=1):
     with open(DIR / "input.txt") as f:
         t = f.read().split("\n")[0] * n
-    return np.array([int(i) for i in t], np.int32)
+    return np.array([int(i) for i in t], np.int64)
 
 
 t = read()
 N = len(t)
-t_ = np.zeros_like(t)
+t_ = np.zeros_like(t, np.int64)
 pattern = [0, 1, 0, -1]
 patterns = {}
 raw_patterns = {}
@@ -88,7 +88,7 @@ def step():
             y = j // (i + 1)
             if y >= N:
                 continue
-            t_[y] = trim(t_[y] + t[j - 1] * x)
+            t_[y] = t_[y] + t[j - 1] * x
     for i in range(N):
         if i < N - 1:
             t_[i + 1] += t_[i]
@@ -103,10 +103,11 @@ def easy():
 
 
 def hard():
-    global t, patterns, raw_patterns, N
+    global t, t_, patterns, raw_patterns, N
     patterns = {}
     raw_patterns = {}
     t = read(10000)
+    t_ = np.zeros_like(t, np.int64)
     N = len(t)
     for i in range(100):
         # print(i)
