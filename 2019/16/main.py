@@ -34,11 +34,16 @@ def pattern_row(n):
     except:
         pass
 
-    p = [[i] * (n + 1) for i in base]
+    p = [[i] * (n + 1) for i in base][: N + 1]
     a = np.array(
         [i for sublist in p * (N // len(p) + 1) for i in sublist],
         np.int32,
     )[1 : N + 1]
+
+    plus = np.where(a == 1)
+    minus = np.where(a == -1)
+    a = (plus, minus)
+
     pattern[n] = a
     return a
 
@@ -51,12 +56,12 @@ def phase(i, n):
     if n == 0:
         p = t[i]
     else:
-        pattern = pattern_row(i)
+        plus, minus = pattern_row(i)
         p = 0
-        for j, x in enumerate(pattern):
-            if x == 0:
-                continue
-            p += x * phase(j, n - 1)
+        for j in plus[0]:
+            p += phase(j, n - 1)
+        for j in minus[0]:
+            p -= phase(j, n - 1)
     p = abs(p) % 10
     phases[n][i] = p
     return p
