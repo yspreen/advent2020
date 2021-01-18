@@ -27,7 +27,7 @@ raw_patterns = {}
 
 
 def get_pattern(n):
-    # print("> ", n)
+    print("> ", n)
     if patterns.get(n, None) is None:
         patterns[n] = get_pattern_(n)
     return patterns[n]
@@ -47,6 +47,7 @@ def iterate(pattern):
     last = 0
     i = -1
     while True:
+        print(">> ", i)
         i += 1
         if i >= N + 1:
             break
@@ -74,12 +75,24 @@ def get_pattern_(n):
     return plus, minus
 
 
+def trim(i):
+    return (i % 10) - (0 if i > 0 else 10)
+
+
 def step():
     global t, t_
+    t_ *= 0
     for i in range(N):
-        plus, minus = get_pattern(i)
-        s = t[plus].sum() - t[minus].sum()
-        t_[i] = abs(s) % 10
+        x = [-1, 1, 1, -1][i % 4]
+        for j in range(1, N + 1):
+            y = j // (i + 1)
+            if y >= N:
+                continue
+            t_[y] = trim(t_[y] + t[j - 1] * x)
+    for i in range(N):
+        if i < N - 1:
+            t_[i + 1] += t_[i]
+        t_[i] = abs(t_[i]) % 10
     t, t_ = t_, t
 
 
