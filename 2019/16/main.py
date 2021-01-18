@@ -13,106 +13,69 @@ inf = float("inf")
 
 
 def read(n=1):
+    global t, N, OFF, base, pattern, phases
     with open(DIR / "input.txt") as f:
-        t = f.read().split("\n")[0] * n
-    return np.array([int(i) for i in t], np.int64)
+        t_ = f.read().split("\n")[0] * n
+    t = np.array([int(i) for i in t_], np.int64)
+    N = len(t)
+    OFF = 0 if n == 1 else int(t_[:7])
+    base = [0, 1, 0, -1]
+    pattern = {}
+    phases = [{} for _ in range(100 + 1)]
 
 
-t = read()
-N = len(t)
-t_ = np.zeros_like(t, np.int64)
-pattern = [0, 1, 0, -1]
-patterns = {}
-raw_patterns = {}
+t = N = OFF = base = pattern = phases = 0
+read()
 
 
-def get_pattern(n):
-    print("> ", n)
-    if patterns.get(n, None) is None:
-        patterns[n] = get_pattern_(n)
-    return patterns[n]
+def pattern_row(n):
+    try:
+        return pattern[n]
+    except:
+        pass
 
-
-def get_pattern_raw(n):
-    if raw_patterns.get(n, None) is None:
-        if raw_patterns.get(n - 1, None) is None:
-            raw_patterns[n] = get_pattern_raw_(n)
-        else:
-            raw_patterns[n] = iterate(raw_patterns[n - 1])
-    return raw_patterns[n]
-
-
-def iterate(pattern):
-    # print("i", N)
-    last = 0
-    i = -1
-    while True:
-        print(">> ", i)
-        i += 1
-        if i >= N + 1:
-            break
-        p = pattern[i]
-        if last != p:
-            pattern = np.insert(pattern, i, last)[: N + 1]
-            i += 1
-        last = p
-    return pattern
-
-
-def get_pattern_raw_(n):
-    p = [[i] * (n + 1) for i in pattern]
+    p = [[i] * (n + 1) for i in base]
     a = np.array(
-        [i for sublist in p * (len(t) // len(p) + 1) for i in sublist],
+        [i for sublist in p * (N // len(p) + 1) for i in sublist],
         np.int32,
-    )
-    return a[: len(t) + 1]
+    )[1 : N + 1]
+    pattern[n] = a
+    return a
 
 
-def get_pattern_(n):
-    a = get_pattern_raw(n)[1:]
-    plus = np.where(a == 1)
-    minus = np.where(a == -1)
-    return plus, minus
-
-
-def trim(i):
-    return (i % 10) - (0 if i > 0 else 10)
-
-
-def step():
-    global t, t_
-    t_ *= 0
-    for i in range(N):
-        x = [-1, 1, 1, -1][i % 4]
-        for j in range(1, N + 1):
-            y = j // (i + 1)
-            if y >= N:
+def phase(i, n):
+    try:
+        return phases[n][i]
+    except:
+        pass
+    if n == 0:
+        p = t[i]
+    else:
+        pattern = pattern_row(i)
+        p = 0
+        for j, x in enumerate(pattern):
+            if x == 0:
                 continue
-            t_[y] = t_[y] + t[j - 1] * x
-    for i in range(N):
-        if i < N - 1:
-            t_[i + 1] += t_[i]
-        t_[i] = abs(t_[i]) % 10
-    t, t_ = t_, t
+            p += x * phase(j, n - 1)
+    p = abs(p) % 10
+    phases[n][i] = p
+    return p
+
+
+def calc():
+    r = []
+    for i in range(OFF, OFF + 8):
+        r.append(phase(i, 100))
+    return r
 
 
 def easy():
-    for _ in range(100):
-        step()
-    print("".join(map(str, t[:8])))
+    print("".join(map(str, calc())))
 
 
 def hard():
-    global t, t_, patterns, raw_patterns, N
-    patterns = {}
-    raw_patterns = {}
-    t = read(10000)
-    t_ = np.zeros_like(t, np.int64)
-    N = len(t)
-    for i in range(100):
-        # print(i)
-        step()
-    print("".join(map(str, t[:8])))
+    read(10000)
+    print("".join(map(str, calc())))
 
 
 if __name__ == "__main__":
