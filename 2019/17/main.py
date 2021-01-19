@@ -94,7 +94,7 @@ class VM:
             return 2
 
     def draw(self):
-        if len(self.outputs) != 1:
+        if len(self.outputs) != 1 or self.move_vacs:
             return
         char = self.outputs.pop()
         if char == 10:
@@ -119,12 +119,13 @@ class VM:
             self.i += self.d
             self.d = self.op(self.i)
             self.draw()
+        return self.outputs
 
     def pad(self):
         n = self.A.shape[0]
         self.A = np.pad(self.A, ((0, n), (0, n)))
 
-    def __init__(self):
+    def __init__(self, move_vacs=False):
         self.read()
         self.outputs = []
         self.inputs = []
@@ -134,6 +135,8 @@ class VM:
         self.pos = [0, 0]
         self.v = [0, 0]
         self.done = False
+        self.move_vacs = move_vacs
+        self.t[0] = 2 if move_vacs else 1
 
     @property
     def direction(self):
@@ -214,34 +217,34 @@ def hard():
             ended = True
 
     program_ = [i for i in program]
-    for _ in range(1000):
-        program = [i for i in program_]
-        subs = []
-        for _ in range(3):
-            candidates = []
-            for i in range(len(program) - 1):
-                last_c = 0
-                for j in range(i + 2, len(program) + 1):
-                    sub = program[i:j]
-                    c = count(program, sub)
-                    if len(",".join(sub)) > 20 or "x" in sub:
-                        break
-                    candidates.append(((c ** 0.5) * (j - i), program[i:j]))
-                    if c < 2:
-                        break
-                    last_c = c
-            candidates.sort(key=lambda i: i[0])
-            sub = candidates[-random.randint(1, 4)]
-            subs.append(sub)
-            sub = ",".join(sub[-1])
-            program = ",".join(program).replace(sub, "x").split(",")
+    # for _ in range(1000):
+    #     program = [i for i in program_]
+    subs = []
+    for _ in range(3):
+        candidates = []
+        for i in range(len(program) - 1):
+            last_c = 0
+            for j in range(i + 2, len(program) + 1):
+                sub = program[i:j]
+                c = count(program, sub)
+                if len(",".join(sub)) > 20 or "x" in sub:
+                    break
+                candidates.append(((c ** 0.5) * (j - i), program[i:j]))
+                if c < 2:
+                    break
+                last_c = c
+        candidates.sort(key=lambda i: i[0])
+        sub = candidates[-random.randint(1, 4)]
+        sub = ",".join(sub[-1])
+        subs.append(sub)
+        program = ",".join(program).replace(sub, "x").split(",")
 
-        program = "".join(program)
-        if program.count("x") == len(program) and len(program) <= 20:
-            break
+    program = ",".join(program_)
 
-    print(program)
-    print(*subs, sep="\n")
+    for i, a in enumerate(["A", "B", "C"]):
+        program = program.replace(subs[i], a)
+    program = [ord(i) for i in ("\n".join([program] + subs) + "\nn\n")]
+    print(VM(True).calc(*program)[-1])
 
 
 if __name__ == "__main__":
