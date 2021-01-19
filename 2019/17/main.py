@@ -194,55 +194,45 @@ def count(a, b):
 
 
 def hard():
-    p = [i for i in v.v]
-    h = v.h
     l = 0
     program = []
     ended = False
     while not ended:
-        if nextpos(v.A, p, h) == 1:
-            move(p, h)
+        if nextpos(v.A, v.v, v.h) == 1:
+            move(v.v, v.h)
             l += 1
             continue
         if l or program:
             program.append(str(l))
         l = 0
-        if nextpos(v.A, p, (h + 1) % 4) == 1:
+        if nextpos(v.A, v.v, (v.h + 1) % 4) == 1:
             program.append("R")
-            h = (h + 1) % 4
-        elif nextpos(v.A, p, (h - 1) % 4) == 1:
+            v.h = (v.h + 1) % 4
+        elif nextpos(v.A, v.v, (v.h - 1) % 4) == 1:
             program.append("L")
-            h = (h - 1) % 4
+            v.h = (v.h - 1) % 4
         else:
             ended = True
 
     program_ = [i for i in program]
-    # for _ in range(1000):
-    #     program = [i for i in program_]
     subs = []
-    for _ in range(3):
+    for A in ["A", "B", "C"]:
         candidates = []
         for i in range(len(program) - 1):
-            last_c = 0
             for j in range(i + 2, len(program) + 1):
                 sub = program[i:j]
                 c = count(program, sub)
-                if len(",".join(sub)) > 20 or "x" in sub:
+                if len(",".join(sub)) > 20 or "A" in sub or "B" in sub:
                     break
                 candidates.append(((c ** 0.5) * (j - i), program[i:j]))
                 if c < 2:
                     break
-                last_c = c
         candidates.sort(key=lambda i: i[0])
-        sub = candidates[-random.randint(1, 4)]
-        sub = ",".join(sub[-1])
+        sub = ",".join(candidates[-1][-1])
         subs.append(sub)
-        program = ",".join(program).replace(sub, "x").split(",")
+        program = ",".join(program).replace(sub, A).split(",")
 
-    program = ",".join(program_)
-
-    for i, a in enumerate(["A", "B", "C"]):
-        program = program.replace(subs[i], a)
+    program = ",".join(program)
     program = [ord(i) for i in ("\n".join([program] + subs) + "\nn\n")]
     print(VM(True).calc(*program)[-1])
 
