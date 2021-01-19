@@ -100,14 +100,16 @@ class VM:
         char = self.outputs.pop()
         if self.move_vacs and VID == "y":
             if self.l == 10 and char == 10:
-                sleep(1)
+                self.pos[0] = -1
+                pprint(self.A)
             self.l = char
-            return print(chr(char), end="")
         if char == 10:
             self.pos[0] += 1
             self.pos[1] = 0
         else:
             self.A[tuple(self.pos)] = 0 if char == 46 else 1
+            if self.move_vacs:
+                self.A[tuple(self.pos)] = char
             if char in vac:
                 self.v = [i for i in self.pos]
                 self.h = vac.index(char)
@@ -165,12 +167,13 @@ def find_match(A, B):
 
 
 def pprint(t):
+    t[t == ord(".")] = 0
     p = np.where(t != 0)
     t = t[min(p[0]) : max(p[0]) + 1, min(p[1]) : max(p[1]) + 1]
 
     for r in t:
         for e in r:
-            print("#" if e else " ", end="")
+            print(chr(e) if e else " ", end="")
         print()
 
 
