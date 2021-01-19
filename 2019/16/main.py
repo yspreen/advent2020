@@ -23,11 +23,36 @@ def read(n=1):
 
 
 t = N = OFF = 0
-read()
+pattern = [0, 1, 0, -1]
+patterns = {}
+
+
+def get_pattern(n):
+    if patterns.get(n, None) is None:
+        patterns[n] = get_pattern_(n)
+    return patterns[n]
+
+
+def get_pattern_(n):
+    p = [[i] * (n + 1) for i in pattern]
+    return [i for sublist in p * (N // 3) for i in sublist][1 : N + 1]
+
+
+def step():
+    global t
+    t_ = []
+    for i in range(N):
+        p = get_pattern(i)
+        s = sum(map(prod, zip(t, p)))
+        t_.append(abs(s) % 10)
+    t = t_
 
 
 def easy():
-    return
+    read()
+    for _ in range(100):
+        step()
+    print("".join(map(str, t[:8])))
 
 
 def get_t(i):
