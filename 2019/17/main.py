@@ -11,6 +11,7 @@ from time import sleep
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
+VID = "n"
 
 
 def digit(num, dig):
@@ -94,9 +95,14 @@ class VM:
             return 2
 
     def draw(self):
-        if len(self.outputs) != 1 or self.move_vacs:
+        if len(self.outputs) != 1 or self.outputs[0] > 1000:
             return
         char = self.outputs.pop()
+        if self.move_vacs and VID == "y":
+            if self.l == 10 and char == 10:
+                sleep(1)
+            self.l = char
+            return print(chr(char), end="")
         if char == 10:
             self.pos[0] += 1
             self.pos[1] = 0
@@ -130,7 +136,7 @@ class VM:
         self.outputs = []
         self.inputs = []
 
-        self.h = self.i = self.d = self.r = 0
+        self.h = self.l = self.i = self.d = self.r = 0
         self.A = np.zeros((2, 2), np.int32)
         self.pos = [0, 0]
         self.v = [0, 0]
@@ -233,7 +239,7 @@ def hard():
         program = ",".join(program).replace(sub, A).split(",")
 
     program = ",".join(program)
-    program = [ord(i) for i in ("\n".join([program] + subs) + "\nn\n")]
+    program = [ord(i) for i in ("\n".join([program] + subs) + "\n%s\n" % VID)]
     print(VM(True).calc(*program)[-1])
 
 
