@@ -16,7 +16,7 @@ def read(n=1):
     global t, N, OFF, base, pattern, phases
     with open(DIR / "input.txt") as f:
         t_ = f.read().split("\n")[0] * n
-    t = np.array([int(i) for i in t_], np.int64)
+    t = np.array([int(i) for i in t_], np.int16)
     N = len(t)
     OFF = 0 if n == 1 else int(t_[:7])
     base = [0, 1, 0, -1]
@@ -28,24 +28,43 @@ t = N = OFF = base = pattern = phases = 0
 read()
 
 
+def encode(arr):
+    r = []
+    last = 0
+    curr = None
+    for i in range(len(arr)):
+        a = arr[i]
+        if a != last:
+            if a != 0:
+                curr = (a, i)
+            else:
+                r.append((curr[0], curr[1], i))
+                curr = None
+        last = a
+    if curr is not None:
+        r.append((curr[0], curr[1], len(arr)))
+    return r
+
+
 def pattern_row(n):
     try:
         return pattern[n]
     except:
         pass
 
-    p = [[i] * (n + 1) for i in base][: N + 1]
-    a = np.array(
-        [i for sublist in p * (N // len(p) + 1) for i in sublist],
-        np.int32,
-    )[1 : N + 1]
+    i = n
+    r = []
+    while i < N + 1:
+        r.append(i - 1)
+        i += n
+    r.append(N)
+    x = 1
+    for i in range(len(r) - 1):
+        r[i] = (x, r[i], r[i + 1])
+        x = -x
+    r.pop()
 
-    plus = np.where(a == 1)
-    minus = np.where(a == -1)
-    a = (plus, minus)
-
-    pattern[n] = a
-    return a
+    return r
 
 
 def phase(i, n):
@@ -75,12 +94,21 @@ def calc():
 
 
 def easy():
-    print("".join(map(str, calc())))
+    print(pattern_row(4))  # print("".join(map(str, calc())))
 
 
 def hard():
     read(10000)
-    print("".join(map(str, calc())))
+    # print("".join(map(str, calc())))
+    print(OFF, pattern_row(OFF))
+
+    lower = OFF
+    upper = OFF + 8
+    for _ in range(100):
+        lower = pattern_row(lower)[0][1]
+        upper = pattern_row(upper)[-1][2] - 1
+    print(pattern_row(lower))
+    print(pattern_row(upper))
 
 
 if __name__ == "__main__":
