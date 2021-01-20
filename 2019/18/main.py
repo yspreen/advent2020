@@ -43,7 +43,7 @@ def neighbors(pos):
 
 def bfs(c=-2, initial=True):
     pos = c_pos(c)
-    t[np.where(t == -2)] = 0
+    # t[np.where(t == -2)] = 0
 
     cost = {pos: 0}
     chain = {pos: []}
@@ -72,19 +72,69 @@ def bfs(c=-2, initial=True):
     return cost, chain, chain_starts
 
 
+class Letter:
+    items = {}
+
+    def __init__(self, c, parent):
+        if self.items.get(c, None) is not None:
+            return
+        self.items[c] = self
+        self.c = c
+        self.parent = parent
+        self.children = []
+        self.req = []
+        try:
+            self.items[parent].children.append(c)
+        except:
+            pass
+
+    def calc(self, cost, parent_req=[]):
+        # add all path requirements
+        self.req.extend(parent_req)
+        if self.parent is not None and self.parent >= 100:
+            self.req.append(self.parent - 100)
+
+        # set distances to children
+        for c in self.children:
+            distances[(self.c, c)] = distances[(c, self.c)] = (
+                cost[c_pos(c)] - cost[c_pos(self.c)]
+            )
+
+        # find same layer neighbors with bfs
+        if len(self.children) > 1:
+            for c in self.children:
+                ds = bfs(c, False)
+                for o in self.children:
+                    op = c_pos(o)
+                    distances[(c, o)] = distances[(o, c)] = ds[op]
+
+        # inherit distances of parent
+        if self.parent != 0 and self.parent != None:
+            pd = distances[(self.c, self.parent)]
+            for k, v in list(distances.items()):
+                if self.parent in k and self.c not in k:
+                    k = k[0] if self.parent == k[1] else k[1]
+                    if distances.get((self.c, k), None) is not None:
+                        continue
+                    distances[(self.c, k)] = distances[(k, self.c)] = v + pd
+
+        # calculate children distances
+        _ = [self.items[c].calc(cost, self.req) for c in self.children]
+
+
+Letter(0, None)
+
+
 def c_pos(c):
     return tuple(map(lambda i: i[0], np.where(t == c)))
 
 
+distances = {}
+
+
 def easy():
+    global distances
     cost, chain, chain_starts = bfs()
-    distances = {}
-    for c in list(chain_starts):
-        distances[(0, c)] = distances[(c, 0)] = cost[c_pos(c)]
-        ds = bfs(c, False)
-        for o in [i for i in chain_starts if i != c]:
-            op = c_pos(o)
-            distances[(c, o)] = distances[(o, c)] = ds[op]
 
     # print(chain)
     # print(rev_replacements[12])
@@ -97,8 +147,15 @@ def easy():
     chains = [chain[k] for k in chains]
     chains = {k: sorted([i for i in chains if k in i]) for k in chain_starts}
     for k, v in chains.items():
-        for c in v:
-            c = c[-1]
+        for cs in v:
+            cs = [0] + cs
+            for i in range(1, len(cs)):
+                Letter(cs[i], cs[i - 1])
+    Letter.items[0].calc(cost)
+
+    # print(list(map(lambda a: rev_replacements[a], Letter.items[replacements["h"]].req)))
+    distances = {k: v for k, v in distances.items() if sum(k) < 100}
+    print(len(distances))
 
 
 def hard():
