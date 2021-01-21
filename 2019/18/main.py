@@ -133,7 +133,7 @@ def c_pos(c):
 
 
 def optimal(paths, chain=[]):
-    skip = len(chain)
+    skip = len(chain) - 1 if chain else 0
     m = (inf, 0)
     for p in paths:
         c = 0
