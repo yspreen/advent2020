@@ -42,13 +42,13 @@ def neighbors(pos):
     return n
 
 
-def bfs(c=-2, initial=True):
+def bfs(c=0, initial=True):
     pos = c_pos(c)
     # t[np.where(t == -2)] = 0
 
     cost = {pos: 0}
     chain = {pos: []}
-    visited = set(pos)
+    visited = set([pos])
     goal = [pos]
     chain_starts = set()
 
