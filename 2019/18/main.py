@@ -24,17 +24,6 @@ def read(n=1):
     return np.array(t, np.int32)
 
 
-t = read()
-N = t[t < 100].max()
-
-directions = [
-    (-1, 0),
-    (0, 1),
-    (1, 0),
-    (0, -1),
-]
-
-
 def neighbors(pos):
     n = []
     for d in directions:
@@ -123,27 +112,32 @@ class Letter:
         _ = [self.items[c].calc(cost, self.req) for c in self.children]
 
 
-Letter(0, None)
-
-
 def c_pos(c):
     c = -2 if c == 0 else c
     return tuple(map(lambda i: i[0], np.where(t == c)))
 
 
+def sub_paths(p):
+    if PART == 1:
+        return [p]
+    sub = [[] for _ in range(4)]
+    for i in p:
+        sub[quadrant(i)].append(i)
+    return sub
+
+
 def optimal(paths, chain=[]):
     skip = len(chain) - 1 if chain else 0
     m = (inf, 0)
-    for p in paths:
+    for p_ in paths:
         c = 0
-        for i in range(1 + skip, len(p)):
-            c += distances[(p[i], p[i - 1])]
+        p = p_[skip:]
+        for p in sub_paths(p):
+            for i in range(1, len(p)):
+                c += distances[(p[i], p[i - 1])]
         if c < m[0]:
-            m = (c, p)
+            m = (c, p_)
     return m
-
-
-cache = {}
 
 
 def options(seen, next, chain, pr=0):
@@ -178,9 +172,6 @@ def options(seen, next, chain, pr=0):
     return [result]
 
 
-distances = {}
-
-
 def easy():
     global distances
     cost, chain, chain_starts = bfs()
@@ -205,19 +196,64 @@ def easy():
 
     # print(list(map(lambda a: rev_replacements[a], Letter.items[replacements["h"]].req)))
     distances = {k: v for k, v in distances.items() if sum(k) < 100}
+    shortest(start)
 
+
+def shortest(start):
     opt = options(
-        set([0]),
+        set([0] if PART == 1 else imaginaries + [0]),
         [c for c in start.children if c < 100 and not Letter.items[c].req],
-        [0],
-        1,
+        [0] if PART == 1 else imaginaries,
     )
-    print(optimal(opt)[0])
+    opt = optimal(opt)
+    # print([rev_replacements[i] for i in opt[1]])
+    print(opt[0])
+
+
+def quadrant(pos):
+    if pos in imaginaries:
+        return imaginaries.index(pos)
+    pos = pos if isinstance(pos, tuple) else c_pos(pos)
+    q = 0
+    if pos[0] > M:
+        q += 1
+    if pos[1] > M:
+        q += 2
+    return q
 
 
 def hard():
-    return
+    global PART, cache, distances
+    PART = 2
+    cache = {}
+    for n, j in enumerate(imaginaries):
+        for k, v in list(distances.items()):
+            if 0 not in k:
+                continue
+            k = k[0] if k[1] == 0 else k[1]
+            v -= 2
+            d = inf
+            if n == quadrant(k):
+                d = v
+            distances[(j, k)] = distances[(k, j)] = d
+    distances = {k: v for k, v in distances.items() if 0 not in k}
+    shortest(Letter.items[0])
 
+
+t = read()
+N = t[t < 100].max()
+M = (t.shape[0] - 1) // 2
+directions = [
+    (-1, 0),
+    (0, 1),
+    (1, 0),
+    (0, -1),
+]
+Letter(0, None)
+cache = {}
+distances = {}
+PART = 1
+imaginaries = [0.1, 0.2, 0.3, 0.4]
 
 if __name__ == "__main__":
     easy()
