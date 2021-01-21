@@ -100,6 +100,7 @@ class Letter:
             distances[(self.c, c)] = distances[(c, self.c)] = (
                 cost[c_pos(c)] - cost[c_pos(self.c)]
             )
+            assert distances[(self.c, c)] > 0
 
         # find same layer neighbors with bfs
         if len(self.children) > 1:
@@ -127,6 +128,7 @@ Letter(0, None)
 
 
 def c_pos(c):
+    c = -2 if c == 0 else c
     return tuple(map(lambda i: i[0], np.where(t == c)))
 
 
