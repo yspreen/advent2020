@@ -127,7 +127,7 @@ def sub_paths(p):
 
 
 def optimal(paths, chain=[]):
-    skip = len(chain) - 1 if chain else 0
+    skip = len(chain) - 1 if chain and PART == 1 else 0
     m = (inf, 0)
     for p_ in paths:
         c = 0
