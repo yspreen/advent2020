@@ -133,7 +133,6 @@ def optimal(paths, chain=[]):
     skip = len(chain)
     m = (inf, 0)
     for p in paths:
-        assert len(p) >= 26
         c = 0
         for i in range(1 + skip, len(p)):
             c += distances[(p[i], p[i - 1])]
@@ -147,12 +146,15 @@ cache = {}
 
 def options(seen, next, chain, pr=0):
     if not next:
+        assert len(chain) >= 26
         return [chain]
     next.sort()
-    key = tuple(chain[-1:] + next)
+    key = tuple(chain[-1:] + [-1] + sorted(next) + [-1] + sorted(list(seen)))
     c = cache.get(key, None)
     if c is not None:
-        return [chain + c]
+        chain = chain + c
+        assert len(chain) >= 26
+        return [chain]
     opt = []
     for n in next:
         if pr:
@@ -169,9 +171,11 @@ def options(seen, next, chain, pr=0):
                 continue
             if not (i.req - seen_):
                 next_ += [i.c]
-        opt.extend(options(seen_, next_, chain_))
+        n = options(seen_, next_, chain_)
+        assert len(n[0]) >= 26
+        opt.extend(n)
     result = optimal(opt, chain)[1]
-    cache[key] = result[-len(next) :]
+    cache[key] = result[len(chain) :]
     return [result]
 
 
@@ -209,7 +213,7 @@ def easy():
         [0],
         1,
     )
-    print(len(opt))
+    print(optimal(opt)[0])
 
     return
 
