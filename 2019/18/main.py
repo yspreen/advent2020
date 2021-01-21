@@ -57,7 +57,6 @@ def bfs(c=0, initial=True):
         for n in neighbors(pos):
             if n in visited or t[n] == -1:
                 continue
-            assert n != c_pos(c)
             cost[n] = cost[pos] + 1
             if initial:
                 chain[n] = list(chain[pos])
@@ -101,7 +100,6 @@ class Letter:
             distances[(self.c, c)] = distances[(c, self.c)] = (
                 cost[c_pos(c)] - cost[c_pos(self.c)]
             )
-            assert distances[(self.c, c)] > 0
 
         # find same layer neighbors with bfs
         if len(self.children) > 1:
@@ -150,14 +148,12 @@ cache = {}
 
 def options(seen, next, chain, pr=0):
     if not next:
-        assert len(chain) >= N
         return [chain]
     next.sort()
     key = tuple(chain[-1:] + [-1] + sorted(next) + [-1] + sorted(list(seen)))
     c = cache.get(key, None)
     if c is not None:
         chain = chain + c
-        assert len(chain) >= N
         return [chain]
     opt = []
     for n in next:
@@ -176,7 +172,6 @@ def options(seen, next, chain, pr=0):
             if not (i.req - seen_):
                 next_ += [i.c]
         n = options(seen_, next_, chain_)
-        assert len(n[0]) >= N
         opt.extend(n)
     result = optimal(opt, chain)[1]
     cache[key] = result[len(chain) :]
