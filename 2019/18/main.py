@@ -57,6 +57,7 @@ def bfs(c=0, initial=True):
         for n in neighbors(pos):
             if n in visited or t[n] == -1:
                 continue
+            assert n != c_pos(c)
             cost[n] = cost[pos] + 1
             if initial:
                 chain[n] = list(chain[pos])
