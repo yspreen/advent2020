@@ -25,6 +25,7 @@ def read(n=1):
 
 
 t = read()
+N = t[t < 100].max()
 
 directions = [
     (-1, 0),
@@ -146,14 +147,14 @@ cache = {}
 
 def options(seen, next, chain, pr=0):
     if not next:
-        assert len(chain) >= 26
+        assert len(chain) >= N
         return [chain]
     next.sort()
     key = tuple(chain[-1:] + [-1] + sorted(next) + [-1] + sorted(list(seen)))
     c = cache.get(key, None)
     if c is not None:
         chain = chain + c
-        assert len(chain) >= 26
+        assert len(chain) >= N
         return [chain]
     opt = []
     for n in next:
@@ -172,7 +173,7 @@ def options(seen, next, chain, pr=0):
             if not (i.req - seen_):
                 next_ += [i.c]
         n = options(seen_, next_, chain_)
-        assert len(n[0]) >= 26
+        assert len(n[0]) >= N
         opt.extend(n)
     result = optimal(opt, chain)[1]
     cache[key] = result[len(chain) :]
@@ -192,9 +193,9 @@ def easy():
 
     # print(list(map(lambda i: rev_replacements[i], chain_starts)))
 
-    chains = map(lambda i: c_pos(i + 1), list(range(26)) + list(range(100, 126)))
+    chains = map(lambda i: c_pos(i + 1), list(range(N)) + list(range(100, N + 100)))
     # print((43, 27) in list(chains))
-    chains = [chain[k] for k in chains]
+    chains = list(chain.values())
     chains = {k: sorted([i for i in chains if k in i]) for k in chain_starts}
     for k, v in chains.items():
         for cs in v:
@@ -214,8 +215,6 @@ def easy():
         1,
     )
     print(optimal(opt)[0])
-
-    return
 
 
 def hard():
