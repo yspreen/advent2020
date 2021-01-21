@@ -8,15 +8,6 @@ from math import prod, gcd
 from itertools import permutations, product
 from multiprocessing import Pool
 
-DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
-
-replacements = {".": 0, "#": -1, "@": -2}
-for i, a in enumerate(ascii_lowercase):
-    replacements[a] = i + 1
-    replacements[a.upper()] = i + 101
-rev_replacements = {v: k for k, v in replacements.items()}
-
 
 def read(n=1):
     with open(DIR / "input.txt") as f:
@@ -240,6 +231,13 @@ def hard():
     shortest(Letter.items[0])
 
 
+DIR = pathlib.Path(__file__).parent.absolute()
+inf = float("inf")
+replacements = {".": 0, "#": -1, "@": -2}
+for i, a in enumerate(ascii_lowercase):
+    replacements[a] = i + 1
+    replacements[a.upper()] = i + 101
+rev_replacements = {v: k for k, v in replacements.items()}
 t = read()
 N = t[t < 100].max()
 M = (t.shape[0] - 1) // 2
@@ -254,6 +252,8 @@ cache = {}
 distances = {}
 PART = 1
 imaginaries = [0.1, 0.2, 0.3, 0.4]
+for i in imaginaries:
+    rev_replacements[i] = "@"
 
 if __name__ == "__main__":
     easy()
