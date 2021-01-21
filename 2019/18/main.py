@@ -31,7 +31,7 @@ def neighbors(pos):
     return n
 
 
-def bfs(c=0, initial=True):
+def bfs(c=0, initial=True, transparent=0):
     pos = c_pos(c)
     # t[np.where(t == -2)] = 0
 
@@ -53,7 +53,7 @@ def bfs(c=0, initial=True):
                     if not chain[n]:
                         chain_starts.add(t[n])
                     chain[n].append(t[n])
-            elif t[n] > 0:
+            elif t[n] > 0 and t[n] != transparent:
                 continue
             goal.append(n)
             visited.add(n)
@@ -93,7 +93,7 @@ class Letter:
         # find same layer neighbors with bfs
         if len(self.children) > 1:
             for c in self.children:
-                ds = bfs(c, False)
+                ds = bfs(c, False, self.c)
                 for o in self.children:
                     op = c_pos(o)
                     distances[(c, o)] = distances[(o, c)] = ds[op]
