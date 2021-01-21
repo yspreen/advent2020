@@ -82,17 +82,17 @@ class Letter:
         self.c = c
         self.parent = parent
         self.children = []
-        self.req = []
+        self.req = set()
         try:
             self.items[parent].children.append(c)
         except:
             pass
 
-    def calc(self, cost, parent_req=[]):
+    def calc(self, cost, parent_req=set()):
         # add all path requirements
-        self.req.extend(parent_req)
+        self.req |= parent_req
         if self.parent is not None and self.parent >= 100:
-            self.req.append(self.parent - 100)
+            self.req.add(self.parent - 100)
 
         # set distances to children
         for c in self.children:
@@ -129,6 +129,52 @@ def c_pos(c):
     return tuple(map(lambda i: i[0], np.where(t == c)))
 
 
+def optimal(paths, chain=[]):
+    skip = len(chain)
+    m = (inf, 0)
+    for p in paths:
+        assert len(p) >= 26
+        c = 0
+        for i in range(1 + skip, len(p)):
+            c += distances[(p[i], p[i - 1])]
+        if c < m[0]:
+            m = (c, p)
+    return m
+
+
+cache = {}
+
+
+def options(seen, next, chain, pr=0):
+    if not next:
+        return [chain]
+    next.sort()
+    key = tuple(chain[-1:] + next)
+    c = cache.get(key, None)
+    if c is not None:
+        return [chain + c]
+    opt = []
+    for n in next:
+        if pr:
+            print(".")
+        chain_ = chain + [n]
+        seen_ = seen | set([n])
+        next_ = [i for i in next if i != n]
+        for i in Letter.items.values():
+            if i.c >= 100:
+                continue
+            if i.c in seen_:
+                continue
+            if i.c in next_:
+                continue
+            if not (i.req - seen_):
+                next_ += [i.c]
+        opt.extend(options(seen_, next_, chain_))
+    result = optimal(opt, chain)[1]
+    cache[key] = result[-len(next) :]
+    return [result]
+
+
 distances = {}
 
 
@@ -151,11 +197,21 @@ def easy():
             cs = [0] + cs
             for i in range(1, len(cs)):
                 Letter(cs[i], cs[i - 1])
-    Letter.items[0].calc(cost)
+    start = Letter.items[0]
+    start.calc(cost)
 
     # print(list(map(lambda a: rev_replacements[a], Letter.items[replacements["h"]].req)))
     distances = {k: v for k, v in distances.items() if sum(k) < 100}
-    print(len(distances))
+
+    opt = options(
+        set([0]),
+        [c for c in start.children if c < 100 and not Letter.items[c].req],
+        [0],
+        1,
+    )
+    print(len(opt))
+
+    return
 
 
 def hard():
