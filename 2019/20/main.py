@@ -84,7 +84,7 @@ def easy():
         if o:
             portal_dest[k] = list(o)[0]
     portal_dest[-1] = list(portals[0])[0]
-    portal_dest[-2] = list(portals[25 * 27])[0]
+    portal_dest[-2] = list(portals[26 * 26 - 1])[0]
     cost = bfs(portal_dest[-1])
     print(cost[portal_dest[-2]])
 
