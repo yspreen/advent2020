@@ -25,13 +25,15 @@ class Move:
 def neigh_3d(pos):
     n = []
     pos, lvl = (pos[0], pos[1]), pos[2]
+    if lvl > 32:
+        return n
     for p, c, dl in neigh[pos]:
+        if p == -2:
+            if lvl != 0:
+                continue
+            p, dl = (-1, -1), 0
         if lvl + dl < 0 or p == -1:
             continue
-        if p == -2:
-            if lvl + dl != 0:
-                continue
-            p = (-1, -1)
         n.append(((p[0], p[1], lvl + dl), c))
     return n
 
