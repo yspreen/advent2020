@@ -52,12 +52,7 @@ def neighbors(pos, portals):
     return n
 
 
-steps = 0
-
-
 def bfs(pos, portals=True):
-    global steps
-    steps = {pos: [pos]}
     cost = {pos: 0}
     visited = set([pos])
     goal = [pos]
@@ -68,7 +63,6 @@ def bfs(pos, portals=True):
             if n in visited or (len(n) == 2 and t[n] != 0):
                 continue
             cost[n] = cost[pos] + c
-            steps[n] = steps[pos] + [n]
             if n == (-1, -1, 0):
                 goal = []
                 break
@@ -134,18 +128,8 @@ def hard():
                 continue
             b_ = portal_dest[b]
             neigh[p].append((b_, c + 1, 1 if inner_donut(*b) else -1))
-    # print(neigh)
     cost = bfs((*portal_dest[-1], 0))
-    print(cost[(-1, -1, 0)])
-    print(
-        *list(
-            zip(
-                [(name(a, b), c) for a, b, c in steps[(-1, -1, 0)]],
-                [cost[p] for p in steps[(-1, -1, 0)]],
-            )
-        ),
-        sep="\n"
-    )
+    print(cost[(-1, -1, 0)] - 1)
 
 
 def name(x, y):
