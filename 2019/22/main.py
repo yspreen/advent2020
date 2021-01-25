@@ -7,6 +7,7 @@ from string import ascii_lowercase
 from math import prod, gcd
 from itertools import permutations, product
 from multiprocessing import Pool
+from sympy import simplify
 
 
 def read():
@@ -22,38 +23,64 @@ def op(s):
 
 
 def cut(a):
-    global A
-    A = A[a % N :] + A[: a % N]
+    global E, I
+    I -= a
+    E = ("%s-%d" % (E, a)).replace("--", "+")
 
 
 def incr(a):
-    global A
-
-    A_ = [0 for _ in A]
-    for i in range(N):
-        A_[i * a % N] = A[i]
-    A = A_
+    global E, I
+    I *= a
+    E = "(%s)*%d" % (E, a)
 
 
 def new_stack(_=0):
-    A.reverse()
+    global E, I
+    I = -I - 1
+    E = "-1*(%s)-1" % E
 
 
 def easy():
+    global I
+    I = 2019
+    allsteps()
+    print(I % N)
+
+
+def allsteps():
     for op, param in t:
         op(param)
-    print(A.index(2019))
 
 
 def hard():
-    return
+    global I, E, N
+    I = 2020
+    N = 119315717514047
+    E = "x"
+    allsteps()
+    E = str(simplify(E))
+    b = int(E.split("x")[-1].replace(" ", "")) % N
+    a = int(E.split("*")[0].replace(" ", "")) % N
+    dic = {I: 1, 2020: 0}
+    print(a)
+    print(b)
+    print(I % N)
+    # print((a ** N) % N)
+    i = 0
+    while True:
+        I = (a * I + b) % N
+        i += 1
+        if dic.get(I, None) is not None:
+            print(dic[I])
+            break
+        dic[I] = i
+    print(I)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 t = read()
-N = 10007
-A = list(range(N))
+E = I = N = 10007
 
 if __name__ == "__main__":
     easy()
