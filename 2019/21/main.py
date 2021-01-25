@@ -112,7 +112,9 @@ class VM:
             return self.calc()
         if cmd[-1] != "\n":
             cmd += "\n"
-        return self.calc(*[ord(i) for i in cmd])
+        for i in range(10):
+            cmd = cmd.replace(str(i + 1), ascii_lowercase[i])
+        return self.calc(*[ord(i) for i in cmd.upper()])
 
     def __init__(self):
         self.read()
@@ -130,18 +132,27 @@ v = VM()
 
 
 def easy():
-    v.execute("NOT D T")
-    v.execute("NOT T J")
-    v.execute("NOT C T")
-    v.execute("AND T J")
-    v.execute("NOT A T")
-    v.execute("OR T J")
-    v.execute("WALK")
+    v.execute("not 4 t")
+    v.execute("not t j")
+    v.execute("not 3 t")
+    v.execute("and t j")
+    v.execute("not 1 t")
+    v.execute("or t j")
+    v.execute("walk")
     print(v.dmg)
 
 
 def hard():
-    return
+    v = VM()
+    v.execute("not 2 j")
+    v.execute("not 3 t")
+    v.execute("or t j")
+    v.execute("and 4 j")
+    v.execute("and 8 j")
+    v.execute("not 1 t")
+    v.execute("or t j")
+    v.execute("run")
+    print(v.dmg)
 
 
 if __name__ == "__main__":
