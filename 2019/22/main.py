@@ -7,7 +7,7 @@ from string import ascii_lowercase
 from math import prod, gcd
 from itertools import permutations, product
 from multiprocessing import Pool
-from sympy import simplify
+from sympy import simplify, symbols
 
 
 def read():
@@ -52,28 +52,32 @@ def allsteps():
         op(param)
 
 
+def double(e):
+    e = str(simplify(e))
+    b = int(e.split("x")[-1].replace(" ", "")) % N
+    a = int(e.split("*")[0].replace(" ", "")) % N
+    return a * (a * symbols("x") + b) + b
+
+
 def hard():
     global I, E, N
     I = 2020
     N = 119315717514047
     E = "x"
     allsteps()
-    E = str(simplify(E))
-    b = int(E.split("x")[-1].replace(" ", "")) % N
-    a = int(E.split("*")[0].replace(" ", "")) % N
-    dic = {I: 1, 2020: 0}
-    print(a)
-    print(b)
-    print(I % N)
-    # print((a ** N) % N)
+
+    simple = simplify(E)
+    M = 101741582076661
+    I = 2019
     i = 0
-    while True:
-        I = (a * I + b) % N
-        i += 1
-        if dic.get(I, None) is not None:
-            print(dic[I])
-            break
-        dic[I] = i
+    while M > 0:
+        times = 1
+        e = simple
+        while times * 2 <= M:
+            times *= 2
+            e = double(e)
+        M -= times
+        I = e.subs(symbols("x"), I) % N
     print(I)
 
 
