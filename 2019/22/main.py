@@ -50,8 +50,8 @@ def easy():
     return
 
 
-def allsteps():
-    for op, param in t:
+def allsteps(reverse=False):
+    for op, param in reversed(t) if reverse else t:
         op(param)
 
 
@@ -67,7 +67,7 @@ def hard():
     I = 2020
     N = 119315717514047
     E = "x"
-    allsteps()
+    allsteps(True)
 
     simple = simplify(E)
     M = 101741582076661
