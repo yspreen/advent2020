@@ -70,6 +70,7 @@ def hard():
     allsteps(True)
 
     simple = simplify(E)
+    print(simple.subs(symbols("x"), 2020))
     M = 101741582076661
     I = 2020
     i = 0
