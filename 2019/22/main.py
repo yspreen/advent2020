@@ -24,14 +24,20 @@ def op(s):
 
 def cut(a):
     global E, I
-    I -= a
-    E = ("%s-%d" % (E, a)).replace("--", "+")
+    I += a % N
+    E = "%s+%d" % (E, (a % N))
 
 
 def incr(a):
     global E, I
-    I *= a
-    E = "(%s)*%d" % (E, a)
+    if a == 0:
+        return
+    n = 0
+    while (I / a) % 1 > 0:
+        I += N
+        n += N
+    I /= a
+    E = "(%s+%d)*%d" % (E, n, a)
 
 
 def new_stack(_=0):
@@ -41,10 +47,7 @@ def new_stack(_=0):
 
 
 def easy():
-    global I
-    I = 2019
-    allsteps()
-    print(I % N)
+    return
 
 
 def allsteps():
@@ -68,7 +71,7 @@ def hard():
 
     simple = simplify(E)
     M = 101741582076661
-    I = 2019
+    I = 2020
     i = 0
     while M > 0:
         times = 1
