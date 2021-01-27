@@ -17,6 +17,7 @@ def digit(num, dig):
 
 class VM:
     items = {}
+    idle = set([])
 
     def read(self):
         with open(DIR / "input.txt") as f:
@@ -59,7 +60,11 @@ class VM:
             self.t[c] = a * b
             return 4
         if ins == 3:
+            self.idle.discard(self.addr)
             if not len(self.inputs):
+                self.idle_i += 1
+                if self.idle_i > 5:
+                    self.idle.add(self.addr)
                 self.inputs = [-1]
             self.t[a] = self.inputs.pop(0)
             return 2
@@ -84,22 +89,33 @@ class VM:
             self.r += a
             return 2
 
-    def draw(self):
+    def draw(self, use_nat):
         if len(self.outputs) != 3:
             return
         a, x, y = self.outputs
         self.outputs = []
-        if a == 255:
-            return y
         self.items[a].inputs.extend([x, y])
+        if a == 255 and not use_nat:
+            return y
 
-    def step(self, *inp):
+    def step(self, use_nat=False):
         if self.done:
             return
-        self.inputs.extend(inp)
+        if self.addr == 255:
+            return self.nat()
         self.d = self.op(self.i)
         self.i += 0 if self.d is None else self.d
-        return self.draw()
+        return self.draw(use_nat)
+
+    def nat(self):
+        self.inputs = self.inputs[-2:]
+        if len(self.idle) < 50:
+            return
+        self.items[0].inputs.extend(self.inputs)
+        if self.i == self.inputs[1]:
+            return self.i
+        self.i = self.inputs[1]
+        self.idle.discard(0)
 
     def __init__(self, addr=0):
         self.read()
@@ -108,25 +124,29 @@ class VM:
 
         self.addr = addr
         self.items[addr] = self
-        self.i = self.d = self.r = 0
+        self.idle_i = self.i = self.d = self.r = 0
         self.done = False
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
-vs = [VM(i) for i in range(50)]
+vs = [VM(i) for i in range(50)] + [VM(255)]
 
 
-def easy():
+def run(nat=False):
     while True:
         for v in vs:
-            i = v.step()
+            i = v.step(use_nat=nat)
             if i is not None:
                 return print(i)
 
 
+def easy():
+    run()
+
+
 def hard():
-    return
+    run(True)
 
 
 if __name__ == "__main__":
