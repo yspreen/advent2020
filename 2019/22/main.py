@@ -7,7 +7,7 @@ from string import ascii_lowercase
 from math import prod, gcd
 from itertools import permutations, product
 from multiprocessing import Pool
-from sympy import simplify, symbols
+from sympy import simplify, symbols, solve
 
 
 def read():
@@ -68,7 +68,7 @@ def hard():
 
     simple = simplify(E)
     M = 101741582076661
-    I = 2020
+    E = I = 2020
     i = 0
     while M > 0:
         times = 1
@@ -77,8 +77,12 @@ def hard():
             times *= 2
             e = double(e)
         M -= times
-    I = e.subs(symbols("x"), I) % N
-    print(I)
+        E = simplify(e.subs(symbols("x"), E))
+    R = solve(E - I, symbols("x"))
+    while not R or "/" in R[0]:
+        I += N
+        R = solve(E - I, symbols("x"))
+    print(int(R[0]) % N)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
