@@ -53,10 +53,20 @@ def allsteps():
 
 
 def double(e):
+    a, b = factors(e)
+    return a * (a * symbols("x") + b) + b
+
+
+def oversimplify(e):
+    a, b = factors(e)
+    return a * symbols("x") + b
+
+
+def factors(e):
     e = str(simplify(e))
     b = int(e.split("x")[-1].replace(" ", "")) % N
     a = int(e.split("*")[0].replace(" ", "")) % N
-    return a * (a * symbols("x") + b) + b
+    return a, b
 
 
 def hard():
@@ -68,7 +78,8 @@ def hard():
 
     simple = simplify(E)
     M = 101741582076661
-    E = I = 2020
+    I = 2020
+    E = symbols("x")
     i = 0
     while M > 0:
         times = 1
@@ -77,9 +88,10 @@ def hard():
             times *= 2
             e = double(e)
         M -= times
-        E = simplify(e.subs(symbols("x"), E))
+        E = oversimplify(e.subs(symbols("x"), E))
+    print(E)
     R = solve(E - I, symbols("x"))
-    while not R or "/" in R[0]:
+    while not R or "/" in str(R[0]):
         I += N
         R = solve(E - I, symbols("x"))
     print(int(R[0]) % N)
