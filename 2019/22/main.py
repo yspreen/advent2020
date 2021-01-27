@@ -69,6 +69,23 @@ def factors(e):
     return a, b
 
 
+# https://www.geeksforgeeks.org/modular-division/
+def mod_inverse(b, m):
+    g = gcd(b, m)
+    if g != 1:
+        return -1
+    else:
+        return pow(b, m - 2, m)
+
+
+# https://www.geeksforgeeks.org/modular-division/
+def mod_divide(a, b, m):
+    a %= m
+    b %= m
+    inv = mod_inverse(b, m)
+    return (inv * a) % m
+
+
 def hard():
     global I, E, N
     I = 2020
@@ -89,12 +106,9 @@ def hard():
             e = double(e)
         M -= times
         E = oversimplify(e.subs(symbols("x"), E))
-    print(E)
-    R = solve(E - I, symbols("x"))
-    while not R or "/" in str(R[0]):
-        I += N
-        R = solve(E - I, symbols("x"))
-    print(int(R[0]) % N)
+    a, b = factors(E)
+    I -= b
+    print(mod_divide(I, a, N))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
