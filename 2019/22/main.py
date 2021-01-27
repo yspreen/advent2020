@@ -36,8 +36,8 @@ def incr(a):
     while (I / a) % 1 > 0:
         I += N
         n += N
-    I //= a
-    E = "(%s+%d)*%d" % (E, n, a)
+    I /= a
+    E = "(%s+%d)/%d" % (E, n, a)
 
 
 def new_stack(_=0):
@@ -90,23 +90,10 @@ t = read()
 E = I = N = 10007
 
 if __name__ == "__main__":
-    # easy()
-    # hard()
-    for i in [3, 7, 9]:
-        N = 10
-        A_ = list(range(N))
-        B_ = list(range(N))
-        for k in range(N):
-            I = k
-            E = "x"
-
-            A = list(range(N))
-            for j in range(N):
-                A[j * i % N] = j
-            A_[k] = A[I]
-
-            incr(i)
-            B_[k] = I
-        print(i, A_)
-        print(i, B_)
-        print()
+    easy()
+    hard()
+    # for i in [3, 7, 9]:
+    #     A = list(range(N))
+    #     incr(i)
+    #     print(i, A)
+    #     print()
