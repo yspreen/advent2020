@@ -95,10 +95,14 @@ class VM:
         self.inputs.extend(inp)
         self.d = 0
         self.outputs = []
-        while not self.done and self.d is not None:
+        k = 0
+        while not self.done and self.d is not None and k < 100000:
+            k += 1
             self.i += self.d
             self.d = self.op(self.i)
             self.draw()
+        if k == 100000:
+            print("infinite loop")
         return self.outputs
 
     def execute(self, cmd=""):
@@ -123,14 +127,14 @@ class VM:
 class Game:
     def __init__(self):
         self.v = VM()
-        self.pos = (0, 0)
+        self.pos = ""
         self.location_pos = {}
         self.dirs = {}
         self.neighbors = {}
         self.back = {}
         self.items = {}
         self.location = None
-        self.seen = set([(0, 0)])
+        self.seen = set([""])
 
     def reset_vm(self):
         self.v = VM()
@@ -146,17 +150,17 @@ class Game:
         for entry in t.split("\n==")[1:]:
             location = entry.split("\n")[0].replace("==", "").strip()
             pos = self.location_pos.get(location, self.pos)
-            assert self.location_pos.get(location, None) in [None, pos]
+            rev = ""
+            if pos:
+                rev = back_dir[{v: k for k, v in directions.items()}[pos[-1]]][0]
             self.location_pos[location] = pos
             blocks = entry.split("\n\n")
             for b in blocks:
                 if b.startswith("Doors here lead:"):
                     dirs = list(map(lambda i: i[2:], b.split("\n")[1:]))
+                    dirs = [i for i in dirs if i[0] != rev]
                     self.dirs[location] = dirs
-                    self.neighbors[location] = [
-                        (pos[0] + directions[d][0], pos[1] + directions[d][1])
-                        for d in dirs
-                    ]
+                    self.neighbors[location] = [pos + d[0] for d in dirs]
                 if b.startswith("Items here:"):
                     items = list(map(lambda i: i[2:], b.split("\n")[1:]))
                     for i in items:
@@ -165,14 +169,11 @@ class Game:
         self.pos = pos
 
     def route(self, goal):
-        if isinstance(goal, str):
-            goal = self.location_pos[goal]
-
         r = []
 
-        while goal != (0, 0):
+        while goal != "":
             d = self.back[goal]
-            goal = (goal[0] + directions[d][0], goal[1] + directions[d][1])
+            goal = goal[:-1]
             r.append(back_dir[d])
 
         r.reverse()
@@ -188,12 +189,8 @@ class Game:
         for r in rs:
             self.v.execute(back_dir[r])
 
-    goals = set()
-
     def next(self):
         nexts = list(zip(self.dirs[self.location], self.neighbors[self.location]))
-        for a, b in nexts:
-            self.goals.add(b)
         nexts = [i for i in nexts if i[1] not in self.seen]
 
         if not nexts:
@@ -205,7 +202,13 @@ class Game:
             self.back[n[1]] = self.back.get(n[1], back_dir[n[0]])
             n = n[0]
 
-        self.pos = (self.pos[0] + directions[n][0], self.pos[1] + directions[n][1])
+        self.pos = (
+            (self.pos + directions[n])
+            .replace("ns", "")
+            .replace("sn", "")
+            .replace("ew", "")
+            .replace("we", "")
+        )
         self.seen.add(self.pos)
         self.v.execute(n)
         self.parse()
@@ -213,18 +216,20 @@ class Game:
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
-directions = {
-    "north": (-1, 0),
-    "east": (0, 1),
-    "south": (1, 0),
-    "west": (0, -1),
-}
+directions = [
+    "north",
+    "east",
+    "south",
+    "west",
+]
+directions = {d: d[0] for d in directions}
 back_dir = {
     "north": "south",
     "east": "west",
     "south": "north",
     "west": "east",
 }
+SCALE = "Pressure-Sensitive Floor"
 
 
 def easy():
@@ -233,8 +238,7 @@ def easy():
     g.parse()
     while not g.next():
         continue
-    print(g.goals)
-    print(g.seen)
+    print(g.items)
     for i, p in list(g.items.items()):
         g.reset_vm()
         g.take_route(p)
@@ -253,7 +257,7 @@ def easy():
         g.take_route(p)
         g.v.execute("take " + i)
         g.go_home(p)
-        g.take_route("Pressure-Sensitive Floor")
+        g.take_route(g.location_pos[SCALE])
         if "heavier" in g.v.A:
             light_items.append(i)
         else:
@@ -271,12 +275,10 @@ def easy():
                 g.go_home(p)
 
         g.v.A = ""
-        g.take_route("Pressure-Sensitive Floor")
-        print(g.v.A.split("Alert!")[-1].split('"')[0])
-        g.v.A = ""
-        g.v.execute("inv")
-        print(g.v.A)
-        print("===================")
+        g.take_route(g.location_pos[SCALE])
+        if "Alert!" not in g.v.A:
+            print(g.v.A)
+            return
 
 
 def hard():
