@@ -87,7 +87,6 @@ class VM:
             return
         c = self.outputs.pop()
         self.A += chr(c)
-        # print(chr(c), end="")
 
     def calc(self, *inp):
         if self.done:
@@ -101,8 +100,6 @@ class VM:
             self.i += self.d
             self.d = self.op(self.i)
             self.draw()
-        if k == 100000:
-            print("infinite loop")
         return self.outputs
 
     def execute(self, cmd=""):
@@ -138,10 +135,6 @@ class Game:
 
     def reset_vm(self):
         self.v = VM()
-
-    @property
-    def pos_location(self):
-        return {v: k for k, v in self.location_pos.items()}
 
     def parse(self):
         t = "\n" + self.v.A
@@ -238,7 +231,6 @@ def easy():
     g.parse()
     while not g.next():
         continue
-    print(g.items)
     for i, p in list(g.items.items()):
         g.reset_vm()
         g.take_route(p)
@@ -249,7 +241,6 @@ def easy():
         if not g.v.done and g.v.A.strip()[:2] == "==":
             continue
         else:
-            print("can't take", i)
             del g.items[i]
     light_items = []
     for i, p in g.items.items():
@@ -260,24 +251,19 @@ def easy():
         g.take_route(g.location_pos[SCALE])
         if "heavier" in g.v.A:
             light_items.append(i)
-        else:
-            print(i, "too heavy")
     g.reset_vm()
-    # light_items = list(g.items.keys())
     for n in range(1, 2 ** len(light_items)):
         g.reset_vm()
         for i, item in enumerate(light_items):
             if "{0:09b}".format(n)[-i - 1] == "1":
-                # print(item)
                 p = g.items[item]
                 g.take_route(p)
                 g.v.execute("take " + item)
                 g.go_home(p)
-
         g.v.A = ""
         g.take_route(g.location_pos[SCALE])
         if "Alert!" not in g.v.A:
-            print(g.v.A)
+            print(g.v.A.split("typing ")[1].split(" ")[0])
             return
 
 
