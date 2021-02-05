@@ -28,6 +28,34 @@ def get_order(ins):
     return order
 
 
+OCR = {
+    585610922974906431: "L",
+    549863600932653150: "C",
+    1126328852214319136: "P",
+    549863601050360029: "G",
+    603844239923161185: "X",
+}
+
+
+def ocr(t_):
+    import numpy as np
+
+    t = np.array([[1 if e == "#" else 0 for e in l] for l in t_.splitlines()])
+    try:
+        c = OCR[int("".join([str(i) for i in t[:, :6].reshape(-1)]), 2)]
+    except:
+        print(
+            "Add key %d for this letter:"
+            % int("".join([str(i) for i in t[:, :6].reshape(-1)]), 2)
+        )
+        for r in t_.splitlines():
+            print(r[:8])
+        assert False
+    if t.shape[1] > 8:
+        c += ocr("\n".join([l[8:] for l in t_.splitlines()]))
+    return c
+
+
 def main():
     global input
     from copy import deepcopy
@@ -70,7 +98,8 @@ def main():
         for x in range(len(arr)):
             out += arr[x][y]
         out += "\n"
-    print(out)
+    # print(out)
+    print(ocr(out))
     print(second)
 
 
