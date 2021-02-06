@@ -1,93 +1,14 @@
 from itertools import product
 import copy
+import pathlib
 
-input = """
-.#.#...|#.
-.....#|##|
-.|..|...#.
-..|#.....#
-#.#|||#|#|
-...#.||...
-.|....|...
-||...#|.#|
-|.||||..|.
-...#.|..|.
-"""
-
-input = """
-#||.....|......|##.#.#|....|#.#|#.|....#|#||#.....
-...#|#..#..#|.#...#|..|....##....|.#.|.#.......#..
-|#.|#...|...|.##.|..#.#.....##.........##|..|.|...
-...#..|....|.....#.............|..|.....|...|...#.
-..|#..||..|####.#|#...##..|#|||#.#.###...#....#...
-..|....||.#..|#|||..##.#.|#.||...|..#|..|.#....#..
-#||..|..|#.|.###..........||.|.|..#.#..#||........
-.|||#..#.|....#......##....#...#.|...#|.||.....#..
-#.||.|#..|#.#.|#|....|.##|..#.....#.|#|..|.||#..#.
-#|........|.#.....#....|#.|.|.##..#.|#.|.|...|....
-|.|..#.#.##|.|#..#.#.#.|#||#|.#.#....#..|..#..|...
-..#..||#|#...|#||...|#|.|.#..##.#.#....#.....||.#.
-#..|||#...|..|#||.|#.....|.|##.........|||..#...|#
-...|....#..|....|.||..|#....##..#....|.#|..#....|.
-#.###|.|#|.##..|...|..|...||.......#|##.#|.||#|..#
-|....|.#.|.#......|...#|||..||#.##..#.....#|..#.#.
-..#|#...##....##..|.|.|#.|.||....|...#..|#.|...|..
-|......|..|.#.....#...|........|.....#|#.#.|#.#.|.
-||.|#..#.###..|.#.......||.#.#...#.#.|#....#|....#
-#.|..|#..#||.....#..||.||.|##|#..#|.....#.#..###..
-|.|#|.#.|..|||.|....#....####||.|.|##..|.|..||##|.
-.....##...#..|#.|||..|..|..#||.#..#...|.|.####|#..
-..|.#...|...#....#|..|.||.#...|##..|.#...#..||....
-|.#|....|....|....|....|#..##..#....#|..||..||....
-#..|.#.||..|..##.|...##...|...|#..|.||...#|.|....#
-|....#||.##|.|#..#|.#..|...||..|.||..|...|.......#
-##....|..#|||..|...#...#...|#..#|.|.#..||.#.#.#...
-|#....||.#.#||.|#|.#.||..###.|.|.....#|...#.#...#.
-.|.#|#.|......#.#..............#....|..||..||#||..
-##.|...|...#.#|#|.#|.|.###...#..#..|..##|#|.||....
-....#|#..#....|.|...|....||...##.....|.|.|.|.#||.|
-.|#||||...#.#..##..##|||........##...#...|..#.|...
-|.|.#|||.||..##..#|.......#.#|##..|.......|##.##..
-...#.|#..#...|.|#.|...|#.#.#..|....||....#|...|..|
-###|.#..#..#..####.#....###....#.#.#.|.|||...|#..#
-##...#...#..#.....#|#|.|....||#..||||#..#.#.#...||
-...#..|.|...##..|...|#........||.|.|.|..#....#|.#|
-.........###|.....|#.|......|.......|.##.|...|...|
-..........#.|..#..#.|....##.||....#|.##....|....||
-..|#|.....|#...#..###||.##...#...#......|..#..|.#.
-|...|..|||.||...|.#|....#|.|...|...#.|..|..||.#|#.
-...#||...##.##.|...#....|...||..|..|..#..|.#..#||#
-.|.||.#|..|.|##......#.......##....|#.#|.|.#.#..|.
-..#..|..|..#...#.#..#|#|#|||...|......#.##...|....
-.##..||.##|..|..|.|#.....|.|#..|....|#..|...#...|.
-..|.|.|||.||..|..#.|..#.....|##|.|..|..###..#....|
-|#...#.#|.#..|..#..|##.##||.||#.....|..#....#.|###
-#..|..........##..|#.|..#.|.###.|..|.....|#|.#....
-#.....#|#...|..|..|.|....##......|||..|.|...|.....
-|..|...#.#.|....|......#|...##......|.##|.....|.#.
-"""
-
-input = input.split("\n")
-input = list(filter(None, input))
-
+input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()
 chars = {
     ".": 0,  # open
     "|": 1,  # tree
     "#": 2,  # lumber
 }
-format = {
-    v: k for (k, v) in chars.items()
-}
-
-
-def print_arr(arr, format=None):
-    out = ""
-    for y in range(len(arr[0])):
-        line = ""
-        for x in range(len(arr)):
-            line += ("%d" % arr[x][y]) if format is None else format[arr[x][y]]
-        out += line + "\n"
-    print(out, end="")
+format = {v: k for (k, v) in chars.items()}
 
 
 class hashable_area:
@@ -109,19 +30,18 @@ class hashable_area:
         return str(self.area)
 
 
-#ha = hashable_area
+# ha = hashable_area
 def ha(arr, *_):
     a = "".join(["".join([str(j) for j in i]) for i in arr])
     return a
 
 
 areas = {}
-for i in product('012', repeat=8):
+for i in product("012", repeat=8):
     i = "".join(i)
-    opens = i.count('0')
-    trees = i.count('1')
-    lumbs = i.count('2')
-
+    opens = i.count("0")
+    trees = i.count("1")
+    lumbs = i.count("2")
     i = [int(j) for j in i]
     area = [[0 for _ in range(3)] for _ in range(3)]
     area[0][0] = i[0]
@@ -132,7 +52,6 @@ for i in product('012', repeat=8):
     area[0][2] = i[5]
     area[1][2] = i[6]
     area[2][2] = i[7]
-
     for m in [0, 1, 2]:
         area[1][1] = m
         n = m
@@ -161,20 +80,23 @@ def pad_zero(arr):
     arr.append([0 for _ in arr[0]])
 
 
-def main():
-    global input, format, areas
+cycle = []
+start = 0
+last_vals = {}
 
+
+def easy():
+    global input, format, areas, cycle, start, last_vals
     input_ = [[0 for _ in input] for _ in input[0]]
     for y in range(len(input)):
         for x in range(len(input[0])):
             input_[x][y] = chars[input[y][x]]
     input = input_
-
     len_x = len(input)
     len_y = len(input[0])
-
     last = 0
-    for minute in range(1000000000):
+    seen = set([])
+    for minute in range(800):
         pad_zero(input)
         new_input = copy.deepcopy(input)
         for x in range(len_x):
@@ -184,16 +106,40 @@ def main():
                     for j in range(3):
                         area[i][j] = input[x + i][y + j]
                 new_input[x + 1][y + 1] = areas[ha(area)]
-
         unpad_zero(new_input)
         input = new_input
-        # print_arr(input, format)
-        # print("")
         trees = sum([i.count(1) for i in input])
         lumbs = sum([i.count(2) for i in input])
         prod = trees * lumbs
-        print(minute+1, trees, lumbs, prod, prod-last)
+        # print(minute + 1, trees, lumbs, prod, prod - last)
+        if minute == 9:
+            print(prod)
+        diff = prod - last
+        cycle.append(diff)
+        last_vals[minute] = prod
+        start = minute
         last = prod
 
 
-main()
+def hard():
+    global start, last_vals, cycle
+
+    while cycle[-1] in cycle[:-1]:
+        cycle = cycle[cycle[:-1].index(cycle[-1]) + 1 :]
+
+    goal = 1000000000
+
+    minute = start - len(cycle) + 1
+    goal -= minute
+    val = last_vals[minute - 1]
+    val += sum(cycle) * (goal // len(cycle))
+    goal %= len(cycle)
+    i = 0
+    while i < goal:
+        val += cycle[i]
+        i += 1
+    print(val)
+
+
+easy()
+hard()
