@@ -22,7 +22,7 @@ mulr 4 5 5
 muli 5 11 5
 addi 3 4 3
 mulr 3 4 3
-seti 109 0 3
+seti 0 0 5
 seti 945 0 5
 addr 4 0 4
 seti 0 5 4

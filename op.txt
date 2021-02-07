@@ -4,12 +4,12 @@
 
 
 
-> SKIP if $a * $b != $d
-  $0 += $a
+> if $a * $b == $d:
+    $0 += $a
   $b += 1
 
-  SKIP if $b > $d
-  GOTO line 7
+  if $b <= $d:
+    GOTO line 7
   $a += 1
 
   HALT if $a > $d
@@ -20,8 +20,8 @@
 
 
 
-> $c = 109
-  $d = 945
+
+> $d = 945
 
   SKIP if part2
   GOTO line 2
@@ -29,8 +29,8 @@
 
 
 
-  $c = 10187520
-  $d = 10188465
+
+> $d = 10188465
 
 
   GOTO line 2
