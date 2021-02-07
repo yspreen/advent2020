@@ -16,46 +16,42 @@ def read():
     return t[0], [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
 
 
-def op():
-    try:
-        o = t[reg[ip]]
-    except:
-        return True
+def op(o):
     code, A, B, C = o
 
     if code == "addr":
-        reg[C] = reg[A] + reg[B]
+        s = "[%d] = [%d] + [%d]" % (C, A, B)
     if code == "addi":
-        reg[C] = reg[A] + B
+        s = "[%d] = [%d] + %d" % (C, A, B)
     if code == "mulr":
-        reg[C] = reg[A] * reg[B]
+        s = "[%d] = [%d] * [%d]" % (C, A, B)
     if code == "muli":
-        reg[C] = reg[A] * B
+        s = "[%d] = [%d] * %d" % (C, A, B)
     if code == "banr":
-        reg[C] = reg[A] & reg[B]
+        s = "[%d] = [%d] & [%d]" % (C, A, B)
     if code == "bani":
-        reg[C] = reg[A] & B
+        s = "[%d] = [%d] & %d" % (C, A, B)
     if code == "borr":
-        reg[C] = reg[A] | reg[B]
+        s = "[%d] = [%d] | [%d]" % (C, A, B)
     if code == "bori":
-        reg[C] = reg[A] | B
+        s = "[%d] = [%d] | %d" % (C, A, B)
     if code == "setr":
-        reg[C] = reg[A]
+        s = "[%d] = [%d]" % (C, A)
     if code == "seti":
-        reg[C] = A
+        s = "[%d] = %d" % (C, A)
     if code == "gtir":
-        reg[C] = 1 if A > reg[B] else 0
+        s = "[%d] = %d > [%d]" % (C, A, B)
     if code == "gtri":
-        reg[C] = 1 if reg[A] > B else 0
+        s = "[%d] = [%d] > %d" % (C, A, B)
     if code == "gtrr":
-        reg[C] = 1 if reg[A] > reg[B] else 0
+        s = "[%d] = [%d] > [%d]" % (C, A, B)
     if code == "eqir":
-        reg[C] = 1 if A == reg[B] else 0
+        s = "[%d] = %d == [%d]" % (C, A, B)
     if code == "eqri":
-        reg[C] = 1 if reg[A] == B else 0
+        s = "[%d] = [%d] == %d" % (C, A, B)
     if code == "eqrr":
-        reg[C] = 1 if reg[A] == reg[B] else 0
-    reg[ip] += 1
+        s = "[%d] = [%d] == [%d]" % (C, A, B)
+    print(s)
 
 
 def easy():
@@ -80,5 +76,6 @@ reg = [0] * 6
 
 
 if __name__ == "__main__":
-    easy()
-    hard()
+    print("#ip %d" % ip)
+    for o in t:
+        op(o)

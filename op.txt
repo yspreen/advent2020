@@ -1,0 +1,36 @@
+  GOTO line 18
+> $a = 1
+> $b = 1
+
+
+
+> SKIP if $a * $b != $d
+  $0 += $a
+  $b += 1
+
+  SKIP if $b > $d
+  GOTO line 7
+  $a += 1
+
+  HALT if $a > $d
+  GOTO line 3
+
+> $d += 2
+  $d *= $d
+  $d *= 19
+  $d *= 11
+  $c += 4
+  $c *= 22
+  $c += 21
+  $d += $c
+  SKIP $0
+  GOTO line 2
+  $c = 27
+  $c *= $c
+  $c += 29
+  $c *= 30
+  $c *= 14
+  $c *= 32
+  $d += $c
+  $0 = 0
+  GOTO line 2
