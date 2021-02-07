@@ -56,7 +56,7 @@ def op(o):
 
 def fact(N):
     n = 0
-    for a in range(1, N):
+    for a in range(N):
         if N % (a + 1) == 0:
             n += a + 1
     print(n)
