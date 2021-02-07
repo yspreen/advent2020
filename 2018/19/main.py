@@ -54,18 +54,20 @@ def op(o):
     print(s)
 
 
+def fact(N):
+    n = 0
+    for a in range(1, N):
+        if N % (a + 1) == 0:
+            n += a + 1
+    print(n)
+
+
 def easy():
-    while not op():
-        continue
-    print(reg[0])
+    fact(945)
 
 
 def hard():
-    global reg
-
-    reg = [0] * 6
-    reg[0] = 1
-    easy()
+    fact(10188465)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
@@ -76,6 +78,5 @@ reg = [0] * 6
 
 
 if __name__ == "__main__":
-    print("#ip %d" % ip)
-    for o in t:
-        op(o)
+    easy()
+    hard()
