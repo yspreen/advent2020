@@ -70,14 +70,25 @@ class Segment:
     @property
     def max_length(self):
         if self.children:
-            return sum([i.max_length for i in self.children])
+            return "".join([i.max_length for i in self.children])
         if self.choices:
-            return max([i.max_length for i in self.choices])
-        return len(self.s)
+            s = [i.max_length for i in self.choices]
+            s = [(i, len(i)) for i in s]
+            s.sort(key=lambda i: i[1])
+            return s[-1][0]
+        return self.s
 
 
 def easy():
-    print(t.max_length)
+    s = t.max_length
+    didreplace = 1
+    while didreplace:
+        didreplace = 0
+        for redundant in ["EW", "WE", "NS", "SN"]:
+            while redundant in s:
+                didreplace = 1
+                s = s.replace(redundant, "")
+    print(len(s))  # , s)
 
 
 def hard():
