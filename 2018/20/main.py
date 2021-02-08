@@ -17,6 +17,15 @@ def read():
 
 
 class Segment:
+    unresolved = []
+
+    @classmethod
+    def resolve(cls):
+        while len(cls.unresolved):
+            e = cls.unresolved.pop()
+            for i in range(len(e)):
+                e[i] = Segment(e[i])
+
     def __init__(self, s):
         self.choices = []
         self.children = []
@@ -41,13 +50,15 @@ class Segment:
         if len(splits) > 2:
             for i in range(1, len(splits)):
                 a, b = splits[i - 1], splits[i]
-                self.choices.append(Segment(s[a + 1 : b]))
+                self.choices.append(s[a + 1 : b])
         elif len(segments) > 2:
             for i in range(1, len(segments)):
                 a, b = segments[i - 1], segments[i]
                 if b - a < 2:
                     continue
-                self.children.append(Segment(s[a + 1 : b]))
+                self.children.append(s[a + 1 : b])
+        self.unresolved.append(self.children)
+        self.unresolved.append(self.choices)
 
     def print(self, prefix=[]):
         print(*prefix, self.s)
@@ -68,7 +79,7 @@ def hard():
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 t = read()
-# t.print()
+Segment.resolve()
 
 if __name__ == "__main__":
     easy()
