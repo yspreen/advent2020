@@ -67,9 +67,17 @@ class Segment:
         for i in self.choices:
             i.print(prefix + ["|"])
 
+    @property
+    def max_length(self):
+        if self.children:
+            return sum([i.max_length for i in self.children])
+        if self.choices:
+            return max([i.max_length for i in self.choices])
+        return len(self.s)
+
 
 def easy():
-    return
+    print(t.max_length)
 
 
 def hard():
