@@ -58,7 +58,7 @@ class Segment:
                 self.children.append(s[a + 1 : b])
         self.unresolved.append(self.children)
         self.unresolved.append(self.choices)
-        self.s = shorten(s)
+        self.s = len(shorten(s))
 
     def print(self, prefix=[]):
         print(*prefix, self.s)
@@ -70,12 +70,11 @@ class Segment:
     @property
     def max_length(self):
         if self.children:
-            return "".join([i.max_length for i in self.children])
+            return sum([i.max_length for i in self.children])
         if self.choices:
             s = [i.max_length for i in self.choices]
-            s = [(i, len(i)) for i in s]
-            s.sort(key=lambda i: i[1])
-            return s[-1][0]
+            s.sort(key=lambda i: -i)
+            return s[0]
         return self.s
 
     @property
@@ -85,7 +84,7 @@ class Segment:
             return [sum(t) for t in product(*c)]
         if self.choices:
             return [i for s in self.choices for i in s.lengths]
-        return [len(self.s)]
+        return [self.s]
 
 
 def shorten(s):
@@ -100,7 +99,7 @@ def shorten(s):
 
 
 def easy():
-    print(len(t.max_length))
+    print((t.max_length))
 
 
 def hard():
