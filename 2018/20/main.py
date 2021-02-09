@@ -29,7 +29,6 @@ class Segment:
     def __init__(self, s):
         self.choices = []
         self.children = []
-        self.s = s
         segments = [-1]
         splits = [-1]
         brace_num = 0
@@ -59,6 +58,7 @@ class Segment:
                 self.children.append(s[a + 1 : b])
         self.unresolved.append(self.children)
         self.unresolved.append(self.choices)
+        self.s = shorten(s)
 
     def print(self, prefix=[]):
         print(*prefix, self.s)
@@ -78,9 +78,17 @@ class Segment:
             return s[-1][0]
         return self.s
 
+    @property
+    def lengths(self):
+        if self.children:
+            c = [i.lengths for i in self.children]
+            return [sum(t) for t in product(*c)]
+        if self.choices:
+            return [i for s in self.choices for i in s.lengths]
+        return [len(self.s)]
 
-def easy():
-    s = t.max_length
+
+def shorten(s):
     didreplace = 1
     while didreplace:
         didreplace = 0
@@ -88,11 +96,15 @@ def easy():
             while redundant in s:
                 didreplace = 1
                 s = s.replace(redundant, "")
-    print(len(s))  # , s)
+    return s
+
+
+def easy():
+    print(len(t.max_length))
 
 
 def hard():
-    return
+    print(len([i for i in t.lengths if i >= 1000]))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
