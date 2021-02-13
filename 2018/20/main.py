@@ -94,12 +94,12 @@ class Segment:
                 a = np.outer(a, b)
                 for i in range(M + 1):
                     a[i] = np.roll(a[i], i)
-                a = np.sum(a, 0)
+                a = np.sum(a, axis=0, dtype=np.int)
             l = a
         elif self.choices:
-            l = np.sum([s.lengths for s in self.choices], axis=0)
+            l = np.sum([s.lengths for s in self.choices], axis=0, dtype=np.int)
         else:
-            A = np.zeros(M + 1, np.uint32)
+            A = np.zeros(M + 1, dtype=np.int)
             A[self.s] = 1
             l = A
         Segment.lengths_[self.id] = l
@@ -158,14 +158,5 @@ t = read()
 Segment.resolve()
 
 if __name__ == "__main__":
-    M = 10
-    a = np.zeros(M + 1, np.uint32)
-    a[2] = 3
-    a[4] = 5
-    b = np.zeros(M + 1, np.uint32)
-    b[5] = 1
-    b[6] = 4
-    print(a)
-    print(b)
-    print(combine_reference(a, b))
-    print(combine(a, b))
+    easy()
+    hard()
