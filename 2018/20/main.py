@@ -81,10 +81,18 @@ class Segment:
     def lengths(self):
         if self.children:
             c = [i.lengths for i in self.children]
-            return [sum(t) for t in product(*c)]
+            a = c[0]
+            for b in c[1:]:
+                a = np.outer(a, b)
+                for i in range(M + 1):
+                    a[i] = np.roll(a[i], i)
+                a = np.sum(a, 0)
+            return a
         if self.choices:
-            return [i for s in self.choices for i in s.lengths]
-        return [self.s]
+            return np.sum([s.lengths for s in self.choices], axis=0)
+        A = np.zeros(M + 1)
+        A[self.s] = 1
+        return A
 
 
 def shorten(s):
@@ -98,12 +106,17 @@ def shorten(s):
     return s
 
 
+M = 0
+
+
 def easy():
-    print((t.max_length))
+    global M
+    M = t.max_length
+    print(M)
 
 
 def hard():
-    print(len([i for i in t.lengths if i >= 1000]))
+    print(t.lengths)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
