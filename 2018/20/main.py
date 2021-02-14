@@ -91,10 +91,13 @@ class Segment:
             c = [i.lengths for i in self.children]
             a = c[0]
             for b in c[1:]:
+                a_ = np.zeros(M + 1, dtype=np.int)
                 a = np.outer(a, b)
-                for i in range(M + 1):
-                    a[i] = np.roll(a[i], i)
-                a = np.sum(a, axis=0, dtype=np.int)
+                for p in zip(*np.where(a > 0)):
+                    i = a[p]
+                    p = min(M, sum(p))
+                    a_[p] += i
+                a = a_
             l = a
         elif self.choices:
             l = np.sum([s.lengths for s in self.choices], axis=0, dtype=np.int)
@@ -108,7 +111,7 @@ class Segment:
 
 def combine(a, b):
     a = np.outer(a, b)
-    for i in range(M + 1):
+    for i in range(1, M + 1):
         a[i] = np.roll(a[i], i)
     return np.sum(a, 0)
 
@@ -137,13 +140,11 @@ def shorten(s):
     return s
 
 
-M = 0
+M = 1000
 
 
 def easy():
-    global M
-    M = t.max_length
-    print(M)
+    print(t.max_length)
 
 
 def hard():
