@@ -16,32 +16,25 @@ def read():
     return Segment(t[1:-1])
 
 
-class SegmentState:
-    directions = {}
-
-    def __init__(self, before, segment):
-        self.before = before
-        self.after = set()
-        self.segment = segment
-
-    def solve(self):
-        if self.segment.children:
-            state = self.before
-            for c in self.segment.children:
-                state = SegmentState(state, c).solve()
-            self.after = state
-        elif self.segment.choices:
-            for c in self.segment.choices:
-                self.after |= SegmentState(self.before, c).solve()
-        else:
-            for p in self.before:
-                direction = self.directions[p]
-                for c in self.segment.s:
-                    direction += c
-                    p = (p[0] + y_dist[c], p[1] + x_dist[c])
-                    self.directions[p] = self.directions.get(p, direction)
-                self.after.add(p)
-        return self.after
+def solve(before, segment):
+    after = set()
+    if segment.children:
+        state = before
+        for c in segment.children:
+            state = solve(state, c)
+        after = state
+    elif segment.choices:
+        for c in segment.choices:
+            after |= solve(before, c)
+    else:
+        for p in before:
+            direction = dirs[p]
+            for c in segment.s:
+                direction += c
+                p = (p[0] + y_dist[c], p[1] + x_dist[c])
+                dirs[p] = dirs.get(p, direction)
+            after.add(p)
+    return after
 
 
 x_dist = {
@@ -104,53 +97,23 @@ class Segment:
                 self.children.append(s[a + 1 : b])
         self.unresolved.append(self.children)
         self.unresolved.append(self.choices)
-        self.l = len(shorten(s))
-
-    def print(self, prefix=[]):
-        print(*prefix, self.s)
-        for i in self.children:
-            i.print(prefix + [">"])
-        for i in self.choices:
-            i.print(prefix + ["|"])
-
-    @property
-    def max_length(self):
-        if self.children:
-            return sum([i.max_length for i in self.children])
-        if self.choices:
-            s = [i.max_length for i in self.choices]
-            s.sort(key=lambda i: -i)
-            return s[0]
-        return self.l
-
-
-def shorten(s):
-    didreplace = 1
-    while didreplace:
-        didreplace = 0
-        for redundant in ["EW", "WE", "NS", "SN"]:
-            while redundant in s:
-                didreplace = 1
-                s = s.replace(redundant, "")
-    return s
 
 
 def easy():
-    print(t.max_length)
+    dirs[(0, 0)] = ""
+    solve(set([(0, 0)]), t)
+    print(max([len(v) for v in dirs.values()]))
 
 
 def hard():
-    SegmentState.directions[(0, 0)] = ""
-    SegmentState(set([(0, 0)]), t).solve()
-    lens = [len(v) for v in SegmentState.directions.values()]
-    lens = [i for i in lens if i >= 1000]
-    print(len(lens))
+    print(len([len(v) for v in dirs.values() if len(v) >= 1000]))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 t = read()
 Segment.resolve()
+dirs = {}
 
 if __name__ == "__main__":
     easy()
