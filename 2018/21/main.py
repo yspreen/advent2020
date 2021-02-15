@@ -16,63 +16,68 @@ def read():
     return t[0], [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
 
 
-def op(reg):
-    try:
-        o = t[reg[ip]]
-    except:
-        return True
-    code, A, B, C = o
-
-    if reg[ip] == 28:
-        print(reg)
-    if code == "addr":
-        reg[C] = reg[A] + reg[B]
-    if code == "addi":
-        reg[C] = reg[A] + B
-    if code == "mulr":
-        reg[C] = reg[A] * reg[B]
-    if code == "muli":
-        reg[C] = reg[A] * B
-    if code == "banr":
-        reg[C] = reg[A] & reg[B]
-    if code == "bani":
-        reg[C] = reg[A] & B
-    if code == "borr":
-        reg[C] = reg[A] | reg[B]
-    if code == "bori":
-        reg[C] = reg[A] | B
-    if code == "setr":
-        reg[C] = reg[A]
-    if code == "seti":
-        reg[C] = A
-    if code == "gtir":
-        reg[C] = 1 if A > reg[B] else 0
-    if code == "gtri":
-        reg[C] = 1 if reg[A] > B else 0
-    if code == "gtrr":
-        reg[C] = 1 if reg[A] > reg[B] else 0
-    if code == "eqir":
-        reg[C] = 1 if A == reg[B] else 0
-    if code == "eqri":
-        reg[C] = 1 if reg[A] == B else 0
-    if code == "eqrr":
-        reg[C] = 1 if reg[A] == reg[B] else 0
-    reg[ip] += 1
-
-
 class VM:
     def __init__(self, r0):
         self.reg = [r0] + [0] * 5
         self.i = 0
+        self.v = []
 
     def step(self):
         self.i += 1
-        return op(self.reg)
+        return self.op()
 
     def run(self, timeout):
         while self.i < timeout and not self.step():
             continue
         return self.i
+
+    def op(self):
+        reg = self.reg
+        try:
+            o = t[reg[ip]]
+        except:
+            return True
+        code, A, B, C = o
+
+        if reg[ip] == 28:
+            v = reg[3]
+            if v in self.v:
+                print(self.v)
+                return True
+            self.v.append(self)
+        if code == "addr":
+            reg[C] = reg[A] + reg[B]
+        if code == "addi":
+            reg[C] = reg[A] + B
+        if code == "mulr":
+            reg[C] = reg[A] * reg[B]
+        if code == "muli":
+            reg[C] = reg[A] * B
+        if code == "banr":
+            reg[C] = reg[A] & reg[B]
+        if code == "bani":
+            reg[C] = reg[A] & B
+        if code == "borr":
+            reg[C] = reg[A] | reg[B]
+        if code == "bori":
+            reg[C] = reg[A] | B
+        if code == "setr":
+            reg[C] = reg[A]
+        if code == "seti":
+            reg[C] = A
+        if code == "gtir":
+            reg[C] = 1 if A > reg[B] else 0
+        if code == "gtri":
+            reg[C] = 1 if reg[A] > B else 0
+        if code == "gtrr":
+            reg[C] = 1 if reg[A] > reg[B] else 0
+        if code == "eqir":
+            reg[C] = 1 if A == reg[B] else 0
+        if code == "eqri":
+            reg[C] = 1 if reg[A] == B else 0
+        if code == "eqrr":
+            reg[C] = 1 if reg[A] == reg[B] else 0
+        reg[ip] += 1
 
 
 def print_op(o, i):
@@ -152,12 +157,20 @@ def easy():
     #     if n != 5000:
     #         print(i, n)
     # reverse_code()
-    N = 16311888
-    print(VM(N).run(5000))
+    # N = 16311888
+    # N = 16777215
+    # print(VM(N).run(5000))
+    return
 
 
 def hard():
-    return
+    VM(1).run(inf)
+    # m = 0
+    # for i in range(16777215 + 1):
+    #     i = (i * 65899) & 16777215
+    #     if i > m:
+    #         m = i
+    # print(m)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
