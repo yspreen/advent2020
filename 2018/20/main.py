@@ -28,24 +28,20 @@ class SegmentState:
         if self.segment.children:
             state = self.before
             for c in self.segment.children:
-                n = SegmentState(state, c)
-                n.solve()
-                state = n.after
+                state = SegmentState(state, c).solve()
             self.after = state
+        elif self.segment.choices:
+            for c in self.segment.choices:
+                self.after |= SegmentState(self.before, c).solve()
         else:
             for p in self.before:
-                if self.segment.choices:
-                    for c in self.segment.choices:
-                        n = SegmentState(set([p]), c)
-                        n.solve()
-                        self.after |= n.after
-                else:
-                    direction = self.directions[p]
-                    for c in self.segment.s:
-                        direction += c
-                        p = (p[0] + y_dist[c], p[1] + x_dist[c])
-                        self.directions[p] = self.directions.get(p, direction)
-                    self.after.add(p)
+                direction = self.directions[p]
+                for c in self.segment.s:
+                    direction += c
+                    p = (p[0] + y_dist[c], p[1] + x_dist[c])
+                    self.directions[p] = self.directions.get(p, direction)
+                self.after.add(p)
+        return self.after
 
 
 x_dist = {
