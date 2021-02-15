@@ -16,6 +16,52 @@ def read():
     return Segment(t[1:-1])
 
 
+class SegmentState:
+    directions = {}
+
+    def __init__(self, before, segment):
+        self.before = before
+        self.after = set()
+        self.segment = segment
+
+    def solve(self):
+        if self.segment.children:
+            state = self.before
+            for c in self.segment.children:
+                n = SegmentState(state, c)
+                n.solve()
+                state = n.after
+            self.after = state
+        else:
+            for p in self.before:
+                if self.segment.choices:
+                    for c in self.segment.choices:
+                        n = SegmentState(set([p]), c)
+                        n.solve()
+                        self.after |= n.after
+                else:
+                    direction = self.directions[p]
+                    for c in self.segment.s:
+                        direction += c
+                        p = (p[0] + y_dist[c], p[1] + x_dist[c])
+                        self.directions[p] = self.directions.get(p, direction)
+                    self.after.add(p)
+
+
+x_dist = {
+    "N": 0,
+    "E": 1,
+    "S": 0,
+    "W": -1,
+}
+y_dist = {
+    "N": -1,
+    "E": 0,
+    "S": 1,
+    "W": 0,
+}
+
+
 class Segment:
     unresolved = []
     items = []
@@ -32,6 +78,7 @@ class Segment:
         self.children = []
         self.items.append(self)
         self.id = len(self.items)
+        self.s = s
         segments = [-1]
         splits = [-1]
         brace_num = 0
@@ -61,7 +108,7 @@ class Segment:
                 self.children.append(s[a + 1 : b])
         self.unresolved.append(self.children)
         self.unresolved.append(self.choices)
-        self.s = len(shorten(s))
+        self.l = len(shorten(s))
 
     def print(self, prefix=[]):
         print(*prefix, self.s)
@@ -78,55 +125,7 @@ class Segment:
             s = [i.max_length for i in self.choices]
             s.sort(key=lambda i: -i)
             return s[0]
-        return self.s
-
-    lengths_ = {}
-
-    @property
-    def lengths(self):
-        l = Segment.lengths_.get(self.id, None)
-        if l is not None:
-            return l
-        if self.children:
-            c = [i.lengths for i in self.children]
-            a = c[0]
-            for b in c[1:]:
-                a_ = np.zeros(M + 1, dtype=np.int)
-                a = np.outer(a, b)
-                for p in zip(*np.where(a > 0)):
-                    i = a[p]
-                    p = min(M, sum(p))
-                    a_[p] += i
-                a = a_
-            l = a
-        elif self.choices:
-            l = np.sum([s.lengths for s in self.choices], axis=0, dtype=np.int)
-        else:
-            A = np.zeros(M + 1, dtype=np.int)
-            A[self.s] = 1
-            l = A
-        Segment.lengths_[self.id] = l
-        return l
-
-
-def combine(a, b):
-    a = np.outer(a, b)
-    for i in range(1, M + 1):
-        a[i] = np.roll(a[i], i)
-    return np.sum(a, 0)
-
-
-def combine_reference(a, b):
-    a = [[i] * j for i, j in enumerate(a) if j > 0]
-    b = [[i] * j for i, j in enumerate(b) if j > 0]
-    a = [i for sublist in a for i in sublist]
-    b = [i for sublist in b for i in sublist]
-
-    r = np.zeros(M + 1, np.uint32)
-
-    for i, j in product(a, b):
-        r[i + j] += 1
-    return r
+        return self.l
 
 
 def shorten(s):
@@ -140,17 +139,16 @@ def shorten(s):
     return s
 
 
-M = 1000
-
-
 def easy():
     print(t.max_length)
 
 
 def hard():
-    for i in reversed(Segment.items):
-        i.lengths
-    print(list(t.lengths))
+    SegmentState.directions[(0, 0)] = ""
+    SegmentState(set([(0, 0)]), t).solve()
+    lens = [len(v) for v in SegmentState.directions.values()]
+    lens = [i for i in lens if i >= 1000]
+    print(len(lens))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
