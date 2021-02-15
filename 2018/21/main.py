@@ -16,13 +16,15 @@ def read():
     return t[0], [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
 
 
-def op():
+def op(reg):
     try:
         o = t[reg[ip]]
     except:
         return True
     code, A, B, C = o
 
+    if reg[ip] == 28:
+        print(reg)
     if code == "addr":
         reg[C] = reg[A] + reg[B]
     if code == "addi":
@@ -56,6 +58,21 @@ def op():
     if code == "eqrr":
         reg[C] = 1 if reg[A] == reg[B] else 0
     reg[ip] += 1
+
+
+class VM:
+    def __init__(self, r0):
+        self.reg = [r0] + [0] * 5
+        self.i = 0
+
+    def step(self):
+        self.i += 1
+        return op(self.reg)
+
+    def run(self, timeout):
+        while self.i < timeout and not self.step():
+            continue
+        return self.i
 
 
 def print_op(o, i):
@@ -124,24 +141,23 @@ def print_op(o, i):
     print("%3d: %s" % (i, s))
 
 
-def reverse():
+def reverse_code():
     for i, o in enumerate(t):
         print_op(o, i)
 
 
 def easy():
-    reg[0] = 100
-    while not op():
-        continue
-    print(reg[0])
+    # for i in range(10000):
+    #     n = VM(i).run(5000)
+    #     if n != 5000:
+    #         print(i, n)
+    # reverse_code()
+    N = 16311888
+    print(VM(N).run(5000))
 
 
 def hard():
-    global reg
-
-    reg = [0] * 6
-    reg[0] = 1
-    easy()
+    return
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
