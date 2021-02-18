@@ -39,12 +39,17 @@ class VM:
             return True
         code, A, B, C = o
 
-        if reg[ip] == 28:
-            v = reg[3]
-            if v in self.v:
-                print(self.v)
-                return True
-            self.v.append(self)
+        print(S[reg[ip]])
+        # if reg[ip] == 28:
+        #     v = reg[3]
+        #     print("{0:08b}".format(reg[2]), end=" ")
+        #     print("{0:024b}".format(v))
+        #     # print((reg[2]), end=" ")
+        #     # print((v))
+        #     if v in self.v:
+        #         print(self.v)
+        #         return True
+        #     self.v.append(self)
         if code == "addr":
             reg[C] = reg[A] + reg[B]
         if code == "addi":
@@ -78,6 +83,32 @@ class VM:
         if code == "eqrr":
             reg[C] = 1 if reg[A] == reg[B] else 0
         reg[ip] += 1
+
+
+S = []
+
+
+def test():
+    s = set()
+    a = b = c = d = z = 0
+    while True:
+        b = c | 65536
+        c = 10736359
+        while True:
+            a = b & 255
+            c += a
+            c &= 16777215
+            c *= 65899
+            c &= 16777215
+            if b < 256:
+                if c in s:
+                    print(d)
+                    return
+                d = c
+                s.add(c)
+                break
+            else:
+                b = b // 256
 
 
 def print_op(o, i):
@@ -143,7 +174,7 @@ def print_op(o, i):
     s = re.sub(r"\$P = (\d+)", r"GOTO \1", s)
     if "GOTO" in s:
         s = "GOTO " + str(int(s[5:]) + 1)
-    print("%3d: %s" % (i, s))
+    S.append("%3d: %s" % (i, s))
 
 
 def reverse_code():
@@ -152,6 +183,7 @@ def reverse_code():
 
 
 def easy():
+    reverse_code()
     # for i in range(10000):
     #     n = VM(i).run(5000)
     #     if n != 5000:
@@ -164,13 +196,14 @@ def easy():
 
 
 def hard():
-    VM(1).run(inf)
+    # VM(1).run(inf)
     # m = 0
     # for i in range(16777215 + 1):
     #     i = (i * 65899) & 16777215
     #     if i > m:
     #         m = i
     # print(m)
+    test()
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
