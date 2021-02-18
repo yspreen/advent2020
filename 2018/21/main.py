@@ -13,18 +13,17 @@ from sympy import simplify, symbols, solve
 def read():
     with open(DIR / "input.txt") as f:
         t = f.read().splitlines()
-    return t[0], [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
+    return [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
 
 
 def test():
     s = set()
-    a = b = c = d = z = i = 0
+    b = c = d = z = i = 0
     while True:
         b = c | A
         c = C
         while True:
-            a = b & 255
-            c += a
+            c += b & 255
             c &= D
             c *= B
             c &= D
@@ -39,7 +38,7 @@ def test():
                 s.add(c)
                 break
             else:
-                b = b // 256
+                b //= 256
 
 
 def easy():
@@ -52,12 +51,8 @@ def hard():
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
-_, t = read()
-A = t[6][2]
-B = t[11][2]
-C = t[7][1]
-D = t[10][2]
-reg = [0] * 6
+t = read()
+A, B, C, D = t[6][2], t[11][2], t[7][1], t[10][2]
 
 
 if __name__ == "__main__":
