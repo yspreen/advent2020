@@ -20,8 +20,8 @@ def read():
 
 def easy():
     global TX, TY, A
-    TX *= 2
-    TY *= 2
+    TX *= K
+    TY *= K
     A = np.zeros((TX + 1, TY + 1), np.int)
     for x in range(TX + 1):
         A[x, 0] = (X * x + D) % M
@@ -29,8 +29,8 @@ def easy():
         A[0, y] = (Y * y + D) % M
     for x, y in product(range(1, TX + 1), range(1, TY + 1)):
         A[x, y] = (A[x - 1, y] * A[x, y - 1] + D) % M
-    TX //= 2
-    TY //= 2
+    TX //= K
+    TY //= K
     A[TX, TY] = (0 + D) % M
     A %= 3
     # for r in A.T:
@@ -67,12 +67,11 @@ def neighbors(p):
     #     else:
     #         possible_tools.append(p[2] + i)
     possible_tools = {0, 1, 2} - {p[2]}
-    for t in possible_tools:
-        if t in allowed[A[p[0], p[1]]]:
-            n.append(((p[0], p[1], t), 7))
+    for t in possible_tools & set(allowed[A[p[0], p[1]]]):
+        n.append(((p[0], p[1], t), 7))
     for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
         x, y = p[0] + dx, p[1] + dy
-        if 0 <= x < TX * 2 and 0 <= y < TY * 2 and A[x, y] in allowed[p[2]]:
+        if 0 <= x < TX * K and 0 <= y < TY * K and A[x, y] in allowed[p[2]]:
             n.append(((x, y, p[2]), 1))
     return n
 
@@ -131,6 +130,7 @@ X = 16807
 Y = 48271
 M = 20183
 A = 0
+K = 8
 
 if __name__ == "__main__":
     easy()
