@@ -60,7 +60,7 @@ def seed(rule):
             j_ - rule[1] + rule[0][1],
             k_ - rule[1] + rule[0][2],
         )
-        if dist((i, j, k), rule[0]) <= rule[1]:
+        if dist((i, j, k), rule[0]) == rule[1]:
             s.append((i, j, k))
     return s
 
