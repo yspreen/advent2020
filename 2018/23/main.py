@@ -46,30 +46,47 @@ def count_p(p, k=1):
 
 
 def easy():
-    t.sort(key=lambda i: -i[1])
-    m = t[0]
+    t.sort(key=lambda i: i[1])
+    m = t[-1]
 
     print(count(m))
+
+
+def seed(rule):
+    s = []
+    for i_, j_, k_ in product(range(rule[1] * 2 + 1), repeat=3):
+        i, j, k = (
+            i_ - rule[1] + rule[0][0],
+            j_ - rule[1] + rule[0][1],
+            k_ - rule[1] + rule[0][2],
+        )
+        if dist((i, j, k), rule[0]) <= rule[1]:
+            s.append((i, j, k))
+    return s
 
 
 def hard():
     import math
 
-    m = max(map(lambda i: max(i[0]), t))
-    m = int(math.log(m) // math.log(10))
-    p = (0, 0, 0)
-    for i in range(m + 1):
-        i = m - i  # m...0
-        p = (p[0] * 10, p[1] * 10, p[2] * 10)
-        mx = (0, 0)
-        for x in product(range(16), repeat=3):
-            p_ = (p[0] + x[0] - 5, p[1] + x[1] - 5, p[2] + x[2] - 5)
-            # print(p_)
-            c = count_p(p_, 10 ** i)
-            if c > mx[0]:
-                mx = (c, p_)
-        p = mx[1]
-    print(p, sum(p))
+    for n in range(7):
+        print("no")
+        n = "0{0:b}".format(n)
+        l = [t[i] for i in range(len(t)) if n[-(i + 1) :][:1] != "1"]
+        s = seed(l[0])
+        broken = False
+        for r in l[1:]:
+            del_queue = []
+            for i, p in enumerate(s):
+                if dist(p, r[0]) > r[1]:
+                    del_queue.append(i)
+            del_queue.reverse()
+            for i in del_queue:
+                del s[i]
+            if not s:
+                broken = True
+                break
+        if not broken:
+            print(s)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
