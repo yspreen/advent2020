@@ -29,18 +29,18 @@ def dist(a, b, k=1):
     return sum([abs(a[0] - b[0] // k), abs(a[1] - b[1] // k), abs(a[2] - b[2] // k)])
 
 
-def count(m, k=1):
+def count(m):
     c = 0
     for l in t:
-        if dist(m[0], l[0], k=k) <= m[1] // k:
+        if dist(m[0], l[0]) <= m[1]:
             c += 1
     return c
 
 
-def count_p(p, k=1):
+def count_p(p, t):
     c = 0
     for l in t:
-        if dist(p, l[0], k=k) <= l[1] // k:
+        if dist(p, l[0]) <= l[1]:
             c += 1
     return c
 
@@ -65,28 +65,34 @@ def seed(rule):
     return s
 
 
+def mask(t, i):
+    m = []
+    i = 10 ** i
+    return [((l[0][0] // i, l[0][1] // i, l[0][2] // i), l[1] // i) for l in t]
+
+
 def hard():
     import math
 
-    for n in range(7):
-        print("no")
-        n = "0{0:b}".format(n)
-        l = [t[i] for i in range(len(t)) if n[-(i + 1) :][:1] != "1"]
-        s = seed(l[0])
-        broken = False
-        for r in l[1:]:
-            del_queue = []
-            for i, p in enumerate(s):
-                if dist(p, r[0]) > r[1]:
-                    del_queue.append(i)
-            del_queue.reverse()
-            for i in del_queue:
-                del s[i]
-            if not s:
-                broken = True
-                break
-        if not broken:
-            print(s)
+    N = len(str(t[-1][1])) + 1
+
+    points = [(0, 0, 0)]
+    for i in range(N):
+        i = N - i - 1
+        print(".", 10 ** i, len(points))
+        t_ = mask(t, i)
+        points = list(map(lambda i: tuple(map(lambda j: j * 10, i)), points))
+        m = (0, [])
+        for p_ in points:
+            for off in product(range(10), repeat=3):
+                p = (p_[0] + off[0], p_[1] + off[1], p_[2] + off[2])
+                c = count_p(p, t_)
+                if c == m[0]:
+                    m[1].append(p)
+                if c > m[0]:
+                    m = (c, [p])
+        points = m[1]
+    print(points)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
