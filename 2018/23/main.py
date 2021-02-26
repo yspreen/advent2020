@@ -37,10 +37,10 @@ def count(m):
     return c
 
 
-def count_p(p, t):
+def count_p(p, t, n):
     c = 0
     for l in t:
-        if dist(p, l[0]) <= l[1]:
+        if dist(p, l[0]) <= l[1] + (1 if n > 1 else 0):
             c += 1
     return c
 
@@ -71,28 +71,34 @@ def mask(t, i):
     return [((l[0][0] // i, l[0][1] // i, l[0][2] // i), l[1] // i) for l in t]
 
 
+def solve(points, n):
+    if n == 0:
+        print(sum(points[0]))
+        return True
+    t_ = mask(t, n)
+    points = list(map(lambda i: tuple(map(lambda j: j * 10, i)), points))
+    m = (0, [])
+    for p_ in points:
+        for off in product(range(10), repeat=3):
+            p = (p_[0] + off[0], p_[1] + off[1], p_[2] + off[2])
+            c = count_p(p, t_, n)
+            if c == m[0]:
+                m[1].append(p)
+            if c > m[0]:
+                m = (c, [p])
+    for p in m[1]:
+        if solve([p], n - 1):
+            return True
+
+
 def hard():
     import math
 
     N = len(str(t[-1][1])) + 1
 
     points = [(0, 0, 0)]
-    for i in range(N):
-        i = N - i - 1
-        print(".", 10 ** i, len(points))
-        t_ = mask(t, i)
-        points = list(map(lambda i: tuple(map(lambda j: j * 10, i)), points))
-        m = (0, [])
-        for p_ in points:
-            for off in product(range(10), repeat=3):
-                p = (p_[0] + off[0], p_[1] + off[1], p_[2] + off[2])
-                c = count_p(p, t_)
-                if c == m[0]:
-                    m[1].append(p)
-                if c > m[0]:
-                    m = (c, [p])
-        points = m[1]
-    print(points)
+    i = N - 1
+    solve(points, i)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
