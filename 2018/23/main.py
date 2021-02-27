@@ -40,7 +40,7 @@ def count(m):
 def count_p(p, t, n):
     c = 0
     for l in t:
-        if dist(p, l[0]) <= l[1] + (1 if n > 1 else 0):
+        if dist(p, l[0]) <= l[1] + (1 if n > 0 else 0):
             c += 1
     return c
 
@@ -72,7 +72,7 @@ def mask(t, i):
 
 
 def solve(points, n):
-    if n == 0:
+    if n < 0:
         print(sum(points[0]))
         return True
     t_ = mask(t, n)
