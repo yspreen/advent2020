@@ -25,22 +25,14 @@ def read():
     return t
 
 
-def dist(a, b, k=1):
-    return sum([abs(a[0] - b[0] // k), abs(a[1] - b[1] // k), abs(a[2] - b[2] // k)])
+def dist(a, b):
+    return sum([abs(a[0] - b[0]), abs(a[1] - b[1]), abs(a[2] - b[2])])
 
 
 def count(m):
     c = 0
     for l in t:
         if dist(m[0], l[0]) <= m[1]:
-            c += 1
-    return c
-
-
-def count_p(p, t, n):
-    c = 0
-    for l in t:
-        if dist(p, l[0]) <= l[1] + (1 if n > 0 else 0):
             c += 1
     return c
 
@@ -52,53 +44,31 @@ def easy():
     print(count(m))
 
 
-def seed(rule):
-    s = []
-    for i_, j_, k_ in product(range(rule[1] * 2 + 1), repeat=3):
-        i, j, k = (
-            i_ - rule[1] + rule[0][0],
-            j_ - rule[1] + rule[0][1],
-            k_ - rule[1] + rule[0][2],
-        )
-        if dist((i, j, k), rule[0]) == rule[1]:
-            s.append((i, j, k))
-    return s
+def neighbors(rule):
+    p = rule[0]
+    d = rule[1]
 
-
-def mask(t, i):
-    m = []
-    i = 10 ** i
-    return [((l[0][0] // i, l[0][1] // i, l[0][2] // i), l[1] // i) for l in t]
-
-
-def solve(points, n):
-    if n < 0:
-        print(sum(points[0]))
-        return True
-    t_ = mask(t, n)
-    points = list(map(lambda i: tuple(map(lambda j: j * 10, i)), points))
-    m = (0, [])
-    for p_ in points:
-        for off in product(range(10), repeat=3):
-            p = (p_[0] + off[0], p_[1] + off[1], p_[2] + off[2])
-            c = count_p(p, t_, n)
-            if c == m[0]:
-                m[1].append(p)
-            if c > m[0]:
-                m = (c, [p])
-    for p in m[1]:
-        if solve([p], n - 1):
-            return True
+    n = []
+    for v in [(-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, -1), (0, 0, 1)]:
+        n.append((p[0] + v[0] * d, p[1] + v[1] * d, p[2] + v[2] * d))
+    return n
 
 
 def hard():
     import math
 
-    N = len(str(t[-1][1])) + 1
+    ps = []
+    for r in t:
+        ps.extend(neighbors(r))
 
-    points = [(0, 0, 0)]
-    i = N - 1
-    solve(points, i)
+    c = {}
+    for p in ps:
+        c[p] = 0
+        for r in t:
+            if dist(p, r[0]) <= r[1]:
+                c[p] += 1
+    c = [sum(k) for k, v in c.items() if v == max([i for i in c.values()])]
+    print(min(c))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
