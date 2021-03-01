@@ -8,6 +8,7 @@ from math import prod, gcd
 from itertools import permutations, product
 from multiprocessing import Pool
 from sympy import simplify, symbols, solve
+import z3
 
 
 def read():
@@ -44,31 +45,24 @@ def easy():
     print(count(m))
 
 
-def neighbors(rule):
-    p = rule[0]
-    d = rule[1]
-
-    n = []
-    for v in [(-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, -1), (0, 0, 1)]:
-        n.append((p[0] + v[0] * d, p[1] + v[1] * d, p[2] + v[2] * d))
-    return n
+def zAbs(x):
+    return z3.If(x >= 0, x, -x)
 
 
 def hard():
-    import math
+    o = z3.Optimize()
+    x, y, z = z3.Ints("x y z")
 
-    ps = []
-    for r in t:
-        ps.extend(neighbors(r))
-
-    c = {}
-    for p in ps:
-        c[p] = 0
-        for r in t:
-            if dist(p, r[0]) <= r[1]:
-                c[p] += 1
-    c = [sum(k) for k, v in c.items() if v == max([i for i in c.values()])]
-    print(min(c))
+    for p, d in t:
+        o.add_soft(
+            z3.If(x > p[0], x - p[0], p[0] - x)
+            + z3.If(y > p[1], y - p[1], p[1] - y)
+            + z3.If(z > p[2], z - p[2], p[2] - z)
+            <= d
+        )
+    o.check()
+    m = o.model()
+    print(m[x] + m[y] + m[z])
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
