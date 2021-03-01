@@ -45,10 +45,6 @@ def easy():
     print(count(m))
 
 
-def zAbs(x):
-    return z3.If(x >= 0, x, -x)
-
-
 def hard():
     o = z3.Optimize()
     x, y, z = z3.Ints("x y z")
