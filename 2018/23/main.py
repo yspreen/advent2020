@@ -62,7 +62,7 @@ def hard():
         )
     o.check()
     m = o.model()
-    print(m[x] + m[y] + m[z])
+    print(m.eval(x + y + z))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
