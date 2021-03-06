@@ -73,17 +73,12 @@ class Unit:
             return
         self.attacks = m[1]
         from_units.discard(m[1])
-        print("%d will attack %d" % (self.id, m[1].id))
 
     def attack(self):
         if self.units <= 0 or self.attacks is None or self.attacks.units <= 0:
             return
 
         a = self.effective_damage_given(self.attacks)
-        print(
-            "%d attacks %d with %d dmg, killing %d"
-            % (self.id, self.attacks.id, a, a // self.attacks.hp)
-        )
         a //= self.attacks.hp
         self.attacks.units -= a
 
@@ -108,13 +103,6 @@ def easy():
     while True:
         if not IMM or not INF:
             break
-        print("\nImmune:")
-        for u in IMM:
-            print("%d with %d units" % (u.id, u.units))
-        print("Infection:")
-        for u in INF:
-            print("%d with %d units" % (u.id, u.units))
-        print()
         IMM.sort(key=lambda i: -i.sort_key)
         INF.sort(key=lambda i: -i.sort_key)
         other = set(INF)
@@ -123,7 +111,6 @@ def easy():
         other = set(IMM)
         for u in INF:
             u.pick(from_units=other)
-        print()
         all = IMM + INF
         all.sort(key=lambda i: -i.init)
         for u in all:
