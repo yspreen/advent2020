@@ -14,7 +14,7 @@ class Unit:
     items = {}
     max_init = 0
 
-    def __init__(self, s):
+    def __init__(self, s, b):
         self.__class__.last_id += 1
         self.id = self.__class__.last_id
         self.items[self.id] = self
@@ -34,7 +34,7 @@ class Unit:
         s = s.split(") ")[-1]
 
         s = s.split("with an attack that does ")[1]
-        self.atk = int(s.split(" ")[0])
+        self.atk = int(s.split(" ")[0]) + b
         self.atk_type = s.split(" ")[1]
         self.init = int(s.split(" ")[-1])
         self.attacks = None
@@ -76,14 +76,15 @@ class Unit:
 
     def attack(self):
         if self.units <= 0 or self.attacks is None or self.attacks.units <= 0:
-            return
+            return 0
 
         a = self.effective_damage_given(self.attacks)
         a //= self.attacks.hp
         self.attacks.units -= a
+        return min(a, 1)
 
 
-def read():
+def read(boost):
     with open(DIR / "input") as f:
         t = f.read().splitlines()
     n = 0
@@ -93,12 +94,12 @@ def read():
             n += 1
         if "units" not in r:
             continue
-        u[n].append(Unit(r))
+        u[n].append(Unit(r, boost if n == 0 else 0))
     return u
 
 
-def easy():
-    IMM, INF = read()
+def sim(boost=0):
+    IMM, INF = read(boost)
 
     while True:
         if not IMM or not INF:
@@ -113,16 +114,40 @@ def easy():
             u.pick(from_units=other)
         all = IMM + INF
         all.sort(key=lambda i: -i.init)
+        did_attack = 0
         for u in all:
-            u.attack()
+            did_attack |= u.attack()
+        if not did_attack:
+            return [[], []]
         IMM = list(filter(lambda i: i.units > 0, IMM))
         INF = list(filter(lambda i: i.units > 0, INF))
+    return IMM, INF
+
+
+def check(boost):
+    return sum(map(lambda i: i.units, sim(boost)[0]))
+
+
+def easy():
+    IMM, INF = sim()
 
     print(sum(map(lambda i: i.units, IMM + INF)))
 
 
 def hard():
-    return
+    b = 1
+    while check(b) == 0:
+        b *= 2
+
+    lower = b // 2
+    upper = b
+    while upper - lower > 1:
+        d = (upper - lower) // 2 + lower
+        if check(d):
+            upper = d
+        else:
+            lower = d
+    print(check(upper))
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
