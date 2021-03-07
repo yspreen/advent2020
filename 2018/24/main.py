@@ -141,13 +141,16 @@ def hard():
 
     lower = b // 2
     upper = b
+    r = 0
     while upper - lower > 1:
         d = (upper - lower) // 2 + lower
-        if check(d):
+        v = check(d)
+        if v:
+            r = v
             upper = d
         else:
             lower = d
-    print(check(upper))
+    print(r)
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
