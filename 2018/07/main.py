@@ -3,7 +3,7 @@ import pathlib
 input = list(
     map(
         lambda l: l.split(", "),
-        open(pathlib.Path(__file__).parent / "input.txt").read().splitlines(),
+        open(pathlib.Path(__file__).parent / "input").read().splitlines(),
     )
 )
 

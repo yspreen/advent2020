@@ -66,7 +66,7 @@ ORE = Element("1 ORE => 1 ORE")
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().split("\n")
     if t[-1] == "":
         t.pop()

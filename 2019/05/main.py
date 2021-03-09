@@ -61,7 +61,7 @@ def op(i):
 
 def calc(*inp):
     global memory, inputs
-    with open("2019.5/input.txt") as f:
+    with open("2019.5/input") as f:
         t = f.read().replace("\n", "").split(",")
     if t[-1] == "":
         t.pop()

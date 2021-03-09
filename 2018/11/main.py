@@ -1,6 +1,6 @@
 import pathlib
 
-serial = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()[0]
+serial = open(pathlib.Path(__file__).parent / "input").read().splitlines()[0]
 serial = int(serial) % 1000
 
 

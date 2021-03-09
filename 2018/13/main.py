@@ -27,7 +27,7 @@ cart_track_char = {
 }
 
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()
+input = open(pathlib.Path(__file__).parent / "input").read().splitlines()
 carts = []
 tracks = [[0 for _ in range(len(input))] for _ in range(len(input[0]))]
 

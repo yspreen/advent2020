@@ -14,7 +14,7 @@ inf = float("inf")
 
 def read(n=1):
     global t, N, OFF
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t_ = f.read().split("\n")[0]
         # t_ = "03036732577212944063491565474664"
     t = np.array([int(i) for i in t_], np.int16)

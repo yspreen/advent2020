@@ -12,7 +12,7 @@ inf = float("inf")
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read()
     n = len(t.split("\n")[0])
     t = t.replace("\n", "").replace("#", "1").replace(".", "0")

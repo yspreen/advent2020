@@ -8,7 +8,7 @@ DIR = pathlib.Path(__file__).parent.absolute()
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "").split("\n\n")
     t = [l.split("\n") for l in t]
     if t[-1] == "":

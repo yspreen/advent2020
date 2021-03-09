@@ -11,7 +11,7 @@ from sympy import simplify, symbols, solve
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().splitlines()
     return t[0], [[i[:4], *map(int, i[5:].split(" "))] for i in t[1:]]
 

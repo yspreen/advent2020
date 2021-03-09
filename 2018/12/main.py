@@ -1,6 +1,6 @@
 import pathlib
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()
+input = open(pathlib.Path(__file__).parent / "input").read().splitlines()
 
 state = input[0].split(" ")[-1]
 rules = {i.split(" ")[0]: i.split(" ")[-1] for i in input[2:]}

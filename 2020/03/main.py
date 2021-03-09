@@ -10,7 +10,7 @@ A = None
 
 def check(x, y):
     global A
-    with open("2020.3/input.txt") as f:
+    with open("2020.3/input") as f:
         t = f.read().replace("\r", "").split("\n")
     if t[-1] == "":
         t.pop()

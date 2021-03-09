@@ -1,6 +1,6 @@
 import pathlib
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()[0]
+input = open(pathlib.Path(__file__).parent / "input").read().splitlines()[0]
 input = [int(input.split(" ")[0]), int(input.split(" ")[-2])]
 
 

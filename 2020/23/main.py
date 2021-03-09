@@ -13,7 +13,7 @@ inf = float("inf")
 
 
 def read(add=0):
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "").replace("\n", "")
     t = llist.dllist([int(i) for i in t])
 

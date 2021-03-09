@@ -1,4 +1,4 @@
-with open("2019.4/input.txt") as f:
+with open("2019.4/input") as f:
     t = f.read().replace("\n", "").split("-")
 if t[-1] == "":
     t.pop()

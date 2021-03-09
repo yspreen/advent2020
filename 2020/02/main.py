@@ -1,5 +1,5 @@
 def easy():
-    with open("2020.2/input.txt") as f:
+    with open("2020.2/input") as f:
         t = f.read().replace("\r", "").split("\n")
     if t[-1] == "":
         t.pop()
@@ -27,7 +27,7 @@ def easy():
 
 
 def hard():
-    with open("2020.2/input.txt") as f:
+    with open("2020.2/input") as f:
         t = f.read().replace("\r", "").split("\n")
     if t[-1] == "":
         t.pop()

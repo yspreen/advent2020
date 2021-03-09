@@ -1,6 +1,6 @@
 import pathlib
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().replace("\n", "")
+input = open(pathlib.Path(__file__).parent / "input").read().replace("\n", "")
 
 
 from string import ascii_lowercase as letters

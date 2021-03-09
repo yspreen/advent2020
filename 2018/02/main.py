@@ -1,7 +1,7 @@
 import pathlib
 
 input = list(
-    map(str, open(pathlib.Path(__file__).parent / "input.txt").read().splitlines())
+    map(str, open(pathlib.Path(__file__).parent / "input").read().splitlines())
 )
 
 

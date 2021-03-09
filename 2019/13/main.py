@@ -38,7 +38,7 @@ def digit(num, dig):
 
 class VM:
     def read(self):
-        with open(DIR / "input.txt") as f:
+        with open(DIR / "input") as f:
             t = f.read().replace("\n", "").split(",")
         if t[-1] == "":
             t.pop()

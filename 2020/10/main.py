@@ -10,7 +10,7 @@ inf = float("inf")
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "")
     t = t.split("\n")
     if t[-1] == "":

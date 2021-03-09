@@ -10,7 +10,7 @@ def seat_id(s):
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = (
             f.read()
             .replace("\r", "")

@@ -61,7 +61,7 @@ class Rule:
 
 
 def read(advanced=False):
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "").split("\n\n")
 
     rules = t[0].split("\n")

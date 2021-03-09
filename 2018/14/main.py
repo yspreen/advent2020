@@ -1,7 +1,7 @@
 from llist import sllist
 import pathlib
 
-input = int(open(pathlib.Path(__file__).parent / "input.txt").read())
+input = int(open(pathlib.Path(__file__).parent / "input").read())
 
 
 def easy():

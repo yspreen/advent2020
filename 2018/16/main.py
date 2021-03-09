@@ -5,7 +5,7 @@ input1, input2 = [
     list(
         filter(
             None,
-            open(pathlib.Path(__file__).parent / "input.txt")
+            open(pathlib.Path(__file__).parent / "input")
             .read()
             .split("\n" * 4)[i]
             .splitlines(),

@@ -2,7 +2,7 @@ from itertools import product
 import copy
 import pathlib
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()
+input = open(pathlib.Path(__file__).parent / "input").read().splitlines()
 chars = {
     ".": 0,  # open
     "|": 1,  # tree

@@ -10,7 +10,7 @@ from multiprocessing import Pool
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = [[ord(i) for i in sub] for sub in f.read().split("\n")][:-1]
     return np.array(t, np.int32)
 

@@ -1,7 +1,7 @@
 import re
 import pathlib
 
-input = open(pathlib.Path(__file__).parent / "input.txt").read().splitlines()
+input = open(pathlib.Path(__file__).parent / "input").read().splitlines()
 input = [
     [i[0]] + re.sub(r"[^0-9,]", "", i.replace("..", ",")).split(",") for i in input
 ]

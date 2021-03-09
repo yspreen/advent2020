@@ -8,7 +8,7 @@ N = 20
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "").split("\n")
     t.pop()
     return np.array([[1 if i == "#" else 0 for i in l] for l in t], dtype=np.int32)

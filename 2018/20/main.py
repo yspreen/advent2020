@@ -11,7 +11,7 @@ from sympy import simplify, symbols, solve
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().splitlines()[0]
     return Segment(t[1:-1])
 

@@ -11,7 +11,7 @@ from sympy import simplify, symbols, solve
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().splitlines()
     return np.array([[[".", "#"].index(e) for e in i] for i in t], np.int32), len(t)
 

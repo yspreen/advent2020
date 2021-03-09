@@ -11,7 +11,7 @@ inf = float("inf")
 
 
 def read():
-    with open(DIR / "input.txt") as f:
+    with open(DIR / "input") as f:
         t = f.read().split(",")
     return [int(i) for i in t]
 
