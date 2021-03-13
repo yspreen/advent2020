@@ -26,30 +26,13 @@ def pos(n):
 
     p = (c // 2 + 1, c // 2 + 1)
 
-    for _ in range(c + 1):
-        if n <= 0:
-            break
-        n -= 1
-        p = (p[0], p[1] - 1)
-        ps.append(p)
-    for _ in range(c + 1):
-        if n <= 0:
-            break
-        n -= 1
-        p = (p[0] - 1, p[1])
-        ps.append(p)
-    for _ in range(c + 1):
-        if n <= 0:
-            break
-        n -= 1
-        p = (p[0], p[1] + 1)
-        ps.append(p)
-    for _ in range(c + 1):
-        if n <= 0:
-            break
-        n -= 1
-        p = (p[0] + 1, p[1])
-        ps.append(p)
+    for m in [(0, -1), (-1, 0), (0, 1), (1, 0)]:
+        for _ in range(c + 1):
+            if n <= 0:
+                break
+            n -= 1
+            p = (p[0] + m[0], p[1] + m[1])
+            ps.append(p)
 
     return ps
 
