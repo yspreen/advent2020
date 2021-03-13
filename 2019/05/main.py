@@ -40,7 +40,8 @@ def op(i):
         memory[a] = inputs.pop()
         return 2
     if ins == 4:
-        print(a)
+        if a > 0:
+            print(a)
         return 2
     if ins == 5:
         if a != 0:
@@ -61,7 +62,9 @@ def op(i):
 
 def calc(*inp):
     global memory, inputs
-    with open("2019.5/input") as f:
+    import pathlib
+
+    with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
         t = f.read().replace("\n", "").split(",")
     if t[-1] == "":
         t.pop()

@@ -1,4 +1,6 @@
-with open("2019.4/input") as f:
+import pathlib
+
+with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
     t = f.read().replace("\n", "").split("-")
 if t[-1] == "":
     t.pop()

@@ -5,7 +5,9 @@ N = 100000
 
 
 def easy():
-    with open("2019.3/input") as f:
+    import pathlib
+
+    with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
         t = f.read().replace("\r", "").split("\n")
     if t[-1] == "":
         t.pop()
@@ -41,7 +43,9 @@ def easy():
 
 
 def hard():
-    with open("2019.3/input") as f:
+    import pathlib
+
+    with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
         t = f.read().replace("\r", "").split("\n")
     if t[-1] == "":
         t.pop()

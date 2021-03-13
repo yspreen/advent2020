@@ -2,7 +2,7 @@ import pathlib
 
 input = list(
     map(
-        lambda l: l.split(", "),
+        lambda l: (l.split(" ")[1], l.split(" ")[7]),
         open(pathlib.Path(__file__).parent / "input").read().splitlines(),
     )
 )

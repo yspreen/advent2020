@@ -1,7 +1,9 @@
 def easy():
-    with open("2019.1/input") as f:
-        t = f.read().replace('\r', '').split('\n')
-    if t[-1] == '':
+    import pathlib
+
+    with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
+        t = f.read().replace("\r", "").split("\n")
+    if t[-1] == "":
         t.pop()
 
     t = [int(i) for i in t]
@@ -10,10 +12,13 @@ def easy():
 
     print(sum(t))
 
+
 def hard():
-    with open("2019.1/input") as f:
-        t = f.read().replace('\r', '').split('\n')
-    if t[-1] == '':
+    import pathlib
+
+    with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
+        t = f.read().replace("\r", "").split("\n")
+    if t[-1] == "":
         t.pop()
 
     t = [int(i) for i in t]
@@ -28,8 +33,8 @@ def hard():
         t = [(i if i > 0 else 0) for i in t]
         s += sum(t)
 
-
     print(s)
+
 
 if __name__ == "__main__":
     easy()

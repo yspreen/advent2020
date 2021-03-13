@@ -1,7 +1,13 @@
 import pathlib
 
 input = list(
-    map(int, open(pathlib.Path(__file__).parent / "input").read().splitlines())
+    map(
+        int,
+        open(pathlib.Path(__file__).parent / "input")
+        .read()
+        .replace(" ", "\n")
+        .splitlines(),
+    )
 )
 total = 0
 
