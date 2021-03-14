@@ -42,15 +42,6 @@ class Group:
         self.end = i
 
 
-"""
-
-
-{{abcdef}}
-0123456790
-
-"""
-
-
 def read():
     with open(DIR / "input") as f:
         s = f.read() if teststr == "" else teststr
