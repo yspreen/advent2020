@@ -32,7 +32,22 @@ def easy():
 
 
 def hard():
-    return
+    c = 0
+    a, b = t
+    for i in range(5000000):
+        while True:
+            a *= A
+            a %= M
+            if not a & 3:
+                break
+        while True:
+            b *= B
+            b %= M
+            if not b & 7:
+                break
+        if a & N == b & N:
+            c += 1
+    print(c)
 
 
 teststr = """"""
