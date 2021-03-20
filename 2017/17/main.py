@@ -37,13 +37,14 @@ def easy():
     print(n.next.value)
 
 
-def hard():
-    zero = n = CircularNode(0)
+def hard():  # 1, 7, 27
+    n = l = 0
     for i in range(50000000):
-        for _ in range(t):
-            n = n.next
-        n = n.insert(i + 1)
-    print(zero.next.value)
+        n += t + 1
+        n %= i + 1
+        if n == 0:
+            l = i + 1
+    print(l)
 
 
 teststr = """"""
