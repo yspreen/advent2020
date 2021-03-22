@@ -14,8 +14,8 @@ def lmap(*a):
 
 def read():
     with open(DIR / "input") as f:
-        s = f.read() if teststr == "" else teststr
-    return lmap(lambda r: lmap(int, r.split("\t")), s.splitlines())
+        s = (f.read() if teststr == "" else teststr).splitlines()
+    return lmap(lambda r: lmap(int, r.split("\t")), s)
 
 
 def easy():
