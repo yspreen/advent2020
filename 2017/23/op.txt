@@ -1,0 +1,21 @@
+$B = 108400
+$C = 125400
+$D = 0
+$E = 0
+
+WHILE TRUE:
+  $F = 1
+  $D = 2
+  WHILE $D != $B:
+    $E = $B
+
+    IF $D * $E == $B:
+      $F = 0
+
+    $D += 1
+
+  IF $F == 0:
+    $H += 1
+  IF $B == $C:
+    return
+  $B += 17
