@@ -18,14 +18,14 @@ def read():
     return lmap(lambda r: lmap(int, r.split("/")), s)
 
 
-def resolve(a, seen, value=0):
+def resolve(a, seen, value=0, l=0):
     s = []
     for b in T.get(a, []):
         if (a, b) in seen:
             continue
-        s.extend(resolve(b, seen | {(a, b), (b, a)}, value + a + b))
+        s.extend(resolve(b, seen | {(a, b), (b, a)}, value + a + b, l + 1))
     if not s and value > 0:
-        s = [value]
+        s = [(value, l)]
     return s
 
 
@@ -35,11 +35,9 @@ def easy():
         T[b] = T.get(b, []) + [a]
 
     s = resolve(0, set())
-    print(max(s))
-
-
-def hard():
-    return
+    print(max([a for a, b in s]))
+    s.sort(key=lambda i: i[1] * 10000 + i[0])
+    print(s[-1][0])
 
 
 teststr = """"""
@@ -49,4 +47,3 @@ t = read()
 T = {}
 if __name__ == "__main__":
     easy()
-    hard()
