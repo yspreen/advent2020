@@ -9,6 +9,6 @@ main() {
     aoc -d $n
     cd $n
     cp ../main.py .
-    code main.py $n.md
+    code main.py $((n)).md
 }
 main
