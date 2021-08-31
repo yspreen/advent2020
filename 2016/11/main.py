@@ -82,23 +82,39 @@ def easy():
     goal = [set(), set(), set(), t[0] | t[1] | t[2]]
     goal_h = make_hash(goal, 3)
 
-    positions = [(0, 0, deepcopy(t))]
-    reached = set()
+    positions_f = [(0, 0, deepcopy(t))]
+    positions_b = [(0, 3, goal)]
+    reached_f = dict()
+    reached_b = dict()
 
     while True:
-        new_p = []
-        for p in positions:
+        new_p_f = []
+        for p in positions_f:
             new_moves = moves(*p)
             for m in new_moves:
                 h = make_hash(m[2], m[1])
-                if h == goal_h:
-                    print(m[0])
-                    return
-                if h in reached:
+                if h in reached_f:
                     continue
-                reached.add(h)
-                new_p.append(m)
-        positions = new_p
+                if h in reached_b:
+                    print(reached_b[h] + m[0])
+                    return
+                reached_f[h] = m[0]
+                new_p_f.append(m)
+        positions_f = new_p_f
+
+        new_p_b = []
+        for p in positions_b:
+            new_moves = moves(*p)
+            for m in new_moves:
+                h = make_hash(m[2], m[1])
+                if h in reached_b:
+                    continue
+                if h in reached_f:
+                    print(reached_f[h] + m[0])
+                    return
+                reached_b[h] = m[0]
+                new_p_b.append(m)
+        positions_b = new_p_b
 
 
 def hard():
