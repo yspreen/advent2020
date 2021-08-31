@@ -97,6 +97,7 @@ def easy():
                     continue
                 if h in reached_b:
                     print(reached_b[h] + m[0])
+                    print(reached_b[h] + m[0] + 12 + 12)
                     return
                 reached_f[h] = m[0]
                 new_p_f.append(m)
@@ -118,13 +119,7 @@ def easy():
 
 
 def hard():
-    t[0] |= {
-        "a-",
-        "a+",
-        "b-",
-        "b+",
-    }
-    easy()
+    return
 
 
 teststr = ""
