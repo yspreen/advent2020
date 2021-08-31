@@ -79,8 +79,6 @@ def moves(cost, elev, arrangement):
 
 
 def easy():
-    global goal, reached
-
     goal = [set(), set(), set(), t[0] | t[1] | t[2]]
     goal_h = make_hash(goal, 3)
 
@@ -104,13 +102,19 @@ def easy():
 
 
 def hard():
-    return
+    t[0] |= {
+        "a-",
+        "a+",
+        "b-",
+        "b+",
+    }
+    easy()
 
 
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
-reached = goal = t = read()
+t = read()
 if __name__ == "__main__":
     easy()
     hard()
