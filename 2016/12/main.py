@@ -45,17 +45,22 @@ def step(pointer, instr, mem):
     return delta
 
 
-def easy():
+def run(init=0):
     i = 0
     N = len(t)
     m = [0] * 4
+    m[2] = init
     while i < N:
         i += step(i, t[i], m)
     print(m[0])
 
 
+def easy():
+    run()
+
+
 def hard():
-    return
+    run(1)
 
 
 teststr = ""
