@@ -51,7 +51,7 @@ def step(forward_positions, costs_forward, costs_back):
     return (False, new_positions)
 
 
-def BFS(x, y):
+def BFS(x, y, max_d=9999999, two_ways=True):
     goal = (x, y)
     start = (1, 1)
 
@@ -60,13 +60,16 @@ def BFS(x, y):
     reached_f = {start: 0}
     reached_b = {goal: 0}
 
-    while True:
+    for _ in range(max_d):
         found, positions_f = step(positions_f, reached_f, reached_b)
         if found:
             return positions_f
+        if not two_ways:
+            continue
         found, positions_b = step(positions_b, reached_b, reached_f)
         if found:
             return positions_b
+    return reached_f
 
 
 def easy():
@@ -75,12 +78,11 @@ def easy():
     for x, y in product(range(265), range(265)):
         A[x, y] = is_wall(x, y)
 
-    # print(BFS(7, 4))
     print(BFS(31, 39))
 
 
 def hard():
-    return
+    print(len(BFS(inf, inf, 50, False)))
 
 
 teststr = ""  # "10"
