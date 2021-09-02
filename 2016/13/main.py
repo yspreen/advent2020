@@ -36,6 +36,21 @@ def moves(x, y):
     return moves
 
 
+def step(forward_positions, costs_forward, costs_back):
+    new_positions = []
+    for cost, pos in forward_positions:
+        cost += 1
+        new_moves = moves(*pos)
+        for m in new_moves:
+            if m in costs_forward:
+                continue
+            if m in costs_back:
+                return (True, costs_back[m] + cost)
+            costs_forward[m] = cost
+            new_positions.append((cost, m))
+    return (False, new_positions)
+
+
 def BFS(x, y):
     goal = (x, y)
     start = (1, 1)
@@ -46,29 +61,12 @@ def BFS(x, y):
     reached_b = {goal: 0}
 
     while True:
-        new_p_f = []
-        for cost, pos in positions_f:
-            new_moves = moves(*pos)
-            for m in new_moves:
-                if m in reached_f:
-                    continue
-                if m in reached_b:
-                    return reached_b[m] + cost + 1
-                reached_f[m] = cost + 1
-                new_p_f.append((cost + 1, m))
-        positions_f = new_p_f
-
-        new_p_b = []
-        for cost, pos in positions_b:
-            new_moves = moves(*pos)
-            for m in new_moves:
-                if m in reached_b:
-                    continue
-                if m in reached_f:
-                    return reached_f[m] + cost + 1
-                reached_b[m] = cost + 1
-                new_p_b.append((cost + 1, m))
-        positions_b = new_p_b
+        found, positions_f = step(positions_f, reached_f, reached_b)
+        if found:
+            return positions_f
+        found, positions_b = step(positions_b, reached_b, reached_f)
+        if found:
+            return positions_b
 
 
 def easy():
