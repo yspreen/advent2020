@@ -1,11 +1,5 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
+from copy import deepcopy
 
 
 def lmap(*a):
@@ -18,30 +12,34 @@ def read():
     return lmap(lambda r: lmap(int, map(lambda i: r.split(" ")[i], [3, 11])), s)
 
 
-def easy():
+def run(t):
     for i in range(len(t)):
         t[i][1] += i + 1
         t[i][1] %= t[i][0]
 
     N = 0
     for i in range(len(t)):
-        X = t[i][0] - t[i][1]
-        for j in range(len(t)):
-            if i == j:
-                continue
+        m = (t[i][0] - t[i][1]) % t[i][0]
+        X = 1
+        for j in range(i):
             X *= t[j][0]
-        N += X
-    N %= prod([i[0] for i in t])
+        while N % t[i][0] != m:
+            N += X
     print(N)
 
 
+def easy():
+    run(deepcopy(t))
+
+
 def hard():
-    return
+    run(t + [[11, 0]])
 
 
+teststr = """Disc #1 has 5 positions; at time=0, it is at position 4.
+Disc #2 has 2 positions; at time=0, it is at position 1."""
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
