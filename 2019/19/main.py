@@ -1,13 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-import random
-from functools import reduce
-from string import ascii_lowercase
-from math import prod
-from itertools import permutations, product
-from time import sleep
+from itertools import product
 
 
 def digit(num, dig):
@@ -201,7 +194,7 @@ def hard():
     y_b_g = x_b_g * db
     x_a_g = x_b_g + 100
     y_a_g = y_b_g - 100
-    delta = x_a_g / 50 + 1
+    x_a_g / 50 + 1
     x = int(x_b_g + 1)
     y = int(y_a_g + 1)
 

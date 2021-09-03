@@ -1,11 +1,7 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
 from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product, count, islice
+from math import sqrt
+from itertools import count, islice
 
 
 def is_prime(n):

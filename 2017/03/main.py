@@ -1,11 +1,5 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
+from math import sqrt
 
 
 def lmap(*a):

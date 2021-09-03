@@ -1,5 +1,3 @@
-import numpy as np
-import re
 import pathlib
 from functools import reduce
 from string import ascii_lowercase

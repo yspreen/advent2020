@@ -1,11 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd
-from itertools import permutations, product
+from math import gcd
 from multiprocessing import Pool
 
 DIR = pathlib.Path(__file__).parent.absolute()
@@ -85,7 +80,6 @@ def step(items, states=set(), dim=-1):
 
 def easy():
     items = read()
-    i = 0
     for _ in range(1000):
         step(items)
     print(get_energy(items))

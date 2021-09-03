@@ -1,12 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd
-from itertools import permutations, product
-from multiprocessing import Pool
+from math import prod
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")

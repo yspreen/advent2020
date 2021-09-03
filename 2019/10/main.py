@@ -1,11 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, atan2, pi as π
-from itertools import permutations, product
+from math import atan2, gcd, pi as π
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")

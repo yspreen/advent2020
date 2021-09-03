@@ -14,7 +14,7 @@ def op(i):
     ins = code % 100
     mode_a = digit(code, 2)
     mode_b = digit(code, 3)
-    mode_c = digit(code, 4)
+    digit(code, 4)
 
     try:
         a = memory[i + 1]

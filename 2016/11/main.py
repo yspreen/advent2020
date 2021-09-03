@@ -1,12 +1,5 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from copy import deepcopy, copy
+from copy import deepcopy
 
 
 def lmap(*a):
@@ -80,7 +73,7 @@ def moves(cost, elev, arrangement):
 
 def easy():
     goal = [set(), set(), set(), t[0] | t[1] | t[2]]
-    goal_h = make_hash(goal, 3)
+    make_hash(goal, 3)
 
     positions_f = [(0, 0, deepcopy(t))]
     positions_b = [(0, 3, goal)]

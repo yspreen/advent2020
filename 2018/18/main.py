@@ -95,7 +95,7 @@ def easy():
     len_x = len(input)
     len_y = len(input[0])
     last = 0
-    seen = set([])
+    set([])
     for minute in range(800):
         pad_zero(input)
         new_input = copy.deepcopy(input)

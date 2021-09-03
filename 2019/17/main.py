@@ -1,13 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-import random
-from functools import reduce
-from string import ascii_lowercase
-from math import prod
-from itertools import permutations, product
-from time import sleep
+from itertools import product
 
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
@@ -223,7 +216,7 @@ def hard():
         else:
             ended = True
 
-    program_ = [i for i in program]
+    [i for i in program]
     subs = []
     for A in ["A", "B", "C"]:
         candidates = []

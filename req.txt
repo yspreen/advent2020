@@ -1,5 +1,6 @@
 appdirs==1.4.4
 appnope==0.1.2
+autoflake==1.4
 backcall==0.2.0
 black==20.8b1
 click==7.1.2
@@ -21,6 +22,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prompt-toolkit==3.0.8
 ptyprocess==0.6.0
+pyflakes==2.3.1
 Pygments==2.7.2
 pyobjc==7.1
 pyobjc-core==7.1

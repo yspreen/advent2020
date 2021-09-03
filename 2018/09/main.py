@@ -67,9 +67,8 @@ def hard():
     marble = 1
     player = 0
     scores = [0 for _ in range(input[0])]
-    time = datetime.now()
-    beginning = marbles
-    end = marbles.nodeat(0)
+    datetime.now()
+    marbles.nodeat(0)
     cursor = marbles.first
     while True:
         # print("".join([("(" + str(m) + ")") if cursor.value == m else " " + str(m) + " " for m in marbles]))

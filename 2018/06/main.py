@@ -148,7 +148,6 @@ max_y = max([i[1] for i in input]) + 1
 
 def hard():
     global input
-    from contextlib import suppress
 
     arr = [
         ([[-1, max_x + max_y] for _ in range(max_y)] + [0]) for _ in range(max_x)

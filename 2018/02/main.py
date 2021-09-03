@@ -25,7 +25,6 @@ def main():
 
     print(twos * threes)
 
-    output = []
 
     n = len(input[0])
     for i in range(len(input)):

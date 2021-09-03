@@ -1,13 +1,6 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd
-from itertools import permutations, product
-from multiprocessing import Pool
-from sympy import simplify, symbols, solve
+from math import gcd
+from sympy import simplify, symbols
 
 
 def read():
@@ -97,7 +90,6 @@ def hard():
     M = 101741582076661
     I = 2020
     E = symbols("x")
-    i = 0
     while M > 0:
         times = 1
         e = simple

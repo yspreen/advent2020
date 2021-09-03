@@ -109,7 +109,6 @@ def move_to(unit, goal):
 
 def attempt(power=3):
     global arr, max_val
-    from copy import deepcopy
 
     read()
     for u in units:
