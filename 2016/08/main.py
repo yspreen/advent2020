@@ -34,13 +34,13 @@ def rect(A, x, y):
 
 def row(A, x, y):
     rows, cols = np.ogrid[: A.shape[0], : A.shape[1]]
-    cols = cols - (np.eye(6, dtype=np.int)[x] * y)[:, np.newaxis]
+    cols = cols - (np.eye(6, dtype=int)[x] * y)[:, np.newaxis]
     return A[rows, cols]
 
 
 def column(A, x, y):
     rows, cols = np.ogrid[: A.shape[0], : A.shape[1]]
-    rows = rows - (np.eye(50, dtype=np.int)[x] * y)[np.newaxis, :]
+    rows = rows - (np.eye(50, dtype=int)[x] * y)[np.newaxis, :]
     return A[rows, cols]
 
 
@@ -71,7 +71,7 @@ def hard():
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
-t, A = read(), np.zeros((6, 50), np.int)
+t, A = read(), np.zeros((6, 50), int)
 if __name__ == "__main__":
     easy()
     hard()

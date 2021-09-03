@@ -11,10 +11,6 @@ class CircularNode:
         return self.next
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 def read():
     with open(DIR / "input") as f:
         s = f.read() if teststr == "" else teststr
@@ -42,7 +38,6 @@ def hard():  # 1, 7, 27
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

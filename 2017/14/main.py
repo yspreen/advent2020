@@ -46,7 +46,7 @@ def easy():
         h = hash("%s-%d" % (t, i))
         for j in h:
             A[-1] += vect_binary(int(j, 16))
-    A = np.array(A, np.int)
+    A = np.array(A, int)
     print(A.sum())
 
 
@@ -84,7 +84,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 A = []
 if __name__ == "__main__":

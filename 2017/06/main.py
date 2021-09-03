@@ -43,7 +43,6 @@ def hard():
 
 teststr = ""  # """0	2	7	0"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 N = len(t)
 if __name__ == "__main__":

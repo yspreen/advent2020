@@ -26,13 +26,12 @@ def read():
 
 
 class VM:
-    def __init__(self, id=0):
+    def __init__(self):
         self.R = {k: 0 for k in ascii_lowercase[:16]}
         self.i = 0
         self.mul_count = 0
 
-    def step(self, rcv=None, part_one=False):
-        self.locked = False
+    def step(self):
         r = t[self.i]
         o = 1
         a = r[1]
@@ -69,7 +68,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

@@ -47,7 +47,6 @@ def hard():
 
 teststr = ""  # "AoC 2017"  # """3,4,1,5"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 N = 256  # 5
 T = list(range(N))

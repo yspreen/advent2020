@@ -14,7 +14,7 @@ def read():
 def easy():
     c = 0
     a, b = t
-    for i in range(40000000):
+    for _ in range(40000000):
         a *= A
         b *= B
         a %= M
@@ -27,7 +27,7 @@ def easy():
 def hard():
     c = 0
     a, b = t
-    for i in range(5000000):
+    for _ in range(5000000):
         while True:
             a *= A
             a %= M
@@ -45,7 +45,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 A, B, M, N = 16807, 48271, 2147483647, 2 ** 16 - 1
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ def easy():
     global TX, TY, A
     TX *= K
     TY *= K
-    A = np.zeros((TX + 1, TY + 1), np.int)
+    A = np.zeros((TX + 1, TY + 1), int)
     for x in range(TX + 1):
         A[x, 0] = (X * x + D) % M
     for y in range(1, TY + 1):

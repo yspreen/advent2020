@@ -16,9 +16,7 @@ def rule(left, right):
 
 
 def parse(a):
-    a = np.array(
-        lmap(lambda i: lmap(ord, i), a.replace("/", "\n").splitlines()), np.int
-    )
+    a = np.array(lmap(lambda i: lmap(ord, i), a.replace("/", "\n").splitlines()), int)
     a[a == ord(".")] = 0
     a[a == ord("#")] = 1
     return a
@@ -55,7 +53,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = {}
 read()
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ def read():
         s = f.read() if teststr == "" else teststr
     return lmap(
         lambda r: lmap(
-            lambda i: np.array(lmap(int, i[3:-1].split(",")), np.int), r.split(", ")
+            lambda i: np.array(lmap(int, i[3:-1].split(",")), int), r.split(", ")
         ),
         s.splitlines(),
     )

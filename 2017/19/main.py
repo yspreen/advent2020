@@ -9,7 +9,7 @@ def lmap(*a):
 def read():
     with open(DIR / "input") as f:
         s = f.read() if teststr == "" else teststr
-    return np.array(lmap(lambda r: lmap(ord, r), s.splitlines()), np.int)
+    return np.array(lmap(lambda r: lmap(ord, r), s.splitlines()), int)
 
 
 def right(p):
@@ -49,16 +49,15 @@ def hard():
     return
 
 
-teststr = ""
-teststr_ = """     |          
+teststr = """     |          
      |  +--+    
      A  |  C    
  F---|----E|--+ 
      |  |  |  D 
      +B-+  +--+ 
                 """
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 DOWN = (1, 0)
 if __name__ == "__main__":

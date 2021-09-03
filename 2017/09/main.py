@@ -1,10 +1,6 @@
 import pathlib
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 class Group:
     items = []
     garbage = [0]
@@ -38,7 +34,7 @@ class Group:
 def read():
     with open(DIR / "input") as f:
         s = f.read() if teststr == "" else teststr
-    return Group(s.splitlines()[0])
+    Group(s.splitlines()[0])
 
 
 def easy():
@@ -51,8 +47,7 @@ def hard():
 
 teststr = ""  #'{<{o"i!a,<{i<a>}'  # """{{{},{},{{}}}}"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
-t = read()
+read()
 if __name__ == "__main__":
     easy()
     hard()

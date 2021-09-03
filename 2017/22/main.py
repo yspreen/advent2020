@@ -9,7 +9,7 @@ def lmap(*a):
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
-    return np.array(lmap(lambda r: lmap(ord, r), s), np.int)
+    return np.array(lmap(lambda r: lmap(ord, r), s), int)
 
 
 def right(p):
@@ -33,7 +33,7 @@ def run(iterations, moves, changes):
     t[t == ord(".")] = 0
     t[t == ord("#")] = 1
     d, p, c, n = (-1, 0), (t.shape[0] // 2, t.shape[1] // 2), 0, 1
-    for i in range(iterations):
+    for _ in range(iterations):
         if not (0 < p[0] < t.shape[0] - 1 and 0 < p[1] < t.shape[1] - 1):
             t = np.pad(t, ((n, n), (n, n)))
             p = (p[0] + n, p[1] + n)
@@ -55,7 +55,6 @@ def hard():
 
 teststr = ""  # "..#\n#..\n..."
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 if __name__ == "__main__":
     easy()
     hard()

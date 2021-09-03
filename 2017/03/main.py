@@ -2,10 +2,6 @@ import pathlib
 from math import sqrt
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 def read():
     with open(DIR / "input") as f:
         t = int(f.read().splitlines()[0])
@@ -54,7 +50,6 @@ def hard():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
