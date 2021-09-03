@@ -58,7 +58,6 @@ class Segment:
         self.choices = []
         self.children = []
         self.items.append(self)
-        self.id = len(self.items)
         self.s = s
         segments = [-1]
         splits = [-1]
@@ -102,7 +101,6 @@ def hard():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 Segment.resolve()
 dirs = {}

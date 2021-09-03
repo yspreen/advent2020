@@ -45,7 +45,6 @@ def hard():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 read()
 if __name__ == "__main__":
     easy()

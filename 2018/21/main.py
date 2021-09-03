@@ -9,7 +9,7 @@ def read():
 
 def test():
     s = set()
-    b = c = d = z = i = 0
+    b = c = d = i = 0
     while True:
         b = c | A
         c = C
@@ -41,7 +41,6 @@ def hard():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 A, B, C, D = t[6][2], t[11][2], t[7][1], t[10][2]
 

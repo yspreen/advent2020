@@ -78,7 +78,6 @@ DIR = pathlib.Path(__file__).parent.absolute()
 inf = float("inf")
 D, TX, TY = 510, 10, 10
 D, TX, TY = read()
-dirs = {}
 X = 16807
 Y = 48271
 M = 20183

@@ -13,7 +13,6 @@ input1, input2 = [
     )
     for i in range(2)
 ]
-units = []
 
 
 def do_operation(reg, op, hard_table=False):
@@ -86,7 +85,6 @@ def easy():
 
 
 easy()
-units = []
 
 
 def change_opcode(reg, op, code):

@@ -6,12 +6,10 @@ input = list(
 
 currents = dict()
 current = 0
-runs = 0
 done = False
 print(sum(input))
 while not done:
     for i in input:
-        runs += 1
         current += i
         if currents.get(current, False):
             print(current)

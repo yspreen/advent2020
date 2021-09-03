@@ -8,29 +8,8 @@ chars = {
     "|": 1,  # tree
     "#": 2,  # lumber
 }
-format = {v: k for (k, v) in chars.items()}
 
 
-class hashable_area:
-    def __init__(self, area, clone=False):
-        self.area = area if not clone else copy.deepcopy(area)
-
-    def __hash__(self):
-        h = 0
-        for r in self.area:
-            for i in r:
-                h *= 4
-                h += i
-        return h
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return str(self.area)
-
-
-# ha = hashable_area
 def ha(arr, *_):
     a = "".join(["".join([str(j) for j in i]) for i in arr])
     return a
@@ -39,7 +18,6 @@ def ha(arr, *_):
 areas = {}
 for i in product("012", repeat=8):
     i = "".join(i)
-    opens = i.count("0")
     trees = i.count("1")
     lumbs = i.count("2")
     i = [int(j) for j in i]
@@ -86,7 +64,7 @@ last_vals = {}
 
 
 def easy():
-    global input, format, areas, cycle, start, last_vals
+    global input, areas, cycle, start, last_vals
     input_ = [[0 for _ in input] for _ in input[0]]
     for y in range(len(input)):
         for x in range(len(input[0])):
