@@ -1,10 +1,6 @@
 import pathlib
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
