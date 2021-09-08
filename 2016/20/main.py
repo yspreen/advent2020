@@ -30,7 +30,19 @@ def easy():
 
 
 def hard():
-    return
+    for i in range(len(t)):
+        for j in range(i):
+            if t[j][1] >= t[i][0]:
+                if t[i][1] > t[j][1]:
+                    t[j][1] = t[i][1]
+                t[i] = [-1, -1]
+                break
+    N = 4294967296
+    for start, end in t:
+        if start < 0:
+            continue
+        N -= end - start + 1
+    print(N)
 
 
 teststr = """"""
