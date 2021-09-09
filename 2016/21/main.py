@@ -42,7 +42,7 @@ class Swap:
         self.a = int(a)
         self.b = int(b)
 
-    def __call__(self, w):
+    def __call__(self, w, _=0):
         w[((self.a, self.b,),)] = w[
             (
                 (
@@ -59,11 +59,11 @@ class SwapLetter:
         self.a = ord(a)
         self.b = ord(b)
 
-    def __call__(self, w):
+    def __call__(self, w, rev=0):
         try:
             x = np.where(w == self.a)[0][0]
             y = np.where(w == self.b)[0][0]
-            return Swap(x, y)(w)
+            return Swap(x, y)(w, rev)
         except:
             return w
 
@@ -72,21 +72,28 @@ class Rotate:
     def __init__(self, n):
         self.n = int(n)
 
-    def __call__(self, w):
-        return np.roll(w, self.n)
+    def __call__(self, w, rev=0):
+        return np.roll(w, -self.n if rev else self.n)
 
 
 class RotateLetter:
     def __init__(self, l):
         self.l = ord(l)
 
-    def __call__(self, w):
+    def __call__(self, w, rev=0):
         try:
-            idx = np.where(w == self.l)[0][0]
-            idx += 2 if idx >= 4 else 1
-            return Rotate(idx)(w)
+            org = idx = np.where(w == self.l)[0][0]
         except:
             return w
+        if not rev:
+            idx += 2 if idx >= 4 else 1
+            return Rotate(idx)(w, rev)
+        idx -= 1
+        idx %= len(w)
+        while (2 * idx + (2 if idx >= 4 else 1)) % len(w) != org:
+            idx -= 1
+            idx %= len(w)
+        return Rotate(idx - org % len(w))(w)
 
 
 class Reverse:
@@ -94,7 +101,7 @@ class Reverse:
         self.a = int(a)
         self.b = int(b)
 
-    def __call__(self, w):
+    def __call__(self, w, rev=0):
         w[self.a : self.b + 1] = np.flip(w[self.a : self.b + 1])
         return w
 
@@ -104,33 +111,38 @@ class Move:
         self.a = int(a)
         self.b = int(b)
 
-    def __call__(self, w):
-        v = w[self.a]
-        w = np.delete(w, self.a)
-        w = np.insert(w, self.b, v)
+    def __call__(self, w, rev=0):
+        a, b = (self.b, self.a) if rev else (self.a, self.b)
+        v = w[a]
+        w = np.delete(w, a)
+        w = np.insert(w, b, v)
         return w
 
 
-# def test(before, after, modifier):
-#     word = np.array(lmap(ord, before))
-#     result = make_func(modifier)(word)
-#     result = "".join(map(chr, result))
-#     assert result == after
+def test(before, after, modifier):
+    word = np.array(lmap(ord, before))
+    result = make_func(modifier)(word)
+    result = "".join(map(chr, result))
+    assert result == after
+    word = np.array(lmap(ord, after))
+    result = make_func(modifier)(word, 1)
+    result = "".join(map(chr, result))
+    assert result == before
 
 
-# def tests():
-#     test("abcde", "ebcda", "swap position 4 with position 0")
-#     test("ebcda", "edcba", "swap letter d with letter b")
-#     test("edcba", "abcde", "reverse positions 0 through 4")
-#     test("abcde", "bcdea", "rotate left 1 step")
-#     test("bcdea", "bdeac", "move position 1 to position 4")
-#     test("bdeac", "abdec", "move position 3 to position 0")
-#     test("abdec", "ecabd", "rotate based on position of letter b")
-#     test("ecabd", "decab", "rotate based on position of letter d")
+def tests():
+    test("abcde", "ebcda", "swap position 4 with position 0")
+    test("ebcda", "edcba", "swap letter d with letter b")
+    test("edcba", "abcde", "reverse positions 0 through 4")
+    test("abcde", "bcdea", "rotate left 1 step")
+    test("bcdea", "bdeac", "move position 1 to position 4")
+    test("bdeac", "abdec", "move position 3 to position 0")
+    test("abdec", "ecabd", "rotate based on position of letter b")
+    test("ecabd", "decab", "rotate based on position of letter d")
 
 
 def easy():
-    # tests()
+    tests()
     a = np.array(lmap(ord, "abcdefgh"))
     for func in t:
         a = func(a)
@@ -138,12 +150,14 @@ def easy():
 
 
 def hard():
-    return
+    a = np.array(lmap(ord, "fbgdceah"))
+    for func in reversed(t):
+        a = func(a, 1)
+    print("".join(map(chr, a)))
 
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
