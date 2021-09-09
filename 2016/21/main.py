@@ -1,12 +1,5 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
 
 
 def lmap(*a):
@@ -119,30 +112,7 @@ class Move:
         return w
 
 
-def test(before, after, modifier):
-    word = np.array(lmap(ord, before))
-    result = make_func(modifier)(word)
-    result = "".join(map(chr, result))
-    assert result == after
-    word = np.array(lmap(ord, after))
-    result = make_func(modifier)(word, 1)
-    result = "".join(map(chr, result))
-    assert result == before
-
-
-def tests():
-    test("abcde", "ebcda", "swap position 4 with position 0")
-    test("ebcda", "edcba", "swap letter d with letter b")
-    test("edcba", "abcde", "reverse positions 0 through 4")
-    test("abcde", "bcdea", "rotate left 1 step")
-    test("bcdea", "bdeac", "move position 1 to position 4")
-    test("bdeac", "abdec", "move position 3 to position 0")
-    test("abdec", "ecabd", "rotate based on position of letter b")
-    test("ecabd", "decab", "rotate based on position of letter d")
-
-
 def easy():
-    tests()
     a = np.array(lmap(ord, "abcdefgh"))
     for func in t:
         a = func(a)
