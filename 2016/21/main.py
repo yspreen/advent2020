@@ -94,7 +94,7 @@ class Reverse:
         self.a = int(a)
         self.b = int(b)
 
-    def __call__(self, w, rev=0):
+    def __call__(self, w, _=0):
         w[self.a : self.b + 1] = np.flip(w[self.a : self.b + 1])
         return w
 
