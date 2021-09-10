@@ -2,14 +2,12 @@ import pathlib
 from functools import reduce
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def read():
     with open(DIR / "input") as f:
         t = f.read().replace("\r", "").split("\n\n")
-    t = [l.split("\n")[1:] for l in t]
-    t[1].pop()
+    t = [l.splitlines()[1:] for l in t]
     return [[int(i) for i in l] for l in t]
 
 

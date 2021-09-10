@@ -3,7 +3,7 @@ import pathlib
 from string import ascii_lowercase
 
 
-def read(n=1):
+def read():
     with open(DIR / "input") as f:
         t = [[replacements[i] for i in sub] for sub in f.read().splitlines()]
     return np.array(t, np.int32)

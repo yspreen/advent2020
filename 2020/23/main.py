@@ -2,7 +2,6 @@ import pathlib
 import llist
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def read(add=0):

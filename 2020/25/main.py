@@ -1,14 +1,11 @@
 import pathlib
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def read():
     with open(DIR / "input") as f:
-        t = f.read().replace("\r", "").split("\n")
-    if t[-1] == "":
-        t.pop()
+        t = f.read().replace("\r", "").splitlines()
     return [int(i) for i in t]
 
 
@@ -30,8 +27,8 @@ def encrypt(value, subject, loop):
 
 
 def easy():
-    loop_card = find_loop(t[0])
-    print(loop_card)
+    _ = find_loop(t[0])
+    # print(loop_card)
     loop_door = find_loop(t[1])
     print(encrypt(1, t[0], loop_door))
 

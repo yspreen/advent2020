@@ -4,7 +4,6 @@ from math import prod
 from itertools import product
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def flipside(side):

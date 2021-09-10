@@ -1,8 +1,11 @@
+import pathlib
+
+DIR = pathlib.Path(__file__).parent.absolute()
+
+
 def easy():
-    with open("2020.1/input") as f:
-        t = f.read().replace("\r", "").split("\n")
-    if t[-1] == "":
-        t.pop()
+    with open(DIR / "input") as f:
+        t = f.read().replace("\r", "").splitlines()
 
     t = [int(i) for i in t]
     t.sort()
@@ -20,10 +23,8 @@ def easy():
 
 
 def hard():
-    with open("2020.1/input") as f:
-        t = f.read().replace("\r", "").split("\n")
-    if t[-1] == "":
-        t.pop()
+    with open(DIR / "input") as f:
+        t = f.read().replace("\r", "").splitlines()
 
     t = [int(i) for i in t]
     t.sort()

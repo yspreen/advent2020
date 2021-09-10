@@ -3,12 +3,11 @@ import pathlib
 from itertools import product
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def read():
     with open(DIR / "input") as f:
-        t = f.read().replace("\r", "").split("\n")
+        t = f.read().replace("\r", "").splitlines()
 
     for a, b in [
         ("se", "1"),
@@ -19,7 +18,7 @@ def read():
         ("w", "3"),
     ]:
         t = [l.replace(a, b) for l in t]
-    return [[int(i) for i in l] for l in t[:-1]]
+    return [[int(i) for i in l] for l in t]
 
 
 changes = [

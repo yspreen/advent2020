@@ -1,4 +1,7 @@
 import re
+import pathlib
+
+DIR = pathlib.Path(__file__).parent.absolute()
 
 
 def checktypes(kv):
@@ -28,13 +31,9 @@ def checktypes(kv):
 
 
 def check(val):
-    with open("2020.4/input") as f:
+    with open(DIR / "input") as f:
         t = f.read().replace("\r", "").replace(" ", "\n").split("\n\n")
-    t = [l.split("\n") for l in t]
-    if t[-1] == "":
-        t.pop()
-    if t[-1][-1] == "":
-        t[-1].pop()
+    t = [l.splitlines() for l in t]
 
     required = [
         "byr",

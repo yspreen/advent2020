@@ -15,14 +15,6 @@ def read():
     return t
 
 
-def is_sorted(l):
-    for i in range(len(l) - 1):
-        if l[i] > l[i + 1]:
-            return False
-
-    return True
-
-
 def add_remove(A, new, old):
     i = 0
     N = len(A)

@@ -1,4 +1,7 @@
 import numpy as np
+import pathlib
+
+DIR = pathlib.Path(__file__).parent.absolute()
 
 
 def get(x, y):
@@ -10,10 +13,8 @@ A = None
 
 def check(x, y):
     global A
-    with open("2020.3/input") as f:
-        t = f.read().replace("\r", "").split("\n")
-    if t[-1] == "":
-        t.pop()
+    with open(DIR / "input") as f:
+        t = f.read().replace("\r", "").splitlines()
 
     t = [[1 if e == "#" else 0 for e in l] for l in t]
     A = np.matrix(t, dtype=np.uint32)
