@@ -31,7 +31,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

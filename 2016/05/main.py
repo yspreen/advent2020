@@ -1,10 +1,6 @@
 import pathlib
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 def read():
     with open(DIR / "input") as f:
         return (f.read() if teststr == "" else teststr).splitlines()[0]
@@ -44,7 +40,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

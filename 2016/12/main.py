@@ -15,7 +15,7 @@ def register_for(letter):
     return ord(letter) - 97
 
 
-def step(pointer, instr, mem):
+def step(_, instr, mem):
     delta = 1
     if instr[0] == "cpy":
         try:
@@ -57,7 +57,6 @@ def hard():
 
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

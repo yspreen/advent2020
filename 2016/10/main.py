@@ -84,7 +84,6 @@ bot 0 gives low to output 2 and high to output 0
 value 2 goes to bot 2""",
 )
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()

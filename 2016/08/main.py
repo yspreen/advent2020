@@ -54,8 +54,6 @@ def easy():
 def hard():
     a, s = A.T, ""
     for i in range(len(a) // 5):
-        l = a[i * 5 : i * 5 + 5].T
-        # print(*["".join([[" ", "#"][i] for i in r]) for r in l], sep="\n")
         s += {
             "111111101001101001100001000000": "E",
             "111111101000101000100000000000": "F",
@@ -70,7 +68,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t, A = read(), np.zeros((6, 50), int)
 if __name__ == "__main__":
     easy()

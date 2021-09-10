@@ -31,20 +31,6 @@ def get_hash(hashes, num, hard):
     return cache
 
 
-def get_triplets(string):
-    trip = set()
-    last = counter = 0
-    for c in string:
-        if last == c:
-            counter += 1
-            if counter >= 2:
-                trip.add(c)
-        else:
-            counter = 0
-        last = c
-    return trip
-
-
 def get_triplet(string):
     last = counter = 0
     for c in string:
@@ -82,8 +68,7 @@ def hard():
 
 teststr = ""  # "abc"
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
-A = t = read()
+t = read()
 if __name__ == "__main__":
     easy()
     hard()
