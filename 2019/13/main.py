@@ -20,7 +20,6 @@ def getkey():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 tiles = [" ", "#", "x", "=", "o"]
 
@@ -178,4 +177,4 @@ def hard(show_game=False):
 
 if __name__ == "__main__":
     easy()
-    hard(True)
+    hard(show_game=False)

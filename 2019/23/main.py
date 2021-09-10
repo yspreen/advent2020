@@ -17,7 +17,6 @@ class VM:
             t.pop()
         t = [int(i) for i in t]
         self.t = {i: v for i, v in enumerate(t)}
-        self.t_ = dict(self.t)
 
     def op(self, i):
         code = self.t[i]
@@ -120,7 +119,6 @@ class VM:
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 vs = [VM(i) for i in range(50)] + [VM(255)]
 
 

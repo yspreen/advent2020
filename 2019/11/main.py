@@ -2,7 +2,6 @@ import numpy as np
 import pathlib
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 directions = [
     (-1, 0),

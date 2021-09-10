@@ -2,7 +2,6 @@ import numpy as np
 import pathlib
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def digit(num, dig):
@@ -117,9 +116,6 @@ class VM:
     def move(self, heading):
         self.h = heading_to_direction[heading]
         self.calc(heading)
-
-    def getA(self, pos):
-        return self.A[pos[0] + self.o, pos[1] + self.o]
 
     def setA(self, pos, v):
         self.A[pos[0] + self.o, pos[1] + self.o] = v

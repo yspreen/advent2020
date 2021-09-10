@@ -1,19 +1,11 @@
 import numpy as np
 import pathlib
-from string import ascii_lowercase
 
 
 def read():
     with open(DIR / "input") as f:
-        t = [[ord(i) for i in sub] for sub in f.read().split("\n")][:-1]
+        t = [[ord(i) for i in sub] for sub in f.read().splitlines()]
     return np.array(t, np.int32)
-
-
-class Move:
-    def __init__(self, newpos, level=0):
-        self.x = x
-        self.y = y
-        self.level = level
 
 
 def neigh_3d(pos):
@@ -126,15 +118,7 @@ def hard():
     print(cost[(-1, -1, 0)] - 1)
 
 
-def name(x, y):
-    if (x, y) == (-1, -1):
-        return "zz"
-    p = points[(x, y)]
-    return ascii_lowercase[p // 26] + ascii_lowercase[p % 26]
-
-
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 X, Y = [i[0] for i in np.where(t[2:-2, 2:-2] == 32)]
 NX, NY = t.shape[0] - 4, t.shape[1] - 4

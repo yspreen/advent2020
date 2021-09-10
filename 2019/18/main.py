@@ -5,7 +5,7 @@ from string import ascii_lowercase
 
 def read(n=1):
     with open(DIR / "input") as f:
-        t = [[replacements[i] for i in sub] for sub in f.read().split("\n")][:-1]
+        t = [[replacements[i] for i in sub] for sub in f.read().splitlines()]
     return np.array(t, np.int32)
 
 
@@ -18,7 +18,6 @@ def neighbors(pos):
 
 def bfs(c=0, initial=True, transparent=0):
     pos = c_pos(c)
-    # t[np.where(t == -2)] = 0
 
     cost = {pos: 0}
     chain = {pos: []}
@@ -64,18 +63,16 @@ class Letter:
             pass
 
     def calc(self, cost, parent_req=set()):
-        # add all path requirements
+
         self.req |= parent_req
         if self.parent is not None and self.parent >= 100:
             self.req.add(self.parent - 100)
 
-        # set distances to children
         for c in self.children:
             distances[(self.c, c)] = distances[(c, self.c)] = (
                 cost[c_pos(c)] - cost[c_pos(self.c)]
             )
 
-        # find same layer neighbors with bfs
         if len(self.children) > 1:
             for c in self.children:
                 ds = bfs(c, False, self.c)
@@ -83,7 +80,6 @@ class Letter:
                     op = c_pos(o)
                     distances[(c, o)] = distances[(o, c)] = ds[op]
 
-        # inherit distances of parent
         if self.parent != 0 and self.parent != None:
             pd = distances[(self.c, self.parent)]
             for k, v in list(distances.items()):
@@ -93,7 +89,6 @@ class Letter:
                         continue
                     distances[(self.c, k)] = distances[(k, self.c)] = v + pd
 
-        # calculate children distances
         _ = [self.items[c].calc(cost, self.req) for c in self.children]
 
 
@@ -161,14 +156,8 @@ def easy():
     global distances
     cost, chain, chain_starts = bfs()
 
-    # print(chain)
-    # print(rev_replacements[12])
-    # print(rev_replacements[101])
-
-    # print(list(map(lambda i: rev_replacements[i], chain_starts)))
-
     chains = map(lambda i: c_pos(i + 1), list(range(N)) + list(range(100, N + 100)))
-    # print((43, 27) in list(chains))
+
     chains = list(chain.values())
     chains = {k: sorted([i for i in chains if k in i]) for k in chain_starts}
     for k, v in chains.items():
@@ -179,7 +168,6 @@ def easy():
     start = Letter.items[0]
     start.calc(cost)
 
-    # print(list(map(lambda a: rev_replacements[a], Letter.items[replacements["h"]].req)))
     distances = {k: v for k, v in distances.items() if sum(k) < 100}
     shortest(start)
 
@@ -191,7 +179,7 @@ def shortest(start):
         [0] if PART == 1 else imaginaries,
     )
     opt = optimal(opt)
-    # print([rev_replacements[i] for i in opt[1]])
+
     print(opt[0])
 
 

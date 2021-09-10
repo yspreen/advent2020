@@ -3,7 +3,6 @@ import pathlib
 from math import atan2, gcd, pi as π
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def read():
@@ -27,7 +26,7 @@ def easy():
     vectors = {}
     for i, asteroid in enumerate(coord):
         vectors[i] = set()
-        for j, other in enumerate(coord):
+        for other in coord:
             if other == asteroid:
                 continue
             vector = get_vector(asteroid, other)
@@ -48,7 +47,7 @@ def angle(b):
 def hard():
     home = coord.pop()
     vectors = {}
-    for j, asteroid in enumerate(coord):
+    for asteroid in coord:
         vector = get_vector(home, asteroid)
         vectors[vector] = vectors.get(vector, [])
         vectors[vector].append(asteroid)

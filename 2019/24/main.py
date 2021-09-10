@@ -90,7 +90,7 @@ def hard():
 
 
 def pad():
-    global A, z_off, M
+    global A, M
 
     A = np.pad(
         A,
@@ -100,24 +100,13 @@ def pad():
             (1, 1),
         ),
     )
-    z_off += 1
     M += 2
 
 
-def get_A(A, p):
-    return A[p[0], p[1], p[2] + z_off]
-
-
-def set_A(A, p, v):
-    A[p[0], p[1], p[2] + z_off] = v
-
-
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 A, N = read()
 scores = np.power(2, np.arange(N * N)).reshape((N, N))
 masks = {}
-z_off = 0
 M = 1
 dirs = list(
     zip(

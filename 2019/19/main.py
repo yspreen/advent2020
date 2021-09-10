@@ -88,7 +88,7 @@ class VM:
         except:
             pass
         self.pos = pos
-        self.h = self.l = self.i = self.d = self.r = 0
+        self.i = self.d = self.r = 0
         self.done = False
         self.t = dict(self.t_)
         while not (self.pos[0] < self.A.shape[0] and self.pos[1] < self.A.shape[1]):
@@ -117,47 +117,13 @@ class VM:
         self.outputs = []
         self.inputs = []
 
-        self.h = self.l = self.i = self.d = self.r = 0
+        self.i = self.d = self.r = 0
         self.A = np.zeros((2, 2), np.int32)
         self.pos = [0, 0]
         self.done = False
 
-    @property
-    def direction(self):
-        return directions[self.h % 4]
-
-
-def find_match(A, B):
-    matches = []
-    n = A.shape[0] - B.shape[0]
-    m = A.shape[1] - B.shape[1]
-    for i, j in product(range(n + 1), range(m + 1)):
-        B_ = np.pad(B, ((i, n - i), (j, m - j)))
-        if (A - B_).min() == 0:
-            matches.append((i, j))
-    if matches:
-        return matches
-
-
-def pprint(t):
-    t[t == ord(".")] = 0
-    p = np.where(t != 0)
-    t = t[min(p[0]) : max(p[0]) + 1, min(p[1]) : max(p[1]) + 1]
-
-    for r in t:
-        for e in r:
-            print(chr(e) if e else " ", end="")
-        print()
-
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
-directions = [
-    (-1, 0),  # u
-    (0, 1),  # r
-    (1, 0),  # d
-    (0, -1),  # l
-]
 v = VM()
 
 

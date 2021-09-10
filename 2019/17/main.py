@@ -3,7 +3,6 @@ import pathlib
 from itertools import product
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 VID = "n"
 
 
@@ -138,10 +137,6 @@ class VM:
         self.done = False
         self.move_vacs = move_vacs
         self.t[0] = 2 if move_vacs else 1
-
-    @property
-    def direction(self):
-        return directions[self.h % 4]
 
 
 v = VM()

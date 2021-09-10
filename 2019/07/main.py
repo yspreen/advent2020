@@ -2,7 +2,6 @@ import pathlib
 from itertools import permutations
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def digit(num, dig):

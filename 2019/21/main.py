@@ -15,7 +15,6 @@ class VM:
             t.pop()
         t = [int(i) for i in t]
         self.t = {i: v for i, v in enumerate(t)}
-        self.t_ = dict(self.t)
 
     def op(self, i):
         code = self.t[i]
@@ -84,7 +83,8 @@ class VM:
             return
         self.A += chr(c)
         if c == 10:
-            print(self.A, end="")
+            if not disable_print:
+                print(self.A, end="")
             self.A = ""
 
     def calc(self, *inp):
@@ -119,8 +119,8 @@ class VM:
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 v = VM()
+disable_print = 1
 
 
 def easy():

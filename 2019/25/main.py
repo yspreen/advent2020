@@ -15,7 +15,6 @@ class VM:
             t.pop()
         t = [int(i) for i in t]
         self.t = {i: v for i, v in enumerate(t)}
-        self.t_ = dict(self.t)
 
     def op(self, i):
         code = self.t[i]
@@ -108,7 +107,7 @@ class VM:
         self.outputs = []
         self.inputs = []
 
-        self.dmg = self.i = self.d = self.r = 0
+        self.i = self.d = self.r = 0
         self.A = ""
         self.done = False
 
@@ -200,7 +199,6 @@ class Game:
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 directions = [
     "north",
     "east",

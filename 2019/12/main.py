@@ -4,7 +4,6 @@ from math import gcd
 from multiprocessing import Pool
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 class Moon:

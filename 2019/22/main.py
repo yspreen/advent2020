@@ -104,15 +104,9 @@ def hard():
 
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 E = I = N = 10007
 
 if __name__ == "__main__":
     easy()
     hard()
-    # for i in [3, 7, 9]:
-    #     A = list(range(N))
-    #     incr(i)
-    #     print(i, A)
-    #     print()

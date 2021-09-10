@@ -1,7 +1,6 @@
 import pathlib
 
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 
 
 def digit(num, dig):
