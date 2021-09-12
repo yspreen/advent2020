@@ -20,7 +20,7 @@ def read():
     return lmap(lambda i: i.split(" "), s)
 
 
-def register_for(letter):
+def reg(letter):
     return ord(letter) - 97
 
 
@@ -42,6 +42,25 @@ def toggle(t, i):
     t[i][0] = repl[t[i][0]]
 
 
+def try_multiply(ptr, ins, mem):
+    instr = ins[ptr]
+    if instr[2] == "-2":
+        inc = ins[ptr - 2] if ins[ptr - 2][0] == "inc" else ins[ptr - 1]
+        dec = ins[ptr - 2] if ins[ptr - 2][0] == "dec" else ins[ptr - 1]
+        if inc[0] != "inc" or dec[0] != "dec" or dec[1] != instr[1]:
+            return
+        mem[reg(inc[1])] += mem[reg(dec[1])]
+        mem[reg(dec[1])] = 0
+    elif instr[2] == "-5" and ins[ptr - 5][0] == "cpy":
+        inc = ins[ptr - 4] if ins[ptr - 4][0] == "inc" else ins[ptr - 3]
+        dec = ins[ptr - 4] if ins[ptr - 4][0] == "dec" else ins[ptr - 3]
+        cpy = ins[ptr - 5]
+        if inc[0] != "inc" or dec[0] != "dec":
+            return
+        mem[reg(inc[1])] += mem[reg(cpy[1])] * mem[reg(instr[1])]
+        mem[reg(instr[1])] = 0
+
+
 def unsafe_step(ptr, ins, mem):
     instr = ins[ptr]
     delta = 1
@@ -49,27 +68,28 @@ def unsafe_step(ptr, ins, mem):
         try:
             val = int(instr[1])
         except:
-            val = mem[register_for(instr[1])]
-        mem[register_for(instr[2])] = val
+            val = mem[reg(instr[1])]
+        mem[reg(instr[2])] = val
     if instr[0] == "jnz":
+        try_multiply(ptr, ins, mem)
         try:
             val = int(instr[1])
         except:
-            val = mem[register_for(instr[1])]
+            val = mem[reg(instr[1])]
         if val != 0:
             try:
                 delta = int(instr[2])
             except:
-                delta = mem[register_for(instr[2])]
+                delta = mem[reg(instr[2])]
     if instr[0] == "inc":
-        mem[register_for(instr[1])] += 1
+        mem[reg(instr[1])] += 1
     if instr[0] == "dec":
-        mem[register_for(instr[1])] -= 1
+        mem[reg(instr[1])] -= 1
     if instr[0] == "tgl":
         try:
             val = int(instr[1])
         except:
-            val = mem[register_for(instr[1])]
+            val = mem[reg(instr[1])]
         ptr += val
         if ptr < N:
             toggle(ins, ptr)
