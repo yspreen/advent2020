@@ -1,12 +1,5 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
 from python_tsp.exact import solve_tsp_dynamic_programming
 
 
@@ -15,17 +8,7 @@ def lmap(*a):
 
 
 rpl = {
-    ".": 0,
-    "0": 1,
-    "1": 2,
-    "2": 3,
-    "3": 4,
-    "4": 5,
-    "5": 6,
-    "6": 7,
-    "7": 8,
-    "8": 9,
-    "#": 10,
+    v: k for k, v in enumerate([".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "#"])
 }
 
 
@@ -33,10 +16,6 @@ def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
     return np.array(lmap(lambda r: lmap(lambda i: rpl[i], r), s), dtype=np.uint32)
-
-
-def coord(m):
-    return (m.count("R") - m.count("L"), m.count("D") - m.count("U"))
 
 
 def neighbors(x, y):
@@ -67,9 +46,10 @@ def easy():
     for i in range(t[t < 10].max()):
         for j, c in BFS(i + 1).items():
             cost[i, j - 1] = c
+    roundtrip = solve_tsp_dynamic_programming(cost)[1]
     cost[:, 0] = 0
-    _, distance = solve_tsp_dynamic_programming(cost)
-    print(distance)
+    print(solve_tsp_dynamic_programming(cost)[1])
+    print(roundtrip)
 
 
 def hard():
@@ -78,7 +58,6 @@ def hard():
 
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
