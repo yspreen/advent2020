@@ -14,7 +14,7 @@ rpl = {
 
 def read():
     with open(DIR / "input") as f:
-        s = (f.read() if teststr == "" else teststr).splitlines()
+        s = f.read().splitlines()
     return np.array(lmap(lambda r: lmap(lambda i: rpl[i], r), s), dtype=np.uint32)
 
 
@@ -41,7 +41,9 @@ def BFS(start=1):
     return costs
 
 
-def easy():
+DIR = pathlib.Path(__file__).parent.absolute()
+t = read()
+if __name__ == "__main__":
     cost = np.zeros((t[t < 10].max(), t[t < 10].max()), dtype=np.uint32)
     for i in range(t[t < 10].max()):
         for j, c in BFS(i + 1).items():
@@ -50,15 +52,3 @@ def easy():
     cost[:, 0] = 0
     print(solve_tsp_dynamic_programming(cost)[1])
     print(roundtrip)
-
-
-def hard():
-    return
-
-
-teststr = ""
-DIR = pathlib.Path(__file__).parent.absolute()
-t = read()
-if __name__ == "__main__":
-    easy()
-    hard()
