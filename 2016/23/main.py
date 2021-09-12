@@ -1,12 +1,5 @@
-import numpy as np
 import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
 from copy import deepcopy
 
 
@@ -125,7 +118,6 @@ def hard():
 
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
-inf = float("inf")
 t = read()
 N = len(t)
 if __name__ == "__main__":
