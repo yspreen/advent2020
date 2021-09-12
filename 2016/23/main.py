@@ -42,6 +42,10 @@ def toggle(t, i):
     t[i][0] = repl[t[i][0]]
 
 
+def no_num(s):
+    return not re.match(r".*[0-9].*", s)
+
+
 def try_multiply(ptr, ins, mem):
     instr = ins[ptr]
     if instr[2] == "-2":
@@ -51,7 +55,7 @@ def try_multiply(ptr, ins, mem):
             return
         mem[reg(inc[1])] += mem[reg(dec[1])]
         mem[reg(dec[1])] = 0
-    elif instr[2] == "-5" and ins[ptr - 5][0] == "cpy":
+    elif instr[2] == "-5" and no_num(ins[ptr - 5][1] + ins[ptr - 5][2]):
         inc = ins[ptr - 4] if ins[ptr - 4][0] == "inc" else ins[ptr - 3]
         dec = ins[ptr - 4] if ins[ptr - 4][0] == "dec" else ins[ptr - 3]
         cpy = ins[ptr - 5]
