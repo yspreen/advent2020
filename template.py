@@ -7,6 +7,8 @@ from string import ascii_lowercase
 from math import prod, gcd, sqrt
 from itertools import permutations, product
 from llist import dllist as llist
+from copy import deepcopy
+from hashlib import md5, sha256
 
 
 def lmap(*a):

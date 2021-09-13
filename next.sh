@@ -8,7 +8,7 @@ main() {
     n="$(printf "%02d" $n)"
     aoc -d $n
     cd $n
-    cp ../main.py .
-    code main.py $((n)).md
+    cp ../../template.py ./main.py
+    code main.py $((n)).md input
 }
 main
