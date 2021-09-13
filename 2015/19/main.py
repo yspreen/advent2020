@@ -50,25 +50,22 @@ def neighbors(chain):
     return n
 
 
-def step(positions, visited):
-    new_positions = []
-    for cost, pos in positions:
-        for m in [m for m in neighbors(pos) if m not in visited]:
-            visited.add(m)
-            new_positions.append((cost + 1, m))
-            if m == "e":
-                return print(cost + 1)
-    return new_positions
+def step(cost, pos, visited):
+    for m in [m for m in neighbors(pos) if m not in visited]:
+        visited.add(m)
+        if m == "e":
+            return print(cost + 1)
+        if not step(cost + 1, m, visited):
+            return 0
+    return 1
 
 
-def BFS(start_pos):
-    visited, positions = {start_pos}, [(0, start_pos)]
-    while positions:
-        positions = step(positions, visited)
+def DFS(start_pos):
+    step(0, start_pos, set())
 
 
 def hard():
-    BFS(t)
+    DFS(t)
 
 
 teststr = """"""
