@@ -1,10 +1,6 @@
 import pathlib
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 move = {"v": (0, 1), "^": (0, -1), "<": (-1, 0), ">": (1, 0)}
 
 
@@ -32,6 +28,7 @@ def hard():
 
 
 teststr = """"""
+lmap = lambda *a: list(map(*a))
 DIR = pathlib.Path(__file__).parent.absolute()
 t = read()
 if __name__ == "__main__":
