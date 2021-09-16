@@ -19,7 +19,7 @@ def read():
 
 
 def easy():
-    A = np.zeros((1000, 1000), dtype=np.uint8)
+    A = np.zeros((1000, 1000))
     for instr, x1, y1, x2, y2 in t:
         if instr == "on":
             A[x1 : x2 + 1, y1 : y2 + 1] = 1
@@ -27,21 +27,19 @@ def easy():
             A[x1 : x2 + 1, y1 : y2 + 1] = 0
         else:
             A[x1 : x2 + 1, y1 : y2 + 1] = 1 - A[x1 : x2 + 1, y1 : y2 + 1]
-    print(A.sum())
+    print(int(A.sum()))
 
 
 def hard():
-    A = np.zeros((1000, 1000), dtype=np.uint8)
+    A = np.zeros((1000, 1000))
     for instr, x1, y1, x2, y2 in t:
         if instr == "on":
             A[x1 : x2 + 1, y1 : y2 + 1] += 1
         elif instr == "off":
-            A[x1 : x2 + 1, y1 : y2 + 1] -= np.array(
-                1 * (A[x1 : x2 + 1, y1 : y2 + 1] > 0), dtype=A.dtype
-            )
+            A[x1 : x2 + 1, y1 : y2 + 1] -= 1 * (A[x1 : x2 + 1, y1 : y2 + 1] > 0)
         else:
             A[x1 : x2 + 1, y1 : y2 + 1] += 2
-    print(A.sum())
+    print(int(A.sum()))
 
 
 teststr = """"""
