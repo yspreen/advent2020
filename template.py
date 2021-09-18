@@ -11,10 +11,6 @@ from copy import deepcopy
 from hashlib import md5, sha256
 
 
-def lmap(*a):
-    return list(map(*a))
-
-
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
@@ -30,8 +26,8 @@ def hard():
 
 
 teststr = """"""
-lmap = lambda *a: list(map(*a))
 DIR = pathlib.Path(__file__).parent.absolute()
+lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
 if __name__ == "__main__":
