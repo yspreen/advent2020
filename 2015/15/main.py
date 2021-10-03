@@ -1,16 +1,6 @@
 import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
-from copy import deepcopy
-from hashlib import md5, sha256
-from scipy.optimize import minimize, rosen, rosen_der
-import cvxpy as cp
+from itertools import product
 
 
 def read():
@@ -22,48 +12,44 @@ def read():
     )
 
 
-def score(x):
-    # print(x)
-    # if x < 0 or x > 100:
-    #     return inf
-    s = [0] * N
-    for amount, weights in zip(x, t):
-        for i, weight in enumerate(weights[:-1]):
-            s[i] += (amount * 1e6) * weight
-    r, a = 1.0, 0
-    for v in s:
-        if v < 0:
-            a = 1e6
-        r *= v
-    return -r + a
-
-
 def easy():
     weights = np.array(t)[:, :-1]
+    s = 0
 
-    x = cp.Variable(len(weights), integer=True)
-
-    part_constraint = weights.T @ x >= 0
-    sum_constraint = cp.sum(x) == 100
-
-    opt = cp.prod(weights.T @ x)
-
-    ip = cp.Problem(cp.Maximize(opt), [part_constraint, sum_constraint])
-
-    ip.solve()
+    for l in product(*([range(100)] * (len(weights) - 1))):
+        if sum(l) > 100:
+            continue
+        l = list(l) + [100 - sum(l)]
+        r = weights.T @ np.array(l)
+        if (r <= 0).any():
+            continue
+        s = max(s, np.prod(r))
+    print(s)
 
 
 def hard():
-    return
+    weights = np.array(t)
+    s = 0
+
+    for l in product(*([range(100)] * (len(weights) - 1))):
+        if sum(l) > 100:
+            continue
+        l = list(l) + [100 - sum(l)]
+        r = weights.T @ np.array(l)
+        if r[-1] != 500:
+            continue
+        if (r[:-1] <= 0).any():
+            continue
+        s = max(s, np.prod(r[:-1]))
+    print(s)
 
 
 teststr = """Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
 Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3"""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 t = read()
-inf, N = float("inf"), len(t[0]) - 1
 if __name__ == "__main__":
     easy()
     hard()
