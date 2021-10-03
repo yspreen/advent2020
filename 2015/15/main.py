@@ -10,6 +10,7 @@ from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
 from scipy.optimize import minimize, rosen, rosen_der
+import cvxpy as cp
 
 
 def read():
@@ -38,20 +39,18 @@ def score(x):
 
 
 def easy():
-    res = minimize(
-        score,
-        [10e-6] * len(t),
-        bounds=[(0, 100e-6)] * len(t),
-        options={"disp": False},
-        tol=1e-7,
-        constraints={"type": "eq", "fun": lambda x: sum(x) - 100e-6},
-    )
-    x = lmap(lambda i: i * 1e6, res.x)
-    print(x)
-    x = lmap(round, x)
-    print(x)
-    print(score(x))
-    print(-round(score(x)))
+    weights = np.array(t)[:, :-1]
+
+    x = cp.Variable(len(weights), integer=True)
+
+    part_constraint = weights.T @ x >= 0
+    sum_constraint = cp.sum(x) == 100
+
+    opt = cp.prod(weights.T @ x)
+
+    ip = cp.Problem(cp.Maximize(opt), [part_constraint, sum_constraint])
+
+    ip.solve()
 
 
 def hard():
