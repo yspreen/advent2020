@@ -12,5 +12,4 @@ with open(pathlib.Path(__file__).parent.absolute() / "input") as f:
     t = np.array(list(map(lambda r: int(r.split(" ")[-1]), f.read().splitlines())))
 f = lambda a: 99 // max(1, t[1] - a[2]) + 1 >= (t[0] - 1) // max(1, a[1] - t[2]) + 1
 win = [(f(w + a + r), (w + a + r)[0]) for w, a, r in product(W, A, R)]
-print(min([cost for wins, cost in win if wins]))
-print(max([cost for wins, cost in win if not wins]))
+print(min([c for w, c in win if w]), max([c for w, c in win if not w]), sep="\n")
