@@ -1,5 +1,4 @@
 import pathlib
-from math import sqrt
 
 
 def read():
