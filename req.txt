@@ -1,6 +1,7 @@
 autoflake==1.4
 black==21.8b0
 click==8.0.1
+cvxopt==1.2.7
 cvxpy==1.1.15
 Deprecated==1.2.13
 ecos==2.0.7.post1
