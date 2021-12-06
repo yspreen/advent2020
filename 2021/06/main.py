@@ -1,4 +1,3 @@
-import numpy as np
 import pathlib
 
 
@@ -9,11 +8,11 @@ def read():
 
 
 def run(days):
-    a = np.array(t, dtype=np.uint64)
+    a = t[:]
     for _ in range(days):
-        a = np.roll(a, -1)
+        a = a[1:] + [a[0]]
         a[6] += a[8]
-    return a.sum()
+    return sum(a)
 
 
 teststr = """"""
