@@ -24,17 +24,17 @@ def step():
             t[x, y] = -int(9e9)
 
 
-def easy():
-    for _ in range(100):
+def easy(steps):
+    for _ in range(steps):
         step()
     print(F)
 
 
-def hard():
+def hard(previous_steps):
     for i in range(int(9e9)):
         step()
         if t.max() == 0:
-            return print(100 + i + 1)
+            return print(previous_steps + i + 1)
 
 
 teststr = """"""
@@ -42,5 +42,5 @@ DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 t, F = read(), 0
 if __name__ == "__main__":
-    easy()
-    hard()
+    easy(100)
+    hard(100)
