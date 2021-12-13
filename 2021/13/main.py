@@ -49,8 +49,7 @@ def OCR(A):
     for y in range(A.shape[1]):
         for x in range(0, A.shape[0]):
             pixels[x, y] = (0, 0, 0) if A.T[y, x] else (255, 255, 255)
-    img = img.resize((A.shape[0] * 2, A.shape[1] * 2), Image.NEAREST)
-    img = img.resize((A.shape[0] * 50, A.shape[1] * 50), Image.BILINEAR)
+    img = img.resize((A.shape[0] * 6, A.shape[1] * 6), Image.BILINEAR)
     return pytesseract.image_to_string(img).strip()
 
 
