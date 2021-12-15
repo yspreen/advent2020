@@ -71,7 +71,16 @@ def easy():
 
 
 def hard():
-    return
+    global t, N
+    o = t[:N, :N]
+    t = np.zeros((N * 5, N * 5), dtype=np.int8)
+    for i in range(5):
+        for j in range(5):
+            t[i * N : (i + 1) * N, j * N : (j + 1) * N] = o + i + j
+    while t.max() > 9:
+        t[t > 9] -= 9
+    N *= 5
+    print(dijkstra_search((0, 0), (N - 1, N - 1))[1][(N - 1, N - 1)])
 
 
 teststr = """"""
