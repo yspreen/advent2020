@@ -18,12 +18,6 @@ def read():
     return np.array(lmap(lambda r: lmap(int, r), s))
 
 
-def heuristic(a, b) -> float:
-    x1, y1 = a
-    x2, y2 = b
-    return (abs(x1 - x2) + abs(y1 - y2)) * 9
-
-
 def neighbors(p):
     x, y = p
     n = []
@@ -42,51 +36,45 @@ def cost(_, next):
     return t[next]
 
 
-def a_star_search(start, goal):
-    frontier = []
-    frontier += [start]
+def dijkstra_search(start, goal):
+    frontier = [[start]]
     came_from = {}
     cost_so_far = {}
     came_from[start] = None
     cost_so_far[start] = 0
-
-    while frontier:
-        current = frontier.pop(0)
-
+    while True:
+        try:
+            i = 0
+            while True:
+                if not frontier[i]:
+                    i += 1
+                else:
+                    current = frontier[i].pop(0)
+                    break
+        except:
+            break
         if current == goal:
             break
-
         for next in neighbors(current):
             new_cost = cost_so_far[current] + cost(current, next)
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(next, goal)
-                frontier.insert(priority - 1, next)
+                while len(frontier) < new_cost + 1:
+                    frontier += [[]]
+                frontier[new_cost] += [next]
                 came_from[next] = current
-
     return came_from, cost_so_far
 
 
 def easy():
-    origin, cost_d = a_star_search((0, 0), (N - 1, N - 1))
-    print(origin, cost_d[(N - 1, N - 1)])
-    p = (N - 1, N - 1)
-    print(p)
-    while p != (0, 0):
-        p = origin[p]
-        print(p)
-    print(t)
+    print(dijkstra_search((0, 0), (N - 1, N - 1))[1][(N - 1, N - 1)])
 
 
 def hard():
     return
 
 
-teststr = """19999
-19111
-19191
-19191
-11191"""
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
