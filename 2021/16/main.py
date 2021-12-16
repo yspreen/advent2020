@@ -51,20 +51,16 @@ def decipher_package(bits):
     else:
         for _ in range(length):
             packets.append(decipher_package(bits))
-    if t == 0:
-        return sum(packets)
-    if t == 1:
-        return prod(packets)
-    if t == 2:
-        return min(packets)
-    if t == 3:
-        return max(packets)
-    if t == 5:
-        return 1 if packets[0] > packets[1] else 0
-    if t == 6:
-        return 1 if packets[0] < packets[1] else 0
-    if t == 7:
-        return 1 if packets[0] == packets[1] else 0
+    return [
+        lambda p: sum(p),
+        lambda p: prod(p),
+        lambda p: min(p),
+        lambda p: max(p),
+        None,
+        lambda p: 1 if p[0] > p[1] else 0,
+        lambda p: 1 if p[0] < p[1] else 0,
+        lambda p: 1 if p[0] == p[1] else 0,
+    ][t](packets)
 
 
 teststr = """"""
