@@ -1,14 +1,4 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
-from copy import deepcopy
-from hashlib import md5, sha256
 
 
 def read():
@@ -27,31 +17,27 @@ def step(x, y, vx, vy):
 
 def run(vx, vy):
     x = y = 0
-    while x <= t[1] and y >= t[2] and (x < t[0] or y > t[3]):
+    while x <= xmax and y >= ymin and (x < xmin or y > ymax):
         x, y, vx, vy = step(x, y, vx, vy)
-    return x <= t[1] and y >= t[2]
+    return x <= xmax and y >= ymin
 
 
 def easy():
-    for i in range(-t[2]):
-        j = i = -t[2] - i
-        x = 0
-        while x > t[3]:
-            x -= i
+    for i in range(-ymin):
+        startval = i = -ymin - i
+        y = 0
+        while y > ymax:
+            y -= i
             i += 1
-        if x < t[2]:
+        if y < ymin:
             continue
-        return print(sumto(j - 1))
-
-
-def sumto(x):
-    return (x + 1) * x // 2
+        return print(sumto(startval - 1))
 
 
 def hard():
     pairs = []
-    for vx in range(t[1] + 1):
-        for vy in range(t[2], -t[2]):
+    for vx in range(xmax + 1):
+        for vy in range(ymin, -ymin):
             if run(vx, vy):
                 pairs.append((vx, vy))
     print(len(pairs))
@@ -60,8 +46,8 @@ def hard():
 teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
-inf = float("inf")
-t = read()
+sumto = lambda x: (x + 1) * x // 2
+xmin, xmax, ymin, ymax = read()
 if __name__ == "__main__":
     easy()
     hard()
