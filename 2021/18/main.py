@@ -98,12 +98,11 @@ class Pair:
         return False
 
     def __str__(self) -> str:
-        return (
-            "[" + str(self.left) + "," + str(self.right) + ":" + str(self.level) + "]"
-        )
+        return "[" + str(self.left) + "," + str(self.right) + "]"
 
     def step(self):
         while True:
+            print(self)
             if self.find_explodable():
                 continue
             if self.find_split():
@@ -146,16 +145,20 @@ def easy():
 def hard():
     t, m = read(), (0, 0)
 
-    for i, j in permutations(range(len(t)), 2):
-        if i == j:
-            continue
-        t = read()
-        s = t[i].add(t[j])
-        s.step()
-        v = s.magnitude()
-        if v > m[0]:
-            m = (v, (i, j))
-    print(m[0])
+    # for i, j in permutations(range(len(t)), 2):
+    #     if i == j:
+    #         continue
+    #     t = read()
+    #     s = t[i].add(t[j])
+    #     s.step()
+    #     v = s.magnitude()
+    #     if v > m[0]:
+    #         m = (v, (i, j))
+    # print(m[0])
+
+    s = t[49].add(t[65])
+    s.step()
+    print(s.magnitude())
 
 
 teststr = """"""
@@ -163,5 +166,5 @@ DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 L, R = 1, 2
 if __name__ == "__main__":
-    easy()
+    # easy()
     hard()
