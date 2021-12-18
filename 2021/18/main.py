@@ -104,8 +104,6 @@ class Pair:
 
     def step(self):
         while True:
-            print(self)
-            self.check_parent()
             if self.find_explodable():
                 continue
             if self.find_split():
@@ -124,15 +122,10 @@ class Pair:
         self.level += 1
         [(i.add_level() if isinstance(i, Pair) else 0) for i in [self.left, self.right]]
 
-    def check_parent(self):
-        if isinstance(self.left, Pair):
-            assert self.left.parent == self
-            assert self.left.level == self.level + 1
-            self.left.check_parent()
-        if isinstance(self.right, Pair):
-            assert self.right.parent == self
-            assert self.right.level == self.level + 1
-            self.right.check_parent()
+    def magnitude(self):
+        l = self.left.magnitude() if isinstance(self.left, Pair) else self.left
+        r = self.right.magnitude() if isinstance(self.right, Pair) else self.right
+        return 3 * l + 2 * r
 
 
 def read():
@@ -142,25 +135,33 @@ def read():
 
 
 def easy():
-    sum = t[0].add(t[1])
-    sum.step()
-    print(sum)
+    t = read()
+    sum = t[0]
+    for other in t[1:]:
+        sum = sum.add(other)
+        sum.step()
+    print(sum.magnitude())
 
 
 def hard():
-    print(t[2])
-    t[2].step()
-    print(t[2])
+    t, m = read(), (0, 0)
+
+    for i, j in permutations(range(len(t)), 2):
+        if i == j:
+            continue
+        t = read()
+        s = t[i].add(t[j])
+        s.step()
+        v = s.magnitude()
+        if v > m[0]:
+            m = (v, (i, j))
+    print(m[0])
 
 
-teststr = """[[[[4,3],4],4],[7,[[8,4],9]]]
-[1,1]
-[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]
-"""
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 L, R = 1, 2
-t = read()
 if __name__ == "__main__":
     easy()
     hard()
