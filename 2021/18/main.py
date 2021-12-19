@@ -85,13 +85,13 @@ class Pair:
             self.left.left = i // 2
             self.left.right = i - i // 2
             return True
+        if isinstance(self.left, Pair) and self.left.find_split():
+            return True
         if not isinstance(self.right, Pair) and self.right >= 10:
             i = self.right
             self.right = Pair(parent=self, level=self.level + 1, pos=R)
             self.right.left = i // 2
             self.right.right = i - i // 2
-            return True
-        if isinstance(self.left, Pair) and self.left.find_split():
             return True
         if isinstance(self.right, Pair) and self.right.find_split():
             return True
