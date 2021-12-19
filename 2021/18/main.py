@@ -1,14 +1,5 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
-from copy import deepcopy
-from hashlib import md5, sha256
+from itertools import permutations
 
 
 class Pair:
@@ -102,7 +93,6 @@ class Pair:
 
     def step(self):
         while True:
-            print(self)
             if self.find_explodable():
                 continue
             if self.find_split():
@@ -130,11 +120,11 @@ class Pair:
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
-    return lmap(lambda r: Pair(iter(r)), s)
+    return s
 
 
 def easy():
-    t = read()
+    t = lmap(lambda r: Pair(iter(r)), read())
     sum = t[0]
     for other in t[1:]:
         sum = sum.add(other)
@@ -143,22 +133,17 @@ def easy():
 
 
 def hard():
-    t, m = read(), (0, 0)
+    t, m = read(), 0
 
-    # for i, j in permutations(range(len(t)), 2):
-    #     if i == j:
-    #         continue
-    #     t = read()
-    #     s = t[i].add(t[j])
-    #     s.step()
-    #     v = s.magnitude()
-    #     if v > m[0]:
-    #         m = (v, (i, j))
-    # print(m[0])
-
-    s = t[49].add(t[65])
-    s.step()
-    print(s.magnitude())
+    for i, j in permutations(range(len(t)), 2):
+        if i == j:
+            continue
+        a, b = iter(t[i]), iter(t[j])
+        s = Pair(a).add(Pair(b))
+        s.step()
+        v = s.magnitude()
+        m = max(m, v)
+    print(m)
 
 
 teststr = """"""
@@ -166,5 +151,5 @@ DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 L, R = 1, 2
 if __name__ == "__main__":
-    # easy()
+    easy()
     hard()
