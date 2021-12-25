@@ -27,6 +27,7 @@ def options(positions, pos):
     if char == 0:
         return []
     x, y = pos
+    f = costs_per_char[char]
 
     if y == 2 and positions.get((x, 1), 0) != 0:
         return []
@@ -46,7 +47,7 @@ def options(positions, pos):
                 return []
             x_ += diff
         c = cost(x, char)
-        return [(char - 1, 2, c + 2)] if l2 == 0 else [(char - 1, 1, c + 1)]
+        return [(char - 1, 2, (c + 2) * f)] if l2 == 0 else [(char - 1, 1, (c + 1) * f)]
 
     if x == char - 1 and (y == 2 or (y == 1 and positions.get((x, 2), 0) == char)):
         return []
@@ -56,15 +57,15 @@ def options(positions, pos):
     while x_ <= 6:
         if positions.get((x_, 0), 0) != 0:
             break
-        opt.append((x_, 0, cost(x_, x + 1) + y))
+        opt.append((x_, 0, (cost(x_, x + 1) + y) * f))
         x_ += 1
     x_ = x + 1
     while x_ >= 0:
         if positions.get((x_, 0), 0) != 0:
             break
-        opt.append((x_, 0, cost(x_, x + 1) + y))
+        opt.append((x_, 0, (cost(x_, x + 1) + y) * f))
         x_ -= 1
-    return opt
+    return sorted(opt, key=lambda i: i[2])
 
 
 def init_positions():
@@ -112,33 +113,34 @@ def pprint(positions):
 
 
 def next_moves(positions, previous_cost):
+    global M
+    if previous_cost >= M:
+        return []
     res = []
+    # pprint(positions)
+    # print(previous_cost)
     for pos, char in positions.items():
         for x, y, cost in options(positions, pos):
-            cost *= costs_per_char[char]
             cost += previous_cost
+            if cost >= M:
+                continue
             new_pos = copy(positions)
             del new_pos[pos]
             new_pos[(x, y)] = char
 
-            res.append((new_pos, cost))
+            if is_done(new_pos):
+                res.append(cost)
+                M = min(M, cost)
+                print(M)
+            else:
+                res.extend(next_moves(new_pos, cost))
 
     return res
 
 
 def easy():
-    M, next_up = inf, [(init_positions(), 0)]
-
-    while next_up:
-        current, next_up = next_up, []
-        current.sort(key=lambda i: i[1])
-        for pos, cost in current:
-            if is_done(pos):
-                M = min(cost, M)
-                print(M)
-            if cost < M:
-                next_up += next_moves(pos, cost)
-    print(M)
+    # return pprint(init_positions())
+    print(min(next_moves(init_positions(), 0)))
 
 
 def hard():
@@ -154,7 +156,7 @@ teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
-t = read()
+t, M = read(), 14558
 if __name__ == "__main__":
     easy()
     hard()
