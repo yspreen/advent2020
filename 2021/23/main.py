@@ -64,7 +64,7 @@ def options(positions, pos):
             break
         opt.append((x_, 0, cost(x_, x + 1) + y))
         x_ -= 1
-    return opt
+    return sorted(opt, key=lambda i: i[2])
 
 
 def init_positions():
@@ -98,8 +98,26 @@ def is_done(positions):
     return True
 
 
+def pprint(positions):
+    print("#" * 13 + "\n#", end="")
+    for x in range(7):
+        print(".ABCD"[positions.get((x, 0), 0)], end=("." if x in [1, 2, 3, 4] else ""))
+    print("#")
+    for y in range(2):
+        print(["###", "  #"][y], end="")
+        for x in range(4):
+            print(".ABCD"[positions.get((x, y + 1), 0)], end="#")
+        print(["##", ""][y])
+    print(" ", "#" * 9)
+
+
 def next_moves(positions, previous_cost):
+    global M
+    if previous_cost >= M:
+        return []
     res = []
+    # pprint(positions)
+    # print(previous_cost)
     for pos, char in positions.items():
         for x, y, cost in options(positions, pos):
             cost *= costs_per_char[char]
@@ -110,6 +128,7 @@ def next_moves(positions, previous_cost):
 
             if is_done(new_pos):
                 res.append(cost)
+                M = min(M, cost)
             else:
                 res.extend(next_moves(new_pos, cost))
 
@@ -117,6 +136,7 @@ def next_moves(positions, previous_cost):
 
 
 def easy():
+    # return pprint(init_positions())
     print(min(next_moves(init_positions(), 0)))
 
 
@@ -129,10 +149,10 @@ teststr = """#############
 ###B#C#B#D###
   #A#D#C#A#
   #########"""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
-inf = float("inf")
+M = inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
