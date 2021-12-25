@@ -64,7 +64,7 @@ def options(positions, pos):
             break
         opt.append((x_, 0, cost(x_, x + 1) + y))
         x_ -= 1
-    return sorted(opt, key=lambda i: i[2])
+    return opt
 
 
 def init_positions():
@@ -112,12 +112,7 @@ def pprint(positions):
 
 
 def next_moves(positions, previous_cost):
-    global M
-    if previous_cost >= M:
-        return []
     res = []
-    # pprint(positions)
-    # print(previous_cost)
     for pos, char in positions.items():
         for x, y, cost in options(positions, pos):
             cost *= costs_per_char[char]
@@ -126,18 +121,24 @@ def next_moves(positions, previous_cost):
             del new_pos[pos]
             new_pos[(x, y)] = char
 
-            if is_done(new_pos):
-                res.append(cost)
-                M = min(M, cost)
-            else:
-                res.extend(next_moves(new_pos, cost))
+            res.append((new_pos, cost))
 
     return res
 
 
 def easy():
-    # return pprint(init_positions())
-    print(min(next_moves(init_positions(), 0)))
+    M, next_up = inf, [(init_positions(), 0)]
+
+    while next_up:
+        current, next_up = next_up, []
+        current.sort(key=lambda i: i[1])
+        for pos, cost in current:
+            if is_done(pos):
+                M = min(cost, M)
+                print(M)
+            if cost < M:
+                next_up += next_moves(pos, cost)
+    print(M)
 
 
 def hard():
@@ -152,7 +153,7 @@ teststr = """#############
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
-M = inf = float("inf")
+inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
