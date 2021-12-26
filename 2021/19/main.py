@@ -13,7 +13,7 @@ def read():
 
 class VectorSet:
     def __init__(self, vectors, k=0) -> None:
-        self.diffs = all_diffs(vectors, k)
+        self.diffs, self.tuples_dict = all_diffs(vectors, k)
         self.diff_tuples = set(map(diff_to_tuple, self.diffs.values()))
         self.vectors = {k: vectors}
         self.points = set(tuple(vector) for vector in vectors)
@@ -25,12 +25,10 @@ class VectorSet:
     def join(self, other: "VectorSet") -> None:
         possible_offs = {}
         for target_tuple in self.diff_tuples & other.diff_tuples:
-            for k_a, v_a in self.diffs.items():
-                if diff_to_tuple(v_a) != target_tuple:
-                    continue
-                for k_b, v_b in other.diffs.items():
-                    if diff_to_tuple(v_b) != target_tuple:
-                        continue
+            for k_a in self.tuples_dict[target_tuple]:
+                v_a = self.diffs[k_a]
+                for k_b in other.tuples_dict[target_tuple]:
+                    v_b = other.diffs[k_b]
                     for rot in vector_matches(v_a, v_b):
                         one_i, _, one_k = k_a
                         other_i, _, other_k = k_b
@@ -49,6 +47,8 @@ class VectorSet:
         self.diff_tuples |= other.diff_tuples
         self.diffs.update({k: rotations(v)[rotate] for (k, v) in other.diffs.items()})
         self.scanners += [move]
+        for k, v in other.tuples_dict.items():
+            self.tuples_dict[k] = self.tuples_dict.get(k, []) + v
 
 
 def vector_matches(one, other):
@@ -104,10 +104,13 @@ def diff_to_tuple(diff):
 
 def all_diffs(vectors, k=0):
     diffs = {}
+    tuples = {}
     for i, vi in enumerate(vectors):
         for (j, vj) in [(j, vj) for (j, vj) in enumerate(vectors) if i != j]:
             diffs[(i, j, k)] = vi - vj
-    return diffs
+            t = diff_to_tuple(vi - vj)
+            tuples[t] = tuples.get(t, []) + [(i, j, k)]
+    return diffs, tuples
 
 
 def run():
