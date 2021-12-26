@@ -23,45 +23,45 @@ def read():
 
 
 def options(positions, pos):
-    char = positions.get(pos, 0)
+    x, y = pos
+    char = positions[y][x]
     if char == 0:
         return []
-    x, y = pos
     f = costs_per_char[char]
 
-    if y == 2 and positions.get((x, 1), 0) != 0:
+    if y == 2 and positions[1][x] != 0:
         return []
 
     if y == 0:
-        l1 = positions.get((char - 1, 1), 0)
+        l1 = positions[1][char - 1]
         if l1 != 0:
             return []
-        l2 = positions.get((char - 1, 2), 0)
+        l2 = positions[2][char - 1]
         if l2 != 0 and l2 != char:
             return []
         diff = 1 if x <= char else -1
         limit = char + 1 if diff > 0 else char
         x_ = x + diff
         while x_ != limit:
-            if positions.get((x_, 0), 0) != 0:
+            if positions[0][x_] != 0:
                 return []
             x_ += diff
         c = cost(x, char)
         return [(char - 1, 2, (c + 2) * f)] if l2 == 0 else [(char - 1, 1, (c + 1) * f)]
 
-    if x == char - 1 and (y == 2 or (y == 1 and positions.get((x, 2), 0) == char)):
+    if x == char - 1 and (y == 2 or (y == 1 and positions[2][x] == char)):
         return []
 
     opt = []
     x_ = x + 2
     while x_ <= 6:
-        if positions.get((x_, 0), 0) != 0:
+        if positions[0][x_] != 0:
             break
         opt.append((x_, 0, (cost(x_, x + 1) + y) * f))
         x_ += 1
     x_ = x + 1
     while x_ >= 0:
-        if positions.get((x_, 0), 0) != 0:
+        if positions[0][x_] != 0:
             break
         opt.append((x_, 0, (cost(x_, x + 1) + y) * f))
         x_ -= 1
@@ -69,13 +69,10 @@ def options(positions, pos):
 
 
 def init_positions():
-    positions = {}
-    for d in [8, 6, 4, 2]:
-        del t[0][d]
-    for k in range(3):
-        for i, c in enumerate(t[k]):
-            positions[(i, k)] = c
-    return positions
+    if len(t[0]) > 8:
+        for d in [8, 6, 4, 2]:
+            del t[0][d]
+    return tuple(tuple(i for i in row) for row in t)
 
 
 def cost(x, char):
@@ -92,46 +89,51 @@ costs_per_char = [0, 1, 10, 100, 1000]
 
 
 def is_done(positions):
-    for y in [1, 2]:
-        for x in range(4):
-            if positions.get((x, y), 0) != x + 1:
-                return False
-    return True
+    return positions == ((0, 0, 0, 0, 0, 0, 0), (1, 2, 3, 4), (1, 2, 3, 4))
 
 
 def pprint(positions):
     print("#" * 13 + "\n#", end="")
     for x in range(7):
-        print(".ABCD"[positions.get((x, 0), 0)], end=("." if x in [1, 2, 3, 4] else ""))
+        print(".ABCD"[positions[0][x]], end=("." if x in [1, 2, 3, 4] else ""))
     print("#")
     for y in range(2):
         print(["###", "  #"][y], end="")
         for x in range(4):
-            print(".ABCD"[positions.get((x, y + 1), 0)], end="#")
+            print(".ABCD"[positions[y + 1][x]], end="#")
         print(["##", ""][y])
     print(" ", "#" * 9)
 
 
+def move(positions, old_x, old_y, new_x, new_y):
+    return tuple(
+        tuple(
+            (i if x != new_x or y != new_y else positions[old_y][old_x])
+            if x != old_x or y != old_y
+            else 0
+            for (x, i) in enumerate(row)
+        )
+        for (y, row) in enumerate(positions)
+    )
+
+
 def next_moves(positions, previous_cost):
-    global M
-    if previous_cost >= M:
+    # pprint(positions)
+    if previous_cost >= costs.get(positions, 9e9):
+        # print("x")
         return []
+    costs[positions] = previous_cost
     res = []
     # pprint(positions)
     # print(previous_cost)
-    for pos, char in positions.items():
-        for x, y, cost in options(positions, pos):
+    for pos in indices(positions):
+        for x_, y_, cost in options(positions, pos):
             cost += previous_cost
-            if cost >= M:
-                continue
-            new_pos = copy(positions)
-            del new_pos[pos]
-            new_pos[(x, y)] = char
+            new_pos = move(positions, *pos, x_, y_)
 
             if is_done(new_pos):
                 res.append(cost)
-                M = min(M, cost)
-                print(M)
+                # print(cost)
             else:
                 res.extend(next_moves(new_pos, cost))
 
@@ -139,12 +141,18 @@ def next_moves(positions, previous_cost):
 
 
 def easy():
-    # return pprint(init_positions())
     print(min(next_moves(init_positions(), 0)))
+    # print(options(init_positions(), (0, 1)))
 
 
 def hard():
     return
+
+
+def indices(pos):
+    for y, row in enumerate(pos):
+        for x, _ in enumerate(row):
+            yield (x, y)
 
 
 teststr = """#############
@@ -156,7 +164,7 @@ teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
-t, M = read(), 14558
+t, costs = read(), {}
 if __name__ == "__main__":
     easy()
     hard()
