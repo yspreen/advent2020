@@ -1,25 +1,11 @@
-import numpy as np
-import re
 import pathlib
-import json
-from functools import reduce
-from string import ascii_lowercase
-from math import prod, gcd, sqrt
-from itertools import permutations, product
-from llist import dllist as llist
-from copy import deepcopy, copy
-from hashlib import md5, sha256
 
 
 def read():
     with open(DIR / "input") as f:
-        s = (
-            (f.read() if teststr == "" else teststr)
-            .replace(" ", "")
-            .replace("#", "")
-            .splitlines()[1:4]
-        )
-    return lmap(lambda r: lmap(lambda i: ".ABCD".index(i), r), s)
+        s = (f.read() if teststr == "" else teststr).splitlines()[1:4]
+    C = ".ABCD"
+    return lmap(lambda r: lmap(lambda i: C.index(i), filter(lambda i: i in C, r)), s)
 
 
 def options(positions, pos):
@@ -48,9 +34,6 @@ def options(positions, pos):
             x_ += diff
         c = cost(x, char)
         return [(char - 1, depth, (c + depth) * f)]
-
-    # if x == char - 1 and y == N - 1:
-    #     return []
 
     if x == char - 1 and y > 0:
         some_wrong = False
@@ -111,19 +94,6 @@ def is_done(positions):
     )
 
 
-def pprint(positions):
-    print("#" * 13 + "\n#", end="")
-    for x in range(7):
-        print(".ABCD"[positions[0][x]], end=("." if x in [1, 2, 3, 4] else ""))
-    print("#")
-    for y in range(N - 1):
-        print(["###", "  #", "  #", "  #"][y], end="")
-        for x in range(4):
-            print(".ABCD"[positions[y + 1][x]], end="#")
-        print(["##", "", "", ""][y])
-    print(" ", "#" * 9)
-
-
 def move(positions, old_x, old_y, new_x, new_y):
     return tuple(
         tuple(
@@ -137,14 +107,10 @@ def move(positions, old_x, old_y, new_x, new_y):
 
 
 def next_moves(positions, previous_cost):
-    # pprint(positions)
     if previous_cost >= costs.get(positions, 9e9):
-        # print("x")
         return []
     costs[positions] = previous_cost
     res = []
-    # pprint(positions)
-    # print(previous_cost)
     for pos in indices(positions):
         for x_, y_, cost in options(positions, pos):
             cost += previous_cost
@@ -152,8 +118,6 @@ def next_moves(positions, previous_cost):
 
             if is_done(new_pos):
                 res.append(cost)
-                # pprint(positions)
-                # print(cost)
             else:
                 res.extend(next_moves(new_pos, cost))
 
@@ -161,9 +125,7 @@ def next_moves(positions, previous_cost):
 
 
 def easy():
-    pprint(init_positions())
     print(min(next_moves(init_positions(), 0)))
-    # print(options(init_positions(), (0, 1)))
 
 
 def hard():
@@ -171,7 +133,6 @@ def hard():
     N += 2
     t = t[:2] + [[4, 3, 2, 1], [4, 2, 1, 3]] + t[2:]
     costs = {}
-    pprint(init_positions())
     print(min(next_moves(init_positions(), 0)))
 
 
@@ -181,16 +142,10 @@ def indices(pos):
             yield (x, y)
 
 
-teststr = """#############
-#...........#
-###B#C#B#D###
-  #A#D#C#A#
-  #########"""
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
-inf = float("inf")
 t, costs, N = read(), {}, 3
 if __name__ == "__main__":
-    # easy()
+    easy()
     hard()
