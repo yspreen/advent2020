@@ -29,16 +29,16 @@ def options(positions, pos):
         return []
     f = costs_per_char[char]
 
-    if y == 2 and positions[1][x] != 0:
+    if y > 1 and positions[y - 1][x] != 0:
         return []
 
     if y == 0:
-        l1 = positions[1][char - 1]
-        if l1 != 0:
-            return []
-        l2 = positions[2][char - 1]
-        if l2 != 0 and l2 != char:
-            return []
+        for i in range(1, N):
+            v = positions[i][char - 1]
+            if v != char and v != 0:
+                return []
+            if v == 0:
+                depth = i
         diff = 1 if x <= char else -1
         limit = char + 1 if diff > 0 else char
         x_ = x + diff
@@ -47,10 +47,19 @@ def options(positions, pos):
                 return []
             x_ += diff
         c = cost(x, char)
-        return [(char - 1, 2, (c + 2) * f)] if l2 == 0 else [(char - 1, 1, (c + 1) * f)]
+        return [(char - 1, depth, (c + depth) * f)]
 
-    if x == char - 1 and (y == 2 or (y == 1 and positions[2][x] == char)):
-        return []
+    # if x == char - 1 and y == N - 1:
+    #     return []
+
+    if x == char - 1 and y > 0:
+        some_wrong = False
+        for y_ in range(y + 1, N):
+            some_wrong = positions[y_][x] != char
+            if some_wrong:
+                break
+        if not some_wrong:
+            return []
 
     opt = []
     x_ = x + 2
@@ -89,7 +98,17 @@ costs_per_char = [0, 1, 10, 100, 1000]
 
 
 def is_done(positions):
-    return positions == ((0, 0, 0, 0, 0, 0, 0), (1, 2, 3, 4), (1, 2, 3, 4))
+    return positions == (
+        (0, 0, 0, 0, 0, 0, 0),
+        (1, 2, 3, 4),
+        (1, 2, 3, 4),
+    ) or positions == (
+        (0, 0, 0, 0, 0, 0, 0),
+        (1, 2, 3, 4),
+        (1, 2, 3, 4),
+        (1, 2, 3, 4),
+        (1, 2, 3, 4),
+    )
 
 
 def pprint(positions):
@@ -97,11 +116,11 @@ def pprint(positions):
     for x in range(7):
         print(".ABCD"[positions[0][x]], end=("." if x in [1, 2, 3, 4] else ""))
     print("#")
-    for y in range(2):
-        print(["###", "  #"][y], end="")
+    for y in range(N - 1):
+        print(["###", "  #", "  #", "  #"][y], end="")
         for x in range(4):
             print(".ABCD"[positions[y + 1][x]], end="#")
-        print(["##", ""][y])
+        print(["##", "", "", ""][y])
     print(" ", "#" * 9)
 
 
@@ -133,6 +152,7 @@ def next_moves(positions, previous_cost):
 
             if is_done(new_pos):
                 res.append(cost)
+                # pprint(positions)
                 # print(cost)
             else:
                 res.extend(next_moves(new_pos, cost))
@@ -141,12 +161,18 @@ def next_moves(positions, previous_cost):
 
 
 def easy():
+    pprint(init_positions())
     print(min(next_moves(init_positions(), 0)))
     # print(options(init_positions(), (0, 1)))
 
 
 def hard():
-    return
+    global t, N, costs
+    N += 2
+    t = t[:2] + [[4, 3, 2, 1], [4, 2, 1, 3]] + t[2:]
+    costs = {}
+    pprint(init_positions())
+    print(min(next_moves(init_positions(), 0)))
 
 
 def indices(pos):
@@ -164,7 +190,7 @@ teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
-t, costs = read(), {}
+t, costs, N = read(), {}, 3
 if __name__ == "__main__":
-    easy()
+    # easy()
     hard()
