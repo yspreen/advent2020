@@ -27,6 +27,7 @@ class VectorSet:
         self.diff_tuples = set(map(diff_to_tuple, self.diffs.values()))
         self.vectors = {k: vectors}
         self.points = set(tuple(vector) for vector in vectors)
+        self.scanners = [np.array((0, 0, 0))]
 
     def similarity(self, other: "VectorSet") -> int:
         return len(self.diff_tuples & other.diff_tuples)
@@ -57,6 +58,7 @@ class VectorSet:
         self.points |= set(tuple(vector) for vector in new_vectors)
         self.diff_tuples |= other.diff_tuples
         self.diffs.update({k: rotations(v)[rotate] for (k, v) in other.diffs.items()})
+        self.scanners += [move]
 
 
 def vector_matches(one, other):
@@ -125,15 +127,16 @@ def easy():
         for k, s in enumerate(sets[1:]):
             if sets[0].similarity(s) > m:
                 m, other = sets[0].similarity(s), k + 1
-        assert other > 0
-        print("join", other)
         sets[0].join(sets[other])
         del sets[other]
     print(len(sets[0].points))
 
-
-def hard():
-    return
+    points = list(sets[0].scanners)
+    points.sort(key=lambda p: sum(map(abs, p)))
+    last = points.pop()
+    m = max([sum(abs(np.array(p) - np.array(last))) for p in points])
+    print(m)
+    print([p for p in points if sum(abs(np.array(p) - np.array(last))) == m])
 
 
 teststr = """--- scanner 0 ---
@@ -279,4 +282,3 @@ inf = float("inf")
 t = read()
 if __name__ == "__main__":
     easy()
-    hard()
