@@ -1,4 +1,8 @@
-# [https://adventofcode.com/](https://adventofcode.com/)
+# 🚨 [FOLLOW me tweet about solving these every day](https://twitter.com/spreen_co) 🚨
+
+# 🚨 [WATCH me solving puzzles on stream](https://twitch.tv/at_spreen_co) 🚨
+
+## [adventofcode.com/](https://adventofcode.com/)
 
 ## Year 2021: 50/50 \*
 
