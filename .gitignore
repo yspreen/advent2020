@@ -1,3 +1,6 @@
 /.pyenv/
 .DS_Store
 *.pyc
+.aoc.secret
+
+.answers.log
