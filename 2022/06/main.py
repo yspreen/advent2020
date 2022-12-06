@@ -34,7 +34,7 @@ def run(num):
     print(i)
 
 
-teststr = """mjqjpqmgbljsphdztnvjfqwrcgsmlb"""
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
