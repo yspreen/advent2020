@@ -33,10 +33,8 @@ def move(T, h, t):
     pos_h, pos_t = T[h], list(T[t])
     if dist(pos_h, pos_t) < 2:
         return
-    if pos_h[0] != pos_t[0]:
-        pos_t[0] += sign(pos_h[0] - pos_t[0])
-    if pos_h[1] != pos_t[1]:
-        pos_t[1] += sign(pos_h[1] - pos_t[1])
+    pos_t[0] += sign(pos_h[0] - pos_t[0])
+    pos_t[1] += sign(pos_h[1] - pos_t[1])
     T[t] = tuple(pos_t)
 
 
