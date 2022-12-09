@@ -17,28 +17,6 @@ def read():
     return lmap(lambda r: (r.split(" ")[0], int(r.split(" ")[1])), s)
 
 
-def easy():
-    H = (0, 0)
-    T = (0, 0)
-    m = {
-        "D": [-1, 0],
-        "U": [1, 0],
-        "L": [0, -1],
-        "R": [0, 1],
-    }
-    seen = set()
-    seen.add(T)
-    for dir, num in t:
-        v = m[dir]
-        for _ in range(num):
-            old_H = H
-            H = (H[0] + v[0], H[1] + v[1])
-            if dist(T, H) > 1:
-                T = old_H
-            seen.add(T)
-    print(len(seen))
-
-
 def dist(H, T):
     return max(abs(H[0] - T[0]), abs(H[1] - T[1]))
 
@@ -73,70 +51,48 @@ def sign(x):
     return 0
 
 
-def move(T, t, h, dir, move_dist, old_H):
-    if move_dist < 2:
-        d = abs(T[t][0] - old_H[h][0]) + abs(T[t][1] - old_H[h][1])
-        T[t] = old_H[h]
-        return d
-    v = (T[h][0] - T[t][0], T[h][1] - T[t][1])
-    d = 0
-    if dir in ["U", "D"]:
-        d += 1
-        T[t] = (T[t][0] + sign(v[0]), T[t][1])
-        if dist(T[h], T[t]) > 1:
-            d += 1
-            T[t] = (T[t][0], T[t][1] + sign(v[1]))
-    else:
-        d += 1
-        T[t] = (T[t][0], T[t][1] + sign(v[1]))
-        if dist(T[h], T[t]) > 1:
-            d += 1
-            T[t] = (T[t][0] + sign(v[0]), T[t][1])
+def move(T, h, t):
+    pos_h = list(T[h])
+    pos_t = list(T[t])
+    if dist(pos_h, pos_t) < 2:
+        return False
+    if pos_h[0] == pos_t[0]:  # horizontal
+        pos_t[1] += sign(pos_h[1] - pos_t[1])
+    elif pos_h[1] == pos_t[1]:  # vertical
+        pos_t[0] += sign(pos_h[0] - pos_t[0])
+    else:  # diag
+        pos_t[1] += sign(pos_h[1] - pos_t[1])
+        pos_t[0] += sign(pos_h[0] - pos_t[0])
+    T[t] = tuple(pos_t)
 
-    return d
+    return True
 
 
-def hard():
-    T = [(0 * i, 0 * i) for i in range(10)]
-    old_H = deepcopy(T)
+def run(length):
+    T = [(0 * i, 0 * i) for i in range(length)]
     m = {
         "D": [1, 0],
         "U": [-1, 0],
         "L": [0, -1],
         "R": [0, 1],
     }
-    seen = set()
-    seen.add(T[9])
+    seen = set([T[length - 1]])
     for dir, num in t:
         v = m[dir]
         for _ in range(num):
-            old_H = deepcopy(T)
             T[0] = (T[0][0] + v[0], T[0][1] + v[1])
-            if dist(T[0], T[1]) > 1:
-                move_dist = 0
-                for i in range(1, 10):
-                    if dist(T[i], T[i - 1]) > 1:
-                        move_dist = move(T, i, i - 1, dir, move_dist, old_H)
-                    else:
-                        break
-            seen.add(T[9])
-        # draw(T, seen)
+            for i in range(1, length):
+                if not move(T, i - 1, i):
+                    break
+            seen.add(T[length - 1])
     print(len(seen))
 
 
-teststr = """R 5
-U 8
-L 8
-D 3
-R 17
-D 10
-L 25
-U 20"""
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
 if __name__ == "__main__":
-    easy()
-    hard()
+    run(2)
+    run(10)
