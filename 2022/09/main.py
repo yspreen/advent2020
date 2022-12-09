@@ -21,28 +21,6 @@ def dist(H, T):
     return max(abs(H[0] - T[0]), abs(H[1] - T[1]))
 
 
-def draw(T, seen):
-    min_x = min(map(lambda i: i[1], T + list(seen)))
-    min_y = min(map(lambda i: i[0], T + list(seen)))
-    max_x = max(map(lambda i: i[1], T + list(seen)))
-    max_y = max(map(lambda i: i[0], T + list(seen)))
-
-    max_x -= min_x - 1
-    max_y -= min_y - 1
-
-    grid = [["." for _ in range(max_x + 1)] for _ in range(max_y + 1)]
-    num = 9
-    for i, j in T:
-        grid[i - min_y][j - min_x] = str(num)
-        num -= 1
-    for i, j in seen:
-        grid[i - min_y][j - min_x] = "#"
-        num -= 1
-
-    for row in grid:
-        print(*row, sep="")
-
-
 def sign(x):
     if x > 0:
         return 1
@@ -52,20 +30,14 @@ def sign(x):
 
 
 def move(T, h, t):
-    pos_h = list(T[h])
-    pos_t = list(T[t])
+    pos_h, pos_t = T[h], list(T[t])
     if dist(pos_h, pos_t) < 2:
-        return False
-    if pos_h[0] == pos_t[0]:  # horizontal
-        pos_t[1] += sign(pos_h[1] - pos_t[1])
-    elif pos_h[1] == pos_t[1]:  # vertical
+        return
+    if pos_h[0] != pos_t[0]:
         pos_t[0] += sign(pos_h[0] - pos_t[0])
-    else:  # diag
+    if pos_h[1] != pos_t[1]:
         pos_t[1] += sign(pos_h[1] - pos_t[1])
-        pos_t[0] += sign(pos_h[0] - pos_t[0])
     T[t] = tuple(pos_t)
-
-    return True
 
 
 def run(length):
@@ -82,8 +54,7 @@ def run(length):
         for _ in range(num):
             T[0] = (T[0][0] + v[0], T[0][1] + v[1])
             for i in range(1, length):
-                if not move(T, i - 1, i):
-                    break
+                move(T, i - 1, i)
             seen.add(T[length - 1])
     print(len(seen))
 
