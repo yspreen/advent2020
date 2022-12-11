@@ -26,7 +26,7 @@ def maybe_int(s):
 
 def easy():
     x = 1
-    cycles = 0
+    cycles = i = s = 0
     i = 0
     marker = [20, 60, 100, 140, 180, 220]
     s = 0
@@ -45,14 +45,6 @@ def easy():
     print(s)
 
 
-def draw(buffer, pos):
-    new_pos = len(buffer) % 40
-    if abs(pos - new_pos) < 2:
-        buffer.append("##")
-    else:
-        buffer.append("  ")
-
-
 def hard():
     buffer = []
     pos = 1
@@ -66,6 +58,14 @@ def hard():
     for _ in range(7):
         print("".join(buffer[:40]))
         buffer = buffer[40:]
+
+
+def draw(buffer, pos):
+    new_pos = len(buffer) % 40
+    if abs(pos - new_pos) < 2:
+        buffer.append("##")
+    else:
+        buffer.append("  ")
 
 
 teststr = """"""
