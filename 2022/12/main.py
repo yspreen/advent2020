@@ -22,21 +22,22 @@ def read():
 
 
 mv = [
-    (-1, 0),
-    (1, 0),
-    (0, 1),
-    (0, -1),
+    (-1, 0),  # U
+    (1, 0),  # D
+    (0, -1),  # L
+    (0, 1),  # R
 ]
 
 
-def easy():
+def BFS(start, can_walk, goal, cost_fn=None):
+    cost_fn = (lambda _, __: 1) if cost_fn is None else cost_fn
+
     options = [(start, 0)]
     visited = set([start])
 
-    while True:
+    while options:
         new_o = []
         for pos, cost in options:
-            cost += 1
             for d in mv:
                 new_p = (pos[0] + d[0], pos[1] + d[1])
                 if new_p[0] < 0:  # lower bound check
@@ -44,54 +45,28 @@ def easy():
                 if new_p[1] < 0:  # lower bound check
                     continue
                 try:
-                    if t[new_p] > t[pos] + 1:
-                        continue
+                    assert can_walk(pos, new_p)
                 except:
                     continue  # upper bound check
                 if new_p in visited:
                     continue
                 visited.add(new_p)
-                new_o.append((new_p, cost))
-                if new_p == end:
-                    return print(cost)
+                cost_ = cost + cost_fn(pos, new_p)
+                new_o.append((new_p, cost_))
+                if goal(new_p):
+                    return cost_
         options = new_o
+    return None
+
+
+def easy():
+    print(BFS(start, lambda a, b: t[b] <= t[a] + 1, lambda p: p == end))
 
 
 def hard():
-    t[t == 26] = 0
-    t[t == 27] = 25
-    options = [(end, 0)]
-    visited = set([end])
-
-    while True:
-        new_o = []
-        for pos, cost in options:
-            cost += 1
-            for d in mv:
-                new_p = (pos[0] + d[0], pos[1] + d[1])
-                if new_p[0] < 0:
-                    continue
-                if new_p[1] < 0:
-                    continue
-                try:
-                    if t[new_p] < t[pos] - 1:
-                        continue
-                except:
-                    continue
-                if new_p in visited:
-                    continue
-                visited.add(new_p)
-                new_o.append((new_p, cost))
-                if t[new_p] == 0:
-                    return print(cost)
-        options = new_o
+    print(BFS(end, lambda a, b: t[b] >= t[a] - 1, lambda p: t[p] == 0))
 
 
-teststr = """Sabqponm
-abcryxxl
-accszExk
-acctuvwj
-abdefghi"""
 teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
