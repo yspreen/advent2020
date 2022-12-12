@@ -64,7 +64,7 @@ def easy():
 
 
 def hard():
-    print(BFS(end, lambda a, b: t[b] >= t[a] - 1, lambda p: t[p] == 0))
+    print(BFS(end, lambda a, b: t[a] <= t[b] + 1, lambda p: t[p] == 0))
 
 
 teststr = ""
