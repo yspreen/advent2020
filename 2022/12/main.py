@@ -36,23 +36,24 @@ def easy():
     while True:
         new_o = []
         for pos, cost in options:
+            cost += 1
             for d in mv:
                 new_p = (pos[0] + d[0], pos[1] + d[1])
-                if new_p[0] < 0:
+                if new_p[0] < 0:  # lower bound check
                     continue
-                if new_p[1] < 0:
+                if new_p[1] < 0:  # lower bound check
                     continue
                 try:
-                    if t[pos] + 1 < t[new_p]:
+                    if t[new_p] > t[pos] + 1:
                         continue
                 except:
-                    continue
+                    continue  # upper bound check
                 if new_p in visited:
                     continue
                 visited.add(new_p)
-                new_o.append((new_p, cost + 1))
+                new_o.append((new_p, cost))
                 if new_p == end:
-                    return print(cost + 1)
+                    return print(cost)
         options = new_o
 
 
@@ -65,6 +66,7 @@ def hard():
     while True:
         new_o = []
         for pos, cost in options:
+            cost += 1
             for d in mv:
                 new_p = (pos[0] + d[0], pos[1] + d[1])
                 if new_p[0] < 0:
@@ -72,16 +74,16 @@ def hard():
                 if new_p[1] < 0:
                     continue
                 try:
-                    if t[pos] - 1 > t[new_p]:
+                    if t[new_p] < t[pos] - 1:
                         continue
                 except:
                     continue
                 if new_p in visited:
                     continue
                 visited.add(new_p)
-                new_o.append((new_p, cost + 1))
+                new_o.append((new_p, cost))
                 if t[new_p] == 0:
-                    return print(cost + 1)
+                    return print(cost)
         options = new_o
 
 
