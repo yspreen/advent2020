@@ -9,6 +9,7 @@ from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
+from typing import Tuple, Any
 
 
 idxs = ascii_lowercase + "SE"
@@ -26,9 +27,6 @@ mv = [
     (0, 1),
     (0, -1),
 ]
-
-
-from typing import Tuple
 
 
 def easy():
@@ -98,8 +96,11 @@ lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
 
-start = list(zip(*np.where(t == 26)))[0]
-end = list(zip(*np.where(t == 27)))[0]
+
+start_ = list(zip(*np.where(t == 26)))[0]  # type: Any
+start = start_  # type: Tuple[int,int]
+end_ = list(zip(*np.where(t == 27)))[0]  # type: Any
+end = end_  # type: Tuple[int,int]
 t[t == 26] = 0
 t[t == 27] = 25
 if __name__ == "__main__":
