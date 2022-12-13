@@ -8,6 +8,6 @@ main() {
     aoc -d $n
     cd "$(printf "%02d" $n)"
     cp ../../template.py ./main.py
-    code main.py input $n.md
+    code $n.md input main.py
 }
 main
