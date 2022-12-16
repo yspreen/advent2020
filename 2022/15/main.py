@@ -76,11 +76,11 @@ def resolution(t_, divisor, potentials):
 
     potentials_ = []
     for x__, y__ in potentials:
-        possible = True
         x__ *= 10
         y__ *= 10
         for x_ in range(10):
             for y_ in range(10):
+                possible = True
                 x = x__ + x_
                 y = y__ + y_
                 if x < 0:
@@ -88,7 +88,7 @@ def resolution(t_, divisor, potentials):
                 if y < 0:
                     continue
                 for xs, ys, d in t__:
-                    if dist((x, y), (xs, ys)) <= (d - 11 if divisor > 1 else d):
+                    if dist((x, y), (xs, ys)) <= (d - 1 if divisor > 1 else d):
                         possible = False
                         break
                 if possible:
@@ -107,10 +107,10 @@ def hard():
 
     while divisor > 1:
         p = resolution(t_, divisor, p)
-        print(p)
         divisor //= 10
 
-    print(resolution(t_, divisor, p))
+    p = resolution(t_, divisor, p)
+    print(p[0][0] * 4000000 + p[0][1])
 
 
 teststr = """Sensor at x=2, y=18: closest beacon is at x=-2, y=15
