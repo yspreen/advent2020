@@ -28,36 +28,6 @@ mv = [
 ]
 
 
-def BFS(start, can_walk, goal, cost_fn=None):
-    cost_fn = (lambda _, __: 1) if cost_fn is None else cost_fn
-
-    options = [(start, 0)]
-    visited = set([start])
-
-    while options:
-        new_o = []
-        for pos, cost in options:
-            for d in mv:
-                new_p = (pos[0] + d[0], pos[1] + d[1])
-                if new_p[0] < 0:  # lower bound check
-                    continue
-                if new_p[1] < 0:  # lower bound check
-                    continue
-                try:
-                    assert can_walk(pos, new_p)
-                except:
-                    continue  # upper bound check
-                if new_p in visited:
-                    continue
-                visited.add(new_p)
-                cost_ = cost + cost_fn(pos, new_p)
-                new_o.append((new_p, cost_))
-                if goal(new_p):
-                    return cost_
-        options = new_o
-    return None
-
-
 def easy():
     t_ = []
     min_x = inf
@@ -67,7 +37,7 @@ def easy():
     r = 0
     seen_bx = set([])
     for sx, sy, bx, by in t:
-        d = abs(sx - bx) + abs(sy - by)
+        d = dist((sx, sy), (bx, by))
         t_.append((sx, sy, d))
         min_x = min(min_x, sx)
         min_x = min(min_x, bx)
@@ -107,24 +77,29 @@ def easy():
                     runloop(t_, i1, i2, i3, i4)
 
 
+def dist(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
 def runloop(t_, i1, i2, i3, i4):
     t1 = t_[i1]
     t2 = t_[i2]
     t3 = t_[i3]
     t4 = t_[i4]
 
-    t1, t2, t3, t4 = sorted([t1, t2, t3, t4], key=lambda t: t[1])
-    t1, t2 = sorted([t1, t2], key=lambda t: t[0])
+    A, B, C, D = sorted([t1, t2, t3, t4], key=lambda t: t[1])
+    A, B = sorted([A, B], key=lambda t: t[0])
+    C, D = sorted([C, D], key=lambda t: t[0])
 
-    x1, x1, d1 = t1
-    x2, x2, d2 = t2
-    x3, x3, d3 = t3
-    x4, x4, d4 = t4
+    x = (A[0] + A[1] + A[2] - B[0] + B[1] - B[2]) / 2
+    y = -x + A[0] + A[1] + (A[2] + 1)
 
-    abs(mx - x1) + abs(my - y1) == d1 + 1
-    abs(mx - x2) + abs(my - y2) == d2 + 1
-    abs(mx - x3) + abs(my - y3) == d3 + 1
-    abs(mx - x4) + abs(my - y4) == d4 + 1
+    if abs(dist((C[0], C[1]), (x, y)) - (C[2] + 1)) >= 5:
+        return
+    if abs(dist((D[0], D[1]), (x, y)) - (D[2] + 1)) >= 5:
+        return
+
+    print(int(x) * 4000000 + int(y))
 
 
 #   1  2

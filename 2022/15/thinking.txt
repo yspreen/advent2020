@@ -1,0 +1,49 @@
+        x                    
+         x                   
+         xx                  
+        x  x                 
+     A x    x                 
+      x      x               B
+     x        x              
+    x        x x             
+   x        x   X                 
+  x        x                    
+ x  x     x                    
+x    x   x                    
+      x x                    
+       x                     
+        x                    
+     C                        
+                             D
+
+
+
+A:
+
+y = -x + mid_x_a + mid_y_a + (d_a + 1)
+
+B:
+
+y = x + mid_x_b - mid_y_b + (d_b + 1)
+
+
+
+Solve:
+
+-x + mid_x_a + mid_y_a + (d_a + 1) = x + mid_x_b - mid_y_b + (d_b + 1)
+-2x + mid_x_a + mid_y_a + (d_a + 1) = mid_x_b - mid_y_b + (d_b + 1)
+2x = mid_x_a + mid_y_a + (d_a + 1) - mid_x_b + mid_y_b - (d_b + 1)
+x = (mid_x_a + mid_y_a + d_a - mid_x_b + mid_y_b - d_b) / 2
+
+
+
+|
+|
+|          x
+|
+|
+|---------------------------
+|
+|
+|
+v
