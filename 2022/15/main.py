@@ -27,8 +27,11 @@ mv = [
     (0, 1),  # R
 ]
 
+t_ = []
+
 
 def easy():
+    global t_
     t_ = []
     min_x = inf
     max_x = 0
@@ -58,70 +61,56 @@ def easy():
     #         r += 1
     # print(r)
 
-    for i1 in range(len(t_)):
-        for i2 in range(len(t_)):
-            for i3 in range(len(t_)):
-                for i4 in range(len(t_)):
-                    if i1 == i2:
-                        continue
-                    if i1 == i3:
-                        continue
-                    if i1 == i4:
-                        continue
-                    if i2 == i3:
-                        continue
-                    if i2 == i4:
-                        continue
-                    if i3 == i4:
-                        continue
-                    runloop(t_, i1, i2, i3, i4)
-
 
 def dist(p1, p2):
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 
-def runloop(t_, i1, i2, i3, i4):
-    t1 = t_[i1]
-    t2 = t_[i2]
-    t3 = t_[i3]
-    t4 = t_[i4]
+def resolution(t_, divisor, potentials):
+    t__ = []
+    for x, y, d in t_:
+        x //= divisor
+        y //= divisor
+        d //= divisor
+        t__.append((x, y, d))
 
-    A, B, C, D = sorted([t1, t2, t3, t4], key=lambda t: t[1])
-    A, B = sorted([A, B], key=lambda t: t[0])
-    C, D = sorted([C, D], key=lambda t: t[0])
-
-    x = (A[0] + A[1] + A[2] - B[0] + B[1] - B[2]) / 2
-    y = -x + A[0] + A[1] + (A[2] + 1)
-
-    if abs(dist((C[0], C[1]), (x, y)) - (C[2] + 1)) >= 5:
-        return
-    if abs(dist((D[0], D[1]), (x, y)) - (D[2] + 1)) >= 5:
-        return
-
-    print(int(x) * 4000000 + int(y))
-
-
-#   1  2
-#  3   4
-
-
-"""
-   
-         2
-
-
-
-       1
-        x
-
-         4
-3
-"""
+    potentials_ = []
+    for x__, y__ in potentials:
+        possible = True
+        x__ *= 10
+        y__ *= 10
+        for x_ in range(10):
+            for y_ in range(10):
+                x = x__ + x_
+                y = y__ + y_
+                if x < 0:
+                    continue
+                if y < 0:
+                    continue
+                for xs, ys, d in t__:
+                    if dist((x, y), (xs, ys)) <= (d - 11 if divisor > 1 else d):
+                        possible = False
+                        break
+                if possible:
+                    potentials_.append((x, y))
+    return list(set(potentials_))
 
 
 def hard():
-    return
+    divisor = 10000
+    limit = 4000000 // divisor // 10
+
+    p = []
+    for x in range(limit + 1):
+        for y in range(limit + 1):
+            p.append((x, y))
+
+    while divisor > 1:
+        p = resolution(t_, divisor, p)
+        print(p)
+        divisor //= 10
+
+    print(resolution(t_, divisor, p))
 
 
 teststr = """Sensor at x=2, y=18: closest beacon is at x=-2, y=15
