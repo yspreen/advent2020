@@ -41,7 +41,7 @@ mv = [
 
 def to_tuple(closed):
     l = []
-    for k in paths.keys():
+    for k in closed_valves:
         if k in closed:
             l.append(k)
 
@@ -50,13 +50,11 @@ def to_tuple(closed):
 
 def BFS(start):
     global M
-    options = [(start, 30, to_tuple(paths.keys()), 0, 0)]
+    options = [(start, 29, to_tuple(closed_valves), 0, 0)]
 
     while options:
         new_o = []
         for pos, time, closed, flow, released in options:
-            if time < 0:
-                continue
             M = max(M, released)
             if time == 0:
                 continue
@@ -65,7 +63,31 @@ def BFS(start):
                 flow_ = flow + flows[pos]
                 new_o.append((pos, time - 1, closed_, flow_, released + flow_))
             for new_p, cost in paths_d[pos]:
-                if time > cost:
+                if time > cost and len(closed) > 0:
+                    new_o.append(
+                        (new_p, time - cost, closed, flow, released + flow * cost)
+                    )
+                else:
+                    new_o.append((new_p, 0, closed, flow, released + flow * time))
+        options = list(set(new_o))
+
+
+def elephant(start):
+    global M
+    options = [(start, start, 25, to_tuple(closed_valves), 0, 0)]
+
+    while options:
+        new_o = []
+        for posA, posB, time, closed, flow, released in options:
+            M = max(M, released)
+            if time == 0:
+                continue
+            if pos in closed and flows[pos] > 0:
+                closed_ = to_tuple(set(closed) - set([pos]))
+                flow_ = flow + flows[pos]
+                new_o.append((pos, time - 1, closed_, flow_, released + flow_))
+            for new_p, cost in paths_d[pos]:
+                if time > cost and len(closed) > 0:
                     new_o.append(
                         (new_p, time - cost, closed, flow, released + flow * cost)
                     )
@@ -77,24 +99,27 @@ def BFS(start):
 paths = {}
 paths_d = {}
 flows = {}
+closed_valves = []
 M = 0
 
 
 def calc_paths(start):
-    pos = [(start, 0, set(start))]
+    pos = [(start, 0)]
     paths_d[start] = []
+    v = set([start])
 
     while pos:
         new_p = []
-        for p, c, v in pos:
+        for p, c in pos:
             c += 1
             for dest in paths[p]:
                 if dest in v:
                     continue
+                v |= set([dest])
                 if flows[dest] > 0:
                     paths_d[start].append((dest, c))
                 else:
-                    new_p.append((dest, c, v | set([dest])))
+                    new_p.append((dest, c))
         pos = new_p
 
 
@@ -104,17 +129,23 @@ def easy():
         flows[start] = c
 
     calc_paths("AA")
+
     for pos in paths.keys():
         if flows[pos] == 0:
             continue
+        closed_valves.append(pos)
         calc_paths(pos)
 
-    r = BFS("AA")
+    BFS("AA")
     print(M)
 
 
 def hard():
-    return
+    global M
+    M = 0
+
+    elephant("AA")
+    print(M)
 
 
 teststr = """Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
@@ -127,7 +158,7 @@ Valve GG has flow rate=0; tunnels lead to valves FF, HH
 Valve HH has flow rate=22; tunnel leads to valve GG
 Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II"""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
