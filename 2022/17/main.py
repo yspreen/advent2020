@@ -121,7 +121,65 @@ def pad_top(A):
 
 
 def hard():
-    return
+    A = np.zeros((8, 7), dtype=int)
+    A[7, :] = 1
+    t_ = t + t  # prop wrong
+    t_.reverse()
+
+    H_before_cycle = 0
+    dropped_before_cycle = 0
+    limit = 1000000000000
+
+    W = H = stopped = i = 0
+    while True:
+        pos = 2
+        A = pad_top(A)
+        new_piece = move(shapes[i], 2, 0)
+        W = new_piece.shape[1] - 2
+        i += 1
+        i %= len(shapes)
+        if A.shape[0] > 200:
+            H += A.shape[0] - 200
+            A = A[:200, :]
+        while True:
+            if not t_:
+                if H_before_cycle != 0:
+                    h_dif = H - H_before_cycle
+                    s_dif = stopped - dropped_before_cycle
+                    drops_left = limit - stopped
+                    drops_left //= s_dif
+                    H += h_dif * drops_left
+                    stopped += drops_left * s_dif
+
+                H_before_cycle = H
+                dropped_before_cycle = stopped
+                t_ += reversed(t)
+            m_v = t_.pop()
+            if m_v == "<" and pos > 0:
+                new_move = move(new_piece, -1, 0)
+                if not collision(A, new_move):
+                    pos -= 1
+                    new_piece = new_move
+            if m_v == ">" and pos + W < 7:
+                new_move = move(new_piece, 1, 0)
+                if not collision(A, new_move):
+                    pos += 1
+                    new_piece = new_move
+            new_move = move(new_piece, 0, 1)
+            if collision(A, new_move):
+                A = set_piece(A, new_piece)
+                stopped += 1
+                if stopped == limit:
+                    height = A.shape[0] - 1
+                    i = 0
+                    while A[i, :].sum() == 0:
+                        height -= 1
+                        i += 1
+                    return print(height + H)
+                break
+            else:
+                new_piece = new_move
+    # print(A)
 
 
 shapes = """....
