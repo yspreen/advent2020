@@ -56,42 +56,35 @@ def BFS(start, can_walk, goal, cost_fn=None):
 
 
 def easy():
-    # print(collision(shapes[0], shapes[1]))
-    # print(collision(shapes[0], move(shapes[1], 0, 1)))
-    # print(move(shapes[1], 1, 1))
-
-    # print(move(move(shapes[1], 1, 1), -1, 0))
-
     A = np.zeros((8, 7), dtype=int)
     A[7, :] = 1
     t_ = t + t  # prop wrong
     t_.reverse()
 
-    H = stopped = i = 0
+    W = H = stopped = i = 0
     while True:
         if not t_:
-            break
-        new_piece = move(shapes[i], 2, 0)
+            t_ += reversed(t)
 
         pos = 2
+        A = pad_top(A)
+        new_piece = move(shapes[i], 2, 0)
+        W = new_piece.shape[1] - 2
         i += 1
         i %= len(shapes)
-        A = pad_top(A)
-        if A.shape[0] > 100:
-            H += A.shape[0] - 100
-            A = A[:100, :]
+        if A.shape[0] > 200:
+            H += A.shape[0] - 200
+            A = A[:200, :]
         while True:
-            # print(new_piece)
-            # print(A)
             if not t_:
-                break
+                t_ += reversed(t)
             m_v = t_.pop()
             if m_v == "<" and pos > 0:
                 new_move = move(new_piece, -1, 0)
                 if not collision(A, new_move):
                     pos -= 1
                     new_piece = new_move
-            if m_v == ">" and pos < 3:
+            if m_v == ">" and pos + W < 7:
                 new_move = move(new_piece, 1, 0)
                 if not collision(A, new_move):
                     pos += 1
@@ -100,7 +93,6 @@ def easy():
             if collision(A, new_move):
                 A = set_piece(A, new_piece)
                 stopped += 1
-                print(stopped)
                 if stopped == 2022:
                     height = A.shape[0] - 1
                     i = 0
@@ -198,7 +190,4 @@ shapes = lmap(
 t = read()
 if __name__ == "__main__":
     easy()
-    # hard()
-    # print(move(shapes[3], 2, 0))
-    # print(move(shapes[3], 0, 1))
-    # print(move(move(shapes[3], 2, 0), -1, 0))
+    hard()
