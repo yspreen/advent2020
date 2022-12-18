@@ -51,24 +51,39 @@ def to_tuple(closed):
 def BFS(start):
     global M
     options = [(start, 29, to_tuple(closed_valves), 0, 0)]
+    history = {options[0]: [start]}
 
     while options:
         new_o = []
-        for pos, time, closed, flow, released in options:
+        for params in options:
+            pos, time, closed, flow, released = params
             M = max(M, released)
+            if released == 1659:
+                print("optimal")
+                print(history[params])
             if time == 0:
                 continue
             if pos in closed and flows[pos] > 0:
                 closed_ = to_tuple(set(closed) - set([pos]))
                 flow_ = flow + flows[pos]
-                new_o.append((pos, time - 1, closed_, flow_, released + flow_))
+                new_state = (pos, time - 1, closed_, flow_, released + flow_)
+                new_o.append(new_state)
+                history[new_state] = history.get(params, []) + [new_state[0]]
             for new_p, cost in paths_d[pos]:
                 if time > cost and len(closed) > 0:
-                    new_o.append(
-                        (new_p, time - cost, closed, flow, released + flow * cost)
+                    new_state = (
+                        new_p,
+                        time - cost,
+                        closed,
+                        flow,
+                        released + flow * cost,
                     )
+                    new_o.append(new_state)
+                    history[new_state] = history.get(params, []) + [new_state[0]]
                 else:
-                    new_o.append((new_p, 0, closed, flow, released + flow * time))
+                    new_state = (new_p, 0, closed, flow, released + flow * time)
+                    new_o.append(new_state)
+                    history[new_state] = history.get(params, []) + [new_state[0]]
         options = list(set(new_o))
 
 
@@ -141,11 +156,7 @@ def easy():
 
 
 def hard():
-    global M
-    M = 0
-
-    elephant("AA")
-    print(M)
+    return
 
 
 teststr = """Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
