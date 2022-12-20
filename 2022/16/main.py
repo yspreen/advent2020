@@ -9,6 +9,28 @@ from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
+from itertools import combinations
+
+
+def TSP(G):
+    n = len(G)
+    C = [[inf for _ in range(n)] for __ in range(1 << n)]
+    C[1][0] = 0  # {0} <-> 1
+    for size in range(1, n):
+        for S in combinations(range(1, n), size):
+            S = (0,) + S
+            k = sum([1 << i for i in S])
+            for i in S:
+                if i == 0:
+                    continue
+                for j in S:
+                    if j == i:
+                        continue
+                    cur_index = k ^ (1 << i)
+                    C[k][i] = min(C[k][i], C[cur_index][j] + G[j][i])
+                    # C[S−{i}][j]
+    all_index = (1 << n) - 1
+    return min([(C[all_index][i] + G[0][i], i) for i in range(n)])
 
 
 def read():
@@ -31,128 +53,39 @@ def maybeint(line):
         return line
 
 
-mv = [
-    (-1, 0),  # U
-    (1, 0),  # D
-    (0, -1),  # L
-    (0, 1),  # R
-]
-
-
-def to_tuple(closed):
-    l = []
-    for k in closed_valves:
-        if k in closed:
-            l.append(k)
-
-    return tuple(l)
-
-
-def BFS(start):
-    global M
-    options = [(start, 29, to_tuple(closed_valves), 0, 0)]
-    history = {options[0]: [start]}
-
-    while options:
-        new_o = []
-        for params in options:
-            pos, time, closed, flow, released = params
-            M = max(M, released)
-            if released == 1659:
-                print("optimal")
-                print(history[params])
-            if time == 0:
-                continue
-            if pos in closed and flows[pos] > 0:
-                closed_ = to_tuple(set(closed) - set([pos]))
-                flow_ = flow + flows[pos]
-                new_state = (pos, time - 1, closed_, flow_, released + flow_)
-                new_o.append(new_state)
-                history[new_state] = history.get(params, []) + [new_state[0]]
-            for new_p, cost in paths_d[pos]:
-                if time > cost and len(closed) > 0:
-                    new_state = (
-                        new_p,
-                        time - cost,
-                        closed,
-                        flow,
-                        released + flow * cost,
-                    )
-                    new_o.append(new_state)
-                    history[new_state] = history.get(params, []) + [new_state[0]]
-                else:
-                    new_state = (new_p, 0, closed, flow, released + flow * time)
-                    new_o.append(new_state)
-                    history[new_state] = history.get(params, []) + [new_state[0]]
-        options = list(set(new_o))
-
-
-def elephant(start):
-    global M
-    options = [(start, start, 25, to_tuple(closed_valves), 0, 0)]
-
-    while options:
-        new_o = []
-        for posA, posB, time, closed, flow, released in options:
-            M = max(M, released)
-            if time == 0:
-                continue
-            if pos in closed and flows[pos] > 0:
-                closed_ = to_tuple(set(closed) - set([pos]))
-                flow_ = flow + flows[pos]
-                new_o.append((pos, time - 1, closed_, flow_, released + flow_))
-            for new_p, cost in paths_d[pos]:
-                if time > cost and len(closed) > 0:
-                    new_o.append(
-                        (new_p, time - cost, closed, flow, released + flow * cost)
-                    )
-                else:
-                    new_o.append((new_p, 0, closed, flow, released + flow * time))
-        options = list(set(new_o))
-
-
 paths = {}
-paths_d = {}
 flows = {}
-closed_valves = []
-M = 0
-
-
-def calc_paths(start):
-    pos = [(start, 0)]
-    paths_d[start] = []
-    v = set([start])
-
-    while pos:
-        new_p = []
-        for p, c in pos:
-            c += 1
-            for dest in paths[p]:
-                if dest in v:
-                    continue
-                v |= set([dest])
-                if flows[dest] > 0:
-                    paths_d[start].append((dest, c))
-                else:
-                    new_p.append((dest, c))
-        pos = new_p
+idx = {}
+valves = []
+G = np.array([[0]])
 
 
 def easy():
-    for start, c, dest in t:
-        paths[start] = dest
-        flows[start] = c
+    global G
+    for pos, flow, dest in t:
+        paths[pos] = dest
+        flows[pos] = flow
+        idx[pos] = len(valves)
+        valves.append(pos)
+    print((flows))
+    G = np.zeros((len(paths), len(paths)))
 
-    calc_paths("AA")
-
-    for pos in paths.keys():
-        if flows[pos] == 0:
-            continue
-        closed_valves.append(pos)
-        calc_paths(pos)
-
-    BFS("AA")
-    print(M)
+    start = ["AA"]
+    prev = []
+    while len(prev) < len(valves):
+        new_starts = []
+        for b in start:
+            for n in paths[b]:
+                if n not in prev and n not in new_starts:
+                    new_starts.append(n)
+                G[idx[b], idx[n]] = 1
+                G[idx[n], idx[b]] = 1
+                for a in prev:
+                    G[idx[a], idx[n]] = G[idx[a], idx[b]] + 1
+                    G[idx[n], idx[a]] = G[idx[a], idx[b]] + 1
+        prev += start
+        start = new_starts
+    print(G)
 
 
 def hard():

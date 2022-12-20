@@ -1,0 +1,24 @@
+optimal
+['AA', 'OU', 'OU', 'TO', 'TO', 'DY', 'DY', 'DI', 'DI', 'RH', 'RH', 'OU', 'OI', 'OI', 'BO', 'BO', 'MJ']
+optimal
+['AA', 'OU', 'OU', 'TO', 'TO', 'DY', 'DY', 'DI', 'DI', 'RH', 'RH', 'OU', 'OI', 'OI', 'BO', 'BO', 'ID']
+optimal
+['AA', 'OU', 'OU', 'TO', 'TO', 'DY', 'DY', 'DI', 'DI', 'RH', 'RH', 'OU', 'OI', 'OI', 'BO', 'BO', 'OI']
+1659
+
+
+
+aa 30
+zv 29
+ou 28
+ou 27 8
+nz 26
+to 25
+to 24 19
+zv 23
+iu 22
+dy 21
+dy 20 23
+zp 19
+di 18
+di 17 13

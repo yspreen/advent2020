@@ -1,0 +1,15 @@
+03 MJ 
+04 AC 
+06 KW 
+08 OU 
+10 OI 
+11 ID 
+13 DI 
+15 RH 
+18 BO 
+19 TO 
+21 KL 
+22 YS 
+23 DY 
+24 DT 
+25 CD 
