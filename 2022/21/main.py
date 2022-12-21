@@ -26,9 +26,9 @@ mv = [
 ]
 
 
-def subs(vars, s):
-    for key, value in vars.items():
-        s = s.replace(key, str(value))
+def subs(vars, s, var_a, var_b):
+    s = s.replace(var_a, str(vars[var_a]))
+    s = s.replace(var_b, str(vars[var_b]))
     return s
 
 
@@ -43,7 +43,7 @@ def easy():
             if start in solved:
                 continue
             if re.sub(r"[0-9\s]+", "", end) == "":
-                vars[start] = eval(subs(vars, end))
+                vars[start] = eval(end)
                 solved.add(start)
                 continue
             parts = end.split(" ")
@@ -51,7 +51,7 @@ def easy():
             var_b = parts[-1]
             if var_a not in solved or var_b not in solved:
                 continue
-            vars[start] = eval(subs(vars, end))
+            vars[start] = eval(subs(vars, end, var_a, var_b))
             solved.add(start)
 
     print(int(vars["root"]))
@@ -67,6 +67,7 @@ def hard():
         start = row.split(" = ")[0]
         end = f"({row.split(' = ')[1]})"
         statements[start] = end
+    statements["humn"] = " x "
 
     lhs, rhs = statements["root"].replace("(", "").replace(")", "").split("+")
 
@@ -74,26 +75,16 @@ def hard():
     while didrepl:
         didrepl = False
         for key, value in statements.items():
-            if key == "humn":
-                value = " x "
             if key in lhs:
                 didrepl = True
-
                 lhs = lhs.replace(key, value)
-                # print(lhs)
-                # lhs = str(simplify(sympify(lhs)))
     didrepl = True
     while didrepl:
         didrepl = False
         for key, value in statements.items():
-            if key == "humn":
-                value = " x "
             if key in rhs:
                 didrepl = True
-
                 rhs = rhs.replace(key, value)
-                # print(rhs)
-                # rhs = str(simplify(sympify(rhs)))
 
     lhs = simplify(sympify(lhs))
     rhs = simplify(sympify(rhs))
