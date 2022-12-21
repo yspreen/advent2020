@@ -9,6 +9,74 @@ from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
+from typing import Optional
+
+
+class DLList:
+    def __init__(self, elem, prev=None, aftr=None):
+        self.elem = elem  # type: int
+        self.mod = mod(elem)  # type: int
+        self.prev = prev  # type: Optional[DLList]
+        self.aftr = aftr  # type: Optional[DLList]
+
+    def __str__(self):
+        return f"[{str(self.elem)}]"
+
+    def remove(self):
+        prev, after = self.prev, self.aftr
+        self.prev = None
+        self.aftr = None
+        prev.aftr = after
+        after.prev = prev
+        return prev, after
+
+    def insert_after(self, new_elem):
+        old_after = self.aftr
+
+        self.aftr = new_elem
+        new_elem.prev = self
+        new_elem.aftr = old_after
+        old_after.prev = new_elem
+
+    def insert_prev(self, new_elem):
+        old_prev = self.prev
+
+        self.prev = new_elem
+        new_elem.aftr = self
+        new_elem.prev = old_prev
+        old_prev.aftr = new_elem
+
+    def find(self, value):
+        curr = self
+        while curr.elem != value:
+            curr = curr.aftr
+        return curr
+
+    def plus(self, offset):
+        curr = self
+        while offset > 0:
+            curr = curr.aftr
+            offset -= 1
+        while offset < 0:
+            curr = curr.prev
+            offset += 1
+        return curr.elem
+
+    def print_all(self):
+        curr = self.aftr
+        s = str(self)
+        while curr != self:
+            s += str(curr)
+            curr = curr.aftr
+        print(s)
+
+    def elem_list(self):
+        l = [self]
+        c = self.aftr
+        while c is not self:
+            l.append(c)
+            c = c.aftr
+        return l
 
 
 def read():
@@ -25,72 +93,88 @@ mv = [
 ]
 
 
-def BFS(start, can_walk, goal, cost_fn=None):
-    cost_fn = (lambda _, __: 1) if cost_fn is None else cost_fn
-
-    options = [(start, 0)]
-    visited = set([start])
-
-    while options:
-        new_o = []
-        for pos, cost in options:
-            for d in mv:
-                new_p = (pos[0] + d[0], pos[1] + d[1])
-                if new_p[0] < 0:  # lower bound check
-                    continue
-                if new_p[1] < 0:  # lower bound check
-                    continue
-                try:
-                    assert can_walk(pos, new_p)
-                except:
-                    continue  # upper bound check
-                if new_p in visited:
-                    continue
-                visited.add(new_p)
-                cost_ = cost + cost_fn(pos, new_p)
-                new_o.append((new_p, cost_))
-                if goal(new_p):
-                    return cost_
-        options = new_o
-    return None
-
-
 def easy():
-    # for i in range(len(t)):
-    #     t[i] = t[i] % len(t)
+    prev = None
+    start = None
+    for elem in t:
+        curr = DLList(elem, prev)
+        start = curr if start is None else start
+        if prev is not None:
+            prev.aftr = curr
+        prev = curr
+    start.prev = prev
+    prev.aftr = start
 
-    idx = list(range(len(t)))
-    # print(lmap(lambda i: t[i], idx))
-    for i in range(len(t)):
-        value = t[i]
-        neg = value < 0
-        # print(value)
-        value %= len(t)
-        a = idx.index(i)
-        b = a + value
-        if neg:
-            b -= 1
-        b %= len(t)
-        if b != a:
-            del idx[a]
-            if b > a:
-                # print("gt", neg)
-                idx.insert(b, i)
-            if b < a:
-                # print("lt", neg)
-                idx.insert(b + 1, i)
-        # print(lmap(lambda i: t[i], idx))
+    curr = start
 
-    idx_0 = idx.index(t.index(0))
-    print(
-        t[idx[(idx_0 + 1000) % len(t)]]
-        + t[idx[(idx_0 + 2000) % len(t)]]
-        + t[idx[(idx_0 + 3000) % len(t)]]
-    )
+    all_nodes = curr.elem_list()
+    # curr.print_all()
+    for node in all_nodes:
+        curr = node
+        value = curr.elem
+
+        if value != 0:
+            prev, after = curr.remove()
+            if value > 0:
+                for _ in range(value - 1):
+                    after = after.aftr
+                after.insert_after(curr)
+            else:
+                for _ in range(-value - 1):
+                    prev = prev.prev
+                prev.insert_prev(curr)
+
+        # curr.print_all()
+
+    zero = curr.find(0)
+    print(zero.plus(1000) + zero.plus(2000) + zero.plus(3000))
+
+
+def mod(x):
+    if x == 0:
+        return 0
+    N = len(t) - 1
+    if x < 0:
+        return (x % N) - N
+    return ((x - 1) % N) + 1
 
 
 def hard():
-    return
+    prev = None
+    start = None
+    for elem in t:
+        curr = DLList((elem * 811589153), prev)
+        start = curr if start is None else start
+        if prev is not None:
+            prev.aftr = curr
+        prev = curr
+    start.prev = prev
+    prev.aftr = start
+
+    curr = start
+
+    all_nodes = curr.elem_list()
+    # curr.print_all()
+    for node in all_nodes * 10:
+        # print(node.mod)
+        curr = node
+        value = curr.mod
+
+        if value != 0:
+            prev, after = curr.remove()
+            if value > 0:
+                for _ in range(value - 1):
+                    after = after.aftr
+                after.insert_after(curr)
+            else:
+                for _ in range(-value - 1):
+                    prev = prev.prev
+                prev.insert_prev(curr)
+
+        # curr.print_all()
+
+    zero = curr.find(0)
+    print(zero.plus(1000) + zero.plus(2000) + zero.plus(3000))
 
 
 teststr = """1
