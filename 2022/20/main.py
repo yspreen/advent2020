@@ -56,27 +56,37 @@ def BFS(start, can_walk, goal, cost_fn=None):
 
 
 def easy():
-    for i in range(len(t)):
-        t[i] = t[i] % len(t)
+    # for i in range(len(t)):
+    #     t[i] = t[i] % len(t)
 
-    i = -1
-    for _ in range(len(t)):
-        i += 1
-        i %= len(t)
-        n = t[i]
-        if n > 0:
-            for j in range(i):
-                end = t.pop()
-                t.insert(0, end)
-                i += 1
-        if n < 0:
-            for j in range(i):
-                start = t[0]
-                del t[0]
-                t.append(start)
-                i -= 1
-            i += len(t)
-    print(t[1000 % len(t)] + t[2000 % len(t)] + t[3000 % len(t)])
+    idx = list(range(len(t)))
+    # print(lmap(lambda i: t[i], idx))
+    for i in range(len(t)):
+        value = t[i]
+        neg = value < 0
+        # print(value)
+        value %= len(t)
+        a = idx.index(i)
+        b = a + value
+        if neg:
+            b -= 1
+        b %= len(t)
+        if b != a:
+            del idx[a]
+            if b > a:
+                # print("gt", neg)
+                idx.insert(b, i)
+            if b < a:
+                # print("lt", neg)
+                idx.insert(b + 1, i)
+        # print(lmap(lambda i: t[i], idx))
+
+    idx_0 = idx.index(t.index(0))
+    print(
+        t[idx[(idx_0 + 1000) % len(t)]]
+        + t[idx[(idx_0 + 2000) % len(t)]]
+        + t[idx[(idx_0 + 3000) % len(t)]]
+    )
 
 
 def hard():
@@ -90,6 +100,7 @@ teststr = """1
 -2
 0
 4"""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
