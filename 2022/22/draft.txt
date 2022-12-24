@@ -1,0 +1,120 @@
+"""
+ xx
+ x
+xx
+x
+
+
+
+      1  2
+      zxxxxx
+   14 xxxxxx 3
+      xxxxxy
+      xxx  4
+   13 xxx 5
+  12  xxx
+   xxxxxy
+11 xxxxxx 6
+   zxxxxx
+   xxx 7
+10 xxx 8
+   xxx
+    9
+
+1 <> 10
+2 <> 9
+4 <> 5
+3 <> 6
+7 <> 8
+11 <> 14
+12 <> 13
+
+102 51
+
+1: R
+2: -
+3: F
+4: R
+5: L
+6: F
+7: R
+8: L
+9: -
+10: L
+11: F
+12: R
+14: F
+13: L
+"""
+
+
+if y == 1 and x < 102:  # 1 c
+    # print(1)
+    v = mv_t[(v, "R")]
+    y = x + 50
+    x = 2
+elif y == 1:  # 2 c
+    # print(2)
+    # v = mv_t[(v, "-")]
+    y = 201
+    x = x - 100
+elif x == 152:  # 3 c
+    # print(3)
+    v = mv_t[(v, "F")]
+    x = 101
+    y = 153 - y
+elif y == 52 and x >= 102:  # 4 c
+    # print(4)
+    v = mv_t[(v, "R")]
+    y = x - 50
+    x = 101
+elif x == 102 and y < 102:  # 5 c
+    # print(5)
+    v = mv_t[(v, "L")]
+    y = 51
+    x = y + 50
+elif x == 102:  # 6 c
+    # print(6)
+    v = mv_t[(v, "F")]
+    x = 151
+    y = 153 - y
+elif y == 152 and x >= 52:  # 7 c
+    # print(7)
+    v = mv_t[(v, "R")]
+    y = x + 100
+    x = 51
+elif x == 52 and y >= 152:  # 8 c
+    # print(8)
+    v = mv_t[(v, "L")]
+    x = y - 100
+    y = 151
+elif y == 202:  # 9 c
+    # print(9)
+    # v = mv_t[(v, "-")]
+    y = 2
+    x = x + 100
+elif x == 1 and y >= 152:  # 10 c
+    # print(10)
+    v = mv_t[(v, "L")]
+    x = y - 50
+    y = 2
+elif x == 1:  # 11 c
+    # print(11)
+    v = mv_t[(v, "F")]
+    y = 153 - y
+    x = 52
+elif x < 52 and y == 101:  # 12 c
+    # print(12)
+    v = mv_t[(v, "R")]
+    y = x + 50
+    x = 52
+elif x == 51 and y < 52:  # 14 c
+    # print(14)
+    v = mv_t[(v, "F")]
+    x = 2
+    y = 153 - y
+elif x == 51 and y < 102:  # 13 c
+    v = mv_t[(v, "L")]
+    # print(13)
+    x = y - 50
+    y = 102

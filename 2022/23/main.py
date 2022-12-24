@@ -13,24 +13,8 @@ from hashlib import md5, sha256
 
 def read():
     with open(DIR / "input") as f:
-        s = (
-            (f.read() if teststr == "" else teststr)
-            .replace(".", "0")
-            .replace("#", "5")
-            .replace("^", "1")
-            .replace("v", "2")
-            .replace("<", "3")
-            .replace(">", "4")
-            .splitlines()
-        )
-    return np.array(lmap(lambda r: lmap(int, r), s))
-
-
-def maybeint(line):
-    try:
-        return int(line)
-    except:
-        return line
+        s = (f.read() if teststr == "" else teststr).splitlines()
+    return lmap(lambda r: lmap(int, r.split("\t")), s)
 
 
 mv = [
@@ -38,14 +22,6 @@ mv = [
     (1, 0),  # D
     (0, -1),  # L
     (0, 1),  # R
-]
-mv_3d = [
-    (-1, 0, 0),  # U
-    (1, 0, 0),  # D
-    (0, -1, 0),  # L
-    (0, 1, 0),  # R
-    (0, 0, -1),  # B
-    (0, 0, 1),  # F
 ]
 
 
@@ -80,7 +56,7 @@ def BFS(start, can_walk, goal, cost_fn=None):
 
 
 def easy():
-    print(t)
+    return
 
 
 def hard():
