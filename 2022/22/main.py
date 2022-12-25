@@ -114,7 +114,7 @@ def cube_walk(tup, v):
     if y == 1 and x < 102:  # 1 c
         # print(1)
         v = mv_t[(v, "R")]
-        y = x + 50
+        y = x + 100
         x = 2
     elif y == 1:  # 2 c
         # print(2)
@@ -131,12 +131,12 @@ def cube_walk(tup, v):
         v = mv_t[(v, "R")]
         y = x - 50
         x = 101
-    elif x == 102 and y < 102:  # 5 c
+    elif x == 102 and y < 102 and y >= 52:  # 5 c
         # print(5)
         v = mv_t[(v, "L")]
-        y = 51
         x = y + 50
-    elif x == 102:  # 6 c
+        y = 51
+    elif x == 102 and y >= 102:  # 6 c
         # print(6)
         v = mv_t[(v, "F")]
         x = 151
@@ -159,7 +159,7 @@ def cube_walk(tup, v):
     elif x == 1 and y >= 152:  # 10 c
         # print(10)
         v = mv_t[(v, "L")]
-        x = y - 50
+        x = y - 100
         y = 2
     elif x == 1:  # 11 c
         # print(11)
