@@ -13,17 +13,8 @@ from hashlib import md5, sha256
 
 def read():
     with open(DIR / "input") as f:
-        s = (
-            (f.read() if teststr == "" else teststr)
-            .replace(".", "0")
-            .replace("#", "5")
-            .replace("^", "1")
-            .replace("v", "2")
-            .replace("<", "3")
-            .replace(">", "4")
-            .splitlines()
-        )
-    return np.array(lmap(lambda r: lmap(int, r), s))
+        s = (f.read() if teststr == "" else teststr).splitlines()
+    return lmap(lambda r: lmap(int, r.split("\t")), s)
 
 
 def maybeint(line):
