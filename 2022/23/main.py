@@ -58,14 +58,6 @@ class Elf:
         self.last_stored_position = (x, y)
 
     def get_proposal(self):
-        """-   If there is no Elf in the N, NE, or NW adjacent positions, the Elf
-            proposes moving *north* one step.
-        -   If there is no Elf in the S, SE, or SW adjacent positions, the Elf
-            proposes moving *south* one step.
-        -   If there is no Elf in the W, NW, or SW adjacent positions, the Elf
-            proposes moving *west* one step.
-        -   If there is no Elf in the E, NE, or SE adjacent positions, the Elf
-            proposes moving *east* one step."""
         x, y = self.x, self.y
         if (
             Elf.all_positions.get((x, y - 1), None) is None

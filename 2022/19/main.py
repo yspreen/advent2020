@@ -14,16 +14,14 @@ from hashlib import md5, sha256
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
-    s = lmap(lambda l: l.split(":")[1], s)
-    s = lmap(lambda l: list(filter(None, lmap(maybeint, l.split(" ")))), s)
-    return s
+    return lmap(lambda r: lmap(int, r.split("\t")), s)
 
 
-def maybeint(s):
+def maybeint(line):
     try:
-        return int(s)
+        return int(line)
     except:
-        return ""
+        return line
 
 
 mv = [
@@ -31,6 +29,14 @@ mv = [
     (1, 0),  # D
     (0, -1),  # L
     (0, 1),  # R
+]
+mv_3d = [
+    (-1, 0, 0),  # U
+    (1, 0, 0),  # D
+    (0, -1, 0),  # L
+    (0, 1, 0),  # R
+    (0, 0, -1),  # B
+    (0, 0, 1),  # F
 ]
 
 
@@ -65,53 +71,14 @@ def BFS(start, can_walk, goal, cost_fn=None):
 
 
 def easy():
-    for or_or, cl_or, ob_or, ob_cl, ge_or, ge_ob in t:
-        or_m = 0
-        or_r = 1
-        cl_m = 0
-        cl_r = 0
-        ob_m = 0
-        ob_r = 0
-        ge_m = 0
-        ge_r = 0
-
-        r = (ob_cl) / (ob_or + ge_or)
-
-        for i in range(24):
-            print(or_m, cl_m, ob_m, ge_m)
-            or_m += or_r
-            cl_m += cl_r
-            ob_m += ob_r
-            ge_m += ge_r
-
-            if ge_or <= or_m and ge_ob <= ob_m:
-                or_m -= ge_or
-                ob_m -= ge_ob
-                ge_r += 1
-            if ob_cl <= cl_m and ob_or <= or_m:
-                cl_m -= ob_cl
-                or_m -= ob_or
-                ob_r += 1
-            if cl_or <= or_m and ob_r * r > cl_r:
-                or_m -= cl_or
-                cl_r += 1
-            if or_or <= or_m:
-                or_m -= or_or
-                or_r += 1
-        print(ge_m)
+    print(t)
 
 
 def hard():
     return
 
 
-teststr = """    Blueprint 1:
-      Each ore robot costs 4 ore.
-      Each clay robot costs 2 ore.
-      Each obsidian robot costs 3 ore and 14 clay.
-      Each geode robot costs 2 ore and 7 obsidian.""".replace(
-    "\n", ""
-)
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
