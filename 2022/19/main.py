@@ -13,15 +13,15 @@ from hashlib import md5, sha256
 
 def read():
     with open(DIR / "input") as f:
-        s = (f.read() if teststr == "" else teststr).splitlines()
-    return lmap(lambda r: lmap(int, r.split("\t")), s)
+        s = (f.read() if teststr == "" else teststr).replace(":", "").splitlines()
+    return lmap(lambda r: list(filter(None, lmap(maybeint, r.split(" "))))[1:], s)
 
 
 def maybeint(line):
     try:
         return int(line)
-    except:
-        return line
+    except Exception:
+        return None
 
 
 mv = [
@@ -40,38 +40,138 @@ mv_3d = [
 ]
 
 
-def BFS(start, can_walk, goal, cost_fn=None):
-    cost_fn = (lambda _, __: 1) if cost_fn is None else cost_fn
+class Blueprint:
+    def __init__(
+        self,
+        ore_cost_ore,
+        clay_cost_ore,
+        obs_cost_ore,
+        obs_cost_clay,
+        geo_cost_ore,
+        geo_cost_obs,
+    ):
+        self.ore_cost_ore = ore_cost_ore
+        self.clay_cost_ore = clay_cost_ore
+        self.obs_cost_ore = obs_cost_ore
+        self.obs_cost_clay = obs_cost_clay
+        self.geo_cost_ore = geo_cost_ore
+        self.geo_cost_obs = geo_cost_obs
 
-    options = [(start, 0)]
-    visited = set([start])
+    def __str__(self):
+        s = "ore_cost_ore: " + str(self.ore_cost_ore)
+        s += "; clay_cost_ore: " + str(self.clay_cost_ore)
+        s += "; obs_cost_ore: " + str(self.obs_cost_ore)
+        s += "; obs_cost_clay: " + str(self.obs_cost_clay)
+        s += "; geo_cost_ore: " + str(self.geo_cost_ore)
+        s += "; geo_cost_obs: " + str(self.geo_cost_obs)
+        return s
 
-    while options:
-        new_o = []
-        for pos, cost in options:
-            for d in mv:
-                new_p = (pos[0] + d[0], pos[1] + d[1])
-                if new_p[0] < 0:  # lower bound check
-                    continue
-                if new_p[1] < 0:  # lower bound check
-                    continue
-                try:
-                    assert can_walk(pos, new_p)
-                except:
-                    continue  # upper bound check
-                if new_p in visited:
-                    continue
-                visited.add(new_p)
-                cost_ = cost + cost_fn(pos, new_p)
-                new_o.append((new_p, cost_))
-                if goal(new_p):
-                    return cost_
-        options = new_o
-    return None
+    def potential_builds(self, resources, timeline):
+        pot = []
+        if resources.ore >= self.ore_cost_ore and "ore" not in timeline.ignore_robots:
+            pot += ["ore"]
+        if resources.ore >= self.clay_cost_ore and "clay" not in timeline.ignore_robots:
+            pot += ["clay"]
+        if (
+            resources.ore >= self.obs_cost_ore
+            and resources.clay >= self.obs_cost_clay
+            and "obs" not in timeline.ignore_robots
+        ):
+            pot += ["obs"]
+        if (
+            resources.ore >= self.geo_cost_ore
+            and resources.ore >= self.geo_cost_ore
+            and "geo" not in timeline.ignore_robots
+        ):
+            pot += ["geo"]
+        return pot
+
+
+class Resources:
+    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+        self.ore = ore
+        self.clay = clay
+        self.obs = obs
+        self.geo = geo
+
+    def add(self, robots):
+        self.ore += robots.ore
+        self.clay += robots.clay
+        self.obs += robots.obs
+        self.geo += robots.geo
+
+    def remove(self, robot, blueprint):
+        ore = self.ore
+        clay = self.clay
+        obs = self.obs
+        geo = self.geo
+        if robot == "ore":
+            ore -= blueprint.ore_cost_ore
+        if robot == "clay":
+            ore -= blueprint.clay_cost_ore
+        if robot == "obs":
+            ore -= blueprint.obs_cost_ore
+            clay -= blueprint.obs_cost_clay
+        if robot == "geo":
+            ore -= blueprint.geo_cost_ore
+            obs -= blueprint.geo_cost_obs
+        return Resources(ore, clay, obs, geo)
+
+
+class Robots:
+    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+        self.ore = ore
+        self.clay = clay
+        self.obs = obs
+        self.geo = geo
+
+    def add(self, robot):
+        if robot == "ore":
+            return Robots(self.ore + 1, self.clay, self.obs, self.geo)
+        if robot == "clay":
+            return Robots(self.ore, self.clay + 1, self.obs, self.geo)
+        if robot == "obs":
+            return Robots(self.ore, self.clay, self.obs + 1, self.geo)
+        if robot == "geo":
+            return Robots(self.ore, self.clay, self.obs, self.geo + 1)
+
+
+class Timeline:
+    def __init__(self, blueprint, resources, robots):
+        self.blueprint = blueprint
+        self.resources = resources
+        self.robots = robots
+        self.ignore_robots = set([])
+
+    def futures(self):
+        pot_robots = self.blueprint.potential_builds(self.resources, self)
+        self.resources.add(self.robots)
+        futures = [self]
+        for robot in pot_robots:
+            futures.append(self.build(robot))
+            self.ignore_robots.add(robot)
+        return futures
+
+    def build(self, robot):
+        return Timeline(
+            self.blueprint,
+            self.resources.remove(robot, self.blueprint),
+            self.robots.add(robot),
+        )
 
 
 def easy():
-    print(t)
+    blueprints = [Blueprint(*r) for r in t]
+    print(blueprints[0])
+
+    for blueprint in blueprints:
+        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
+        for i in range(24):
+            print(i)
+            new_timelines = []
+            for timeline in timelines:
+                new_timelines += timeline.futures()
+            timelines = new_timelines
 
 
 def hard():
