@@ -24,46 +24,30 @@ def maybeint(line):
         return None
 
 
-mv = [
-    (-1, 0),  # U
-    (1, 0),  # D
-    (0, -1),  # L
-    (0, 1),  # R
-]
-mv_3d = [
-    (-1, 0, 0),  # U
-    (1, 0, 0),  # D
-    (0, -1, 0),  # L
-    (0, 1, 0),  # R
-    (0, 0, -1),  # B
-    (0, 0, 1),  # F
-]
-
-
 class Blueprint:
     def __init__(
         self,
         ore_cost_ore,
         clay_cost_ore,
-        obs_cost_ore,
-        obs_cost_clay,
+        silver_cost_ore,
+        silver_cost_clay,
         geo_cost_ore,
-        geo_cost_obs,
+        geo_cost_silver,
     ):
         self.ore_cost_ore = ore_cost_ore
         self.clay_cost_ore = clay_cost_ore
-        self.obs_cost_ore = obs_cost_ore
-        self.obs_cost_clay = obs_cost_clay
+        self.silver_cost_ore = silver_cost_ore
+        self.silver_cost_clay = silver_cost_clay
         self.geo_cost_ore = geo_cost_ore
-        self.geo_cost_obs = geo_cost_obs
+        self.geo_cost_silver = geo_cost_silver
 
     def __str__(self):
         s = "ore_cost_ore: " + str(self.ore_cost_ore)
         s += "; clay_cost_ore: " + str(self.clay_cost_ore)
-        s += "; obs_cost_ore: " + str(self.obs_cost_ore)
-        s += "; obs_cost_clay: " + str(self.obs_cost_clay)
+        s += "; silver_cost_ore: " + str(self.silver_cost_ore)
+        s += "; silver_cost_clay: " + str(self.silver_cost_clay)
         s += "; geo_cost_ore: " + str(self.geo_cost_ore)
-        s += "; geo_cost_obs: " + str(self.geo_cost_obs)
+        s += "; geo_cost_silver: " + str(self.geo_cost_silver)
         return s
 
     def can_build(self, resources, robot):
@@ -73,50 +57,55 @@ class Blueprint:
         if robot == "C":
             return resources.ore >= self.clay_cost_ore
 
-        if robot == "B":
+        if robot == "S":
             return (
-                resources.ore >= self.obs_cost_ore
-                and resources.clay >= self.obs_cost_clay
+                resources.ore >= self.silver_cost_ore
+                and resources.clay >= self.silver_cost_clay
             )
 
         if robot == "G":
             return (
                 resources.ore >= self.geo_cost_ore
-                and resources.obs >= self.geo_cost_obs
+                and resources.silver >= self.geo_cost_silver
             )
 
 
 class Resources:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
 
     def add(self, robots):
-        self.ore += robots.ore
-        self.clay += robots.clay
-        self.obs += robots.obs
-        self.geo += robots.geo
+        return Resources(
+            self.ore + robots.ore,
+            self.clay + robots.clay,
+            self.silver + robots.silver,
+            self.geo + robots.geo,
+        )
 
     def remove(self, robot, blueprint):
         if robot == "O":
             self.ore -= blueprint.ore_cost_ore
         if robot == "C":
             self.ore -= blueprint.clay_cost_ore
-        if robot == "B":
-            self.ore -= blueprint.obs_cost_ore
-            self.clay -= blueprint.obs_cost_clay
+        if robot == "S":
+            self.ore -= blueprint.silver_cost_ore
+            self.clay -= blueprint.silver_cost_clay
         if robot == "G":
             self.ore -= blueprint.geo_cost_ore
-            self.obs -= blueprint.geo_cost_obs
+            self.silver -= blueprint.geo_cost_silver
+
+    def __str__(self):
+        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
 
 
 class Robots:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
 
     def add(self, robot):
@@ -124,65 +113,72 @@ class Robots:
             self.ore += 1
         if robot == "C":
             self.clay += 1
-        if robot == "B":
-            self.obs += 1
+        if robot == "S":
+            self.silver += 1
         if robot == "G":
             self.geo += 1
 
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots, robot_order):
+    def __init__(self, blueprint, resources, robots, lookahead=1):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.robot_order = robot_order
-        self.current_prefix = ""
+        self.lookahead = lookahead
+        self.lookahead2 = lookahead + 1
+
+    def next_robot(self):
+        future = self.resources
+        for _ in range(self.lookahead):
+            future = future.add(self.robots)
+        future2 = self.resources
+        for _ in range(self.lookahead2):
+            future2 = future2.add(self.robots)
+        if self.blueprint.can_build(future2, "G"):
+            return "G"
+        if self.blueprint.can_build(future, "S"):
+            return "S"
+        desired_ratio = self.blueprint.silver_cost_clay / (
+            self.blueprint.silver_cost_ore
+        )
+        if (
+            self.robots.clay < self.robots.ore * desired_ratio
+            and self.blueprint.can_build(future, "C")
+        ):
+            return "C"
+        return "O"
 
     def step(self):
-        can_build = self.robot_order and self.blueprint.can_build(
-            self.resources, self.robot_order[0]
-        )
-        self.resources.add(self.robots)
+        next_robot = self.next_robot()
+        can_build = next_robot and self.blueprint.can_build(self.resources, next_robot)
+        self.resources = self.resources.add(self.robots)
+        print(self.resources)
+
         if not can_build:
             return
-        self.build(self.robot_order[0])
-        self.current_prefix += self.robot_order[0]
-        self.robot_order = self.robot_order[1:]
+        self.build(next_robot)
+        print("build " + next_robot)
 
     def build(self, robot):
         self.resources.remove(robot, self.blueprint)
         self.robots.add(robot)
 
 
-def potential_prefixes(s, N):
-    return [s[:i] for i in range(1, N)]
-
-
 def easy():
     N = 24
     blueprints = [Blueprint(*r) for r in t]
-    print(blueprints[1])
 
     max_g = 0
 
     for blueprint in [blueprints[1]]:
-        prefixes = set()
-        for sequence in product(["O", "C", "B", "G"], repeat=11):
-            if "G" not in sequence:
-                continue
-            sequence = "".join(sequence)
-            found = False
-            # for pre in potential_prefixes(sequence, N):
-            #     if pre in prefixes:
-            #         found = False
-            #         break
-            if found:
-                continue
-            timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
+        for lookahead in [0, 1, 2, 3, 4, 5]:
+            timeline = Timeline(blueprint, Resources(), Robots(1), lookahead)
             for _ in range(N):
                 timeline.step()
-            # prefixes.add(timeline.current_prefix)
-            max_g = max(max_g, timeline.resources.geo)
+            if timeline.resources.geo > max_g:
+                print("lookahead", lookahead)
+                max_g = timeline.resources.geo
+            print()
     print(max_g)
 
 
