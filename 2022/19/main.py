@@ -66,25 +66,24 @@ class Blueprint:
         s += "; geo_cost_obs: " + str(self.geo_cost_obs)
         return s
 
-    def potential_builds(self, resources, timeline):
-        pot = []
-        if resources.ore >= self.ore_cost_ore and "ore" not in timeline.ignore_robots:
-            pot += ["ore"]
-        if resources.ore >= self.clay_cost_ore and "clay" not in timeline.ignore_robots:
-            pot += ["clay"]
-        if (
-            resources.ore >= self.obs_cost_ore
-            and resources.clay >= self.obs_cost_clay
-            and "obs" not in timeline.ignore_robots
-        ):
-            pot += ["obs"]
-        if (
-            resources.ore >= self.geo_cost_ore
-            and resources.ore >= self.geo_cost_ore
-            and "geo" not in timeline.ignore_robots
-        ):
-            pot += ["geo"]
-        return pot
+    def can_build(self, resources, robot):
+        if robot == "O":
+            return resources.ore >= self.ore_cost_ore
+
+        if robot == "C":
+            return resources.ore >= self.clay_cost_ore
+
+        if robot == "B":
+            return (
+                resources.ore >= self.obs_cost_ore
+                and resources.clay >= self.obs_cost_clay
+            )
+
+        if robot == "G":
+            return (
+                resources.ore >= self.geo_cost_ore
+                and resources.obs >= self.geo_cost_obs
+            )
 
 
 class Resources:
@@ -101,21 +100,16 @@ class Resources:
         self.geo += robots.geo
 
     def remove(self, robot, blueprint):
-        ore = self.ore
-        clay = self.clay
-        obs = self.obs
-        geo = self.geo
-        if robot == "ore":
-            ore -= blueprint.ore_cost_ore
-        if robot == "clay":
-            ore -= blueprint.clay_cost_ore
-        if robot == "obs":
-            ore -= blueprint.obs_cost_ore
-            clay -= blueprint.obs_cost_clay
-        if robot == "geo":
-            ore -= blueprint.geo_cost_ore
-            obs -= blueprint.geo_cost_obs
-        return Resources(ore, clay, obs, geo)
+        if robot == "O":
+            self.ore -= blueprint.ore_cost_ore
+        if robot == "C":
+            self.ore -= blueprint.clay_cost_ore
+        if robot == "B":
+            self.ore -= blueprint.obs_cost_ore
+            self.clay -= blueprint.obs_cost_clay
+        if robot == "G":
+            self.ore -= blueprint.geo_cost_ore
+            self.obs -= blueprint.geo_cost_obs
 
 
 class Robots:
@@ -126,59 +120,78 @@ class Robots:
         self.geo = geo
 
     def add(self, robot):
-        if robot == "ore":
-            return Robots(self.ore + 1, self.clay, self.obs, self.geo)
-        if robot == "clay":
-            return Robots(self.ore, self.clay + 1, self.obs, self.geo)
-        if robot == "obs":
-            return Robots(self.ore, self.clay, self.obs + 1, self.geo)
-        if robot == "geo":
-            return Robots(self.ore, self.clay, self.obs, self.geo + 1)
+        if robot == "O":
+            self.ore += 1
+        if robot == "C":
+            self.clay += 1
+        if robot == "B":
+            self.obs += 1
+        if robot == "G":
+            self.geo += 1
 
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots):
+    def __init__(self, blueprint, resources, robots, robot_order):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.ignore_robots = set([])
+        self.robot_order = robot_order
+        self.current_prefix = ""
 
-    def futures(self):
-        pot_robots = self.blueprint.potential_builds(self.resources, self)
+    def step(self):
+        can_build = self.robot_order and self.blueprint.can_build(
+            self.resources, self.robot_order[0]
+        )
         self.resources.add(self.robots)
-        futures = [self]
-        for robot in pot_robots:
-            futures.append(self.build(robot))
-            self.ignore_robots.add(robot)
-        return futures
+        if not can_build:
+            return
+        self.build(self.robot_order[0])
+        self.current_prefix += self.robot_order[0]
+        self.robot_order = self.robot_order[1:]
 
     def build(self, robot):
-        return Timeline(
-            self.blueprint,
-            self.resources.remove(robot, self.blueprint),
-            self.robots.add(robot),
-        )
+        self.resources.remove(robot, self.blueprint)
+        self.robots.add(robot)
+
+
+def potential_prefixes(s, N):
+    return [s[:i] for i in range(1, N)]
 
 
 def easy():
+    N = 24
     blueprints = [Blueprint(*r) for r in t]
-    print(blueprints[0])
+    print(blueprints[1])
 
-    for blueprint in blueprints:
-        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-        for i in range(24):
-            print(i)
-            new_timelines = []
-            for timeline in timelines:
-                new_timelines += timeline.futures()
-            timelines = new_timelines
+    max_g = 0
+
+    for blueprint in [blueprints[1]]:
+        prefixes = set()
+        for sequence in product(["O", "C", "B", "G"], repeat=11):
+            if "G" not in sequence:
+                continue
+            sequence = "".join(sequence)
+            found = False
+            # for pre in potential_prefixes(sequence, N):
+            #     if pre in prefixes:
+            #         found = False
+            #         break
+            if found:
+                continue
+            timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
+            for _ in range(N):
+                timeline.step()
+            # prefixes.add(timeline.current_prefix)
+            max_g = max(max_g, timeline.resources.geo)
+    print(max_g)
 
 
 def hard():
     return
 
 
-teststr = """"""
+teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
+    Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
