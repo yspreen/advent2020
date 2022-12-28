@@ -45,25 +45,25 @@ class Blueprint:
         self,
         ore_cost_ore,
         clay_cost_ore,
-        obs_cost_ore,
-        obs_cost_clay,
+        silver_cost_ore,
+        silver_cost_clay,
         geo_cost_ore,
-        geo_cost_obs,
+        geo_cost_silver,
     ):
         self.ore_cost_ore = ore_cost_ore
         self.clay_cost_ore = clay_cost_ore
-        self.obs_cost_ore = obs_cost_ore
-        self.obs_cost_clay = obs_cost_clay
+        self.silver_cost_ore = silver_cost_ore
+        self.silver_cost_clay = silver_cost_clay
         self.geo_cost_ore = geo_cost_ore
-        self.geo_cost_obs = geo_cost_obs
+        self.geo_cost_silver = geo_cost_silver
 
     def __str__(self):
         s = "ore_cost_ore: " + str(self.ore_cost_ore)
         s += "; clay_cost_ore: " + str(self.clay_cost_ore)
-        s += "; obs_cost_ore: " + str(self.obs_cost_ore)
-        s += "; obs_cost_clay: " + str(self.obs_cost_clay)
+        s += "; silver_cost_ore: " + str(self.silver_cost_ore)
+        s += "; silver_cost_clay: " + str(self.silver_cost_clay)
         s += "; geo_cost_ore: " + str(self.geo_cost_ore)
-        s += "; geo_cost_obs: " + str(self.geo_cost_obs)
+        s += "; geo_cost_silver: " + str(self.geo_cost_silver)
         return s
 
     def can_build(self, resources, robot):
@@ -73,16 +73,16 @@ class Blueprint:
         if robot == "C":
             return resources.ore >= self.clay_cost_ore
 
-        if robot == "B":
+        if robot == "S":
             return (
-                resources.ore >= self.obs_cost_ore
-                and resources.clay >= self.obs_cost_clay
+                resources.ore >= self.silver_cost_ore
+                and resources.clay >= self.silver_cost_clay
             )
 
         if robot == "G":
             return (
                 resources.ore >= self.geo_cost_ore
-                and resources.obs >= self.geo_cost_obs
+                and resources.obs >= self.geo_cost_silver
             )
 
 
@@ -104,12 +104,12 @@ class Resources:
             self.ore -= blueprint.ore_cost_ore
         if robot == "C":
             self.ore -= blueprint.clay_cost_ore
-        if robot == "B":
-            self.ore -= blueprint.obs_cost_ore
-            self.clay -= blueprint.obs_cost_clay
+        if robot == "S":
+            self.ore -= blueprint.silver_cost_ore
+            self.clay -= blueprint.silver_cost_clay
         if robot == "G":
             self.ore -= blueprint.geo_cost_ore
-            self.obs -= blueprint.geo_cost_obs
+            self.obs -= blueprint.geo_cost_silver
 
 
 class Robots:
@@ -124,7 +124,7 @@ class Robots:
             self.ore += 1
         if robot == "C":
             self.clay += 1
-        if robot == "B":
+        if robot == "S":
             self.obs += 1
         if robot == "G":
             self.geo += 1
@@ -167,7 +167,7 @@ def easy():
 
     for blueprint in [blueprints[1]]:
         prefixes = set()
-        for sequence in product(["O", "C", "B", "G"], repeat=11):
+        for sequence in product(["O", "C", "S", "G"], repeat=11):
             if "G" not in sequence:
                 continue
             sequence = "".join(sequence)
