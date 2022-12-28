@@ -160,33 +160,36 @@ class Timeline:
         self.robots.add(robot)
 
 
+def run_sequence(blueprint, sequence):
+    global max_g, N
+
+    timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
+    for _ in range(N):
+        timeline.step()
+    if timeline.resources.geo > max_g:
+        max_g = timeline.resources.geo
+
+
 def easy():
+    global max_g, N, blueprints
     N = 24
     blueprints = [Blueprint(*r) for r in t]
-    print(blueprints[1])
-
     max_g = 0
 
-    for blueprint in [blueprints[1]]:
-        for sequence in product(["O", "C", "S"], repeat=13):
-            # if "O" not in sequence:
-            #     continue
-            # if "C" not in sequence:
-            #     continue
-            # if "S" not in sequence:
-            #     continue
-            sequence = "".join(sequence)
-            found = False
-            if found:
-                continue
-            timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
-            for _ in range(N):
-                timeline.step()
-            if timeline.resources.geo > max_g:
-                max_g = timeline.resources.geo
-                print(sequence)
-                print(timeline.resources)
-    print(max_g)
+    for blueprint in blueprints:
+        for i in range(0, N):
+            for j in range(i + 1, N - 1):
+                s = ""
+                for l in range(N):
+                    if l <= i:
+                        s += "O"
+                        continue
+                    if l <= j:
+                        s += "C"
+                        continue
+                    s += "S"
+                run_sequence(blueprint, s)
+        print(max_g)
 
 
 def hard():
@@ -195,10 +198,12 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
+# teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
+N = blueprints = 0
 if __name__ == "__main__":
     easy()
     hard()
