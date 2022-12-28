@@ -173,7 +173,7 @@ class Timeline:
         for _ in range(self.lookahead):
             future = future.add(self.robots)
         future2 = self.resources
-        for _ in range(self.lookahead):
+        for _ in range(self.lookahead + 1):
             future2 = future2.add(self.robots)
         if self.blueprint.can_build(future2, "G"):
             return "G"
