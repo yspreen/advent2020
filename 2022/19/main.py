@@ -95,6 +95,14 @@ class Resources:
         self.end_of_sequence = False
 
     def add(self, robots):
+        return Resources(
+            self.ore + robots.ore,
+            self.clay + robots.clay,
+            self.silver + robots.silver,
+            self.geo + robots.geo,
+        )
+
+    def add_mutating(self, robots):
         self.ore += robots.ore
         self.clay += robots.clay
         self.silver += robots.silver
@@ -135,23 +143,24 @@ class Robots:
 
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots, robot_order):
+    def __init__(self, blueprint, resources, robots, sequence=None, lookahead=0):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.robot_order = robot_order
+        self.robot_order = [] if sequence is None else sequence
+        self.lookahead = lookahead
 
-    def step(self):
+    def step_sequence(self):
         if self.blueprint.can_build(self.resources, "G"):
             next_robot = "G"
         else:
             if not self.robot_order:
                 self.resources.end_of_sequence = True
-                return self.resources.add(self.robots)
+                return self.resources.add_mutating(self.robots)
             next_robot = self.robot_order[0]
             if not self.blueprint.can_build(self.resources, next_robot):
-                return self.resources.add(self.robots)
-        self.resources.add(self.robots)
+                return self.resources.add_mutating(self.robots)
+        self.resources.add_mutating(self.robots)
         self.build(next_robot)
         self.robot_order = self.robot_order[1:]
 
@@ -159,13 +168,55 @@ class Timeline:
         self.resources.remove(robot, self.blueprint)
         self.robots.add(robot)
 
+    def next_robot(self):
+        future = self.resources
+        for _ in range(self.lookahead):
+            future = future.add(self.robots)
+        future2 = self.resources
+        for _ in range(self.lookahead):
+            future2 = future2.add(self.robots)
+        if self.blueprint.can_build(future2, "G"):
+            return "G"
+        if self.blueprint.can_build(future, "S"):
+            return "S"
+        desired_ratio = self.blueprint.silver_cost_clay / (
+            self.blueprint.silver_cost_ore
+        )
+        if (
+            self.robots.clay < self.robots.ore * desired_ratio
+            and self.blueprint.can_build(future, "C")
+        ):
+            return "C"
+        return "O"
+
+    def step_heuristic(self):
+        next_robot = self.next_robot()
+        can_build = next_robot and self.blueprint.can_build(self.resources, next_robot)
+        self.resources.add_mutating(self.robots)
+        # print(self.resources)
+
+        if not can_build:
+            return
+        self.build(next_robot)
+        # print("build " + next_robot)
+
 
 def run_sequence(blueprint, sequence):
     global max_g, N
 
-    timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
+    timeline = Timeline(blueprint, Resources(), Robots(1), sequence=sequence)
     for _ in range(N):
-        timeline.step()
+        timeline.step_sequence()
+    if timeline.resources.geo > max_g:
+        max_g = timeline.resources.geo
+
+
+def simple_approach(blueprint, lookahead):
+    global max_g, N
+
+    timeline = Timeline(blueprint, Resources(), Robots(1), lookahead=lookahead)
+    for _ in range(N):
+        timeline.step_heuristic()
     if timeline.resources.geo > max_g:
         max_g = timeline.resources.geo
 
@@ -174,9 +225,12 @@ def easy():
     global max_g, N, blueprints
     N = 24
     blueprints = [Blueprint(*r) for r in t]
-    max_g = 0
+
+    answer = 0
+    num = 1
 
     for blueprint in blueprints:
+        max_g = 0
         for i in range(0, N):
             for j in range(i + 1, N - 1):
                 s = ""
@@ -189,7 +243,11 @@ def easy():
                         continue
                     s += "S"
                 run_sequence(blueprint, s)
-        print(max_g)
+        for lah in [0, 1, 2, 3]:
+            simple_approach(blueprint, lah)
+        answer += num * max_g
+        num += 1
+    print(answer)
 
 
 def hard():
@@ -198,7 +256,7 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
