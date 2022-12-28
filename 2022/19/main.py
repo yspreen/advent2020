@@ -211,6 +211,24 @@ def run_sequence(blueprint, sequence):
         max_g = timeline.resources.geo
 
 
+def run_sequences(blueprint, s, i, j):
+    for i_ in range(3):
+        for j_ in range(3):
+            s_ = list(s)
+            if i - 1 - 2 >= 0:
+                for x in range(i_):
+                    s_[i - 1 - x] = "C"
+            if j - 1 - 2 >= 0:
+                for x in range(j_):
+                    s_[j - 1 - x] = "S"
+            run_sequence(blueprint, s_)
+            # print(s_)
+
+
+# run_sequences(0, "OOOOCCCCSSSS", 4, 8)
+# 0 / 0
+
+
 def simple_approach(blueprint, lookahead):
     global max_g, N
 
@@ -224,6 +242,7 @@ def simple_approach(blueprint, lookahead):
 def easy():
     global max_g, N, blueprints
     N = 24
+    N_ = N * 3 // 4
     blueprints = [Blueprint(*r) for r in t]
 
     answer = 0
@@ -231,22 +250,27 @@ def easy():
 
     for blueprint in blueprints:
         max_g = 0
-        for i in range(0, N):
-            for j in range(i + 1, N - 1):
-                s = ""
-                for l in range(N):
-                    if l <= i:
-                        s += "O"
-                        continue
-                    if l <= j:
-                        s += "C"
-                        continue
-                    s += "S"
-                run_sequence(blueprint, s)
+        for i in range(0, N_):
+            for j in range(i, N_ - 1):
+                for k in range(j, N_ - 1):
+                    s = ""
+                    for l in range(N_):
+                        if l < i:
+                            s += "O"
+                            continue
+                        if l <= j:
+                            s += "C"
+                            continue
+                        if l <= k:
+                            s += "S"
+                            continue
+                        s += "G"
+                    run_sequences(blueprint, s, i, j)
         for lah in [0, 1, 2, 3]:
             simple_approach(blueprint, lah)
         answer += num * max_g
         num += 1
+        print(max_g)
     print(answer)
 
 
