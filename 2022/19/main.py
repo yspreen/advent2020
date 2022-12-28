@@ -82,21 +82,22 @@ class Blueprint:
         if robot == "G":
             return (
                 resources.ore >= self.geo_cost_ore
-                and resources.obs >= self.geo_cost_silver
+                and resources.silver >= self.geo_cost_silver
             )
 
 
 class Resources:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
+        self.end_of_sequence = False
 
     def add(self, robots):
         self.ore += robots.ore
         self.clay += robots.clay
-        self.obs += robots.obs
+        self.silver += robots.silver
         self.geo += robots.geo
 
     def remove(self, robot, blueprint):
@@ -109,14 +110,17 @@ class Resources:
             self.clay -= blueprint.silver_cost_clay
         if robot == "G":
             self.ore -= blueprint.geo_cost_ore
-            self.obs -= blueprint.geo_cost_silver
+            self.silver -= blueprint.geo_cost_silver
+
+    def __str__(self):
+        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo} E:{self.end_of_sequence}"
 
 
 class Robots:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
 
     def add(self, robot):
@@ -125,7 +129,7 @@ class Robots:
         if robot == "C":
             self.clay += 1
         if robot == "S":
-            self.obs += 1
+            self.silver += 1
         if robot == "G":
             self.geo += 1
 
@@ -136,26 +140,24 @@ class Timeline:
         self.resources = resources
         self.robots = robots
         self.robot_order = robot_order
-        self.current_prefix = ""
 
     def step(self):
-        can_build = self.robot_order and self.blueprint.can_build(
-            self.resources, self.robot_order[0]
-        )
+        if self.blueprint.can_build(self.resources, "G"):
+            next_robot = "G"
+        else:
+            if not self.robot_order:
+                self.resources.end_of_sequence = True
+                return self.resources.add(self.robots)
+            next_robot = self.robot_order[0]
+            if not self.blueprint.can_build(self.resources, next_robot):
+                return self.resources.add(self.robots)
         self.resources.add(self.robots)
-        if not can_build:
-            return
-        self.build(self.robot_order[0])
-        self.current_prefix += self.robot_order[0]
+        self.build(next_robot)
         self.robot_order = self.robot_order[1:]
 
     def build(self, robot):
         self.resources.remove(robot, self.blueprint)
         self.robots.add(robot)
-
-
-def potential_prefixes(s, N):
-    return [s[:i] for i in range(1, N)]
 
 
 def easy():
@@ -166,23 +168,24 @@ def easy():
     max_g = 0
 
     for blueprint in [blueprints[1]]:
-        prefixes = set()
-        for sequence in product(["O", "C", "S", "G"], repeat=11):
-            if "G" not in sequence:
-                continue
+        for sequence in product(["O", "C", "S"], repeat=13):
+            # if "O" not in sequence:
+            #     continue
+            # if "C" not in sequence:
+            #     continue
+            # if "S" not in sequence:
+            #     continue
             sequence = "".join(sequence)
             found = False
-            # for pre in potential_prefixes(sequence, N):
-            #     if pre in prefixes:
-            #         found = False
-            #         break
             if found:
                 continue
             timeline = Timeline(blueprint, Resources(), Robots(1), sequence)
             for _ in range(N):
                 timeline.step()
-            # prefixes.add(timeline.current_prefix)
-            max_g = max(max_g, timeline.resources.geo)
+            if timeline.resources.geo > max_g:
+                max_g = timeline.resources.geo
+                print(sequence)
+                print(timeline.resources)
     print(max_g)
 
 
