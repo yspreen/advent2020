@@ -45,247 +45,144 @@ class Blueprint:
         self,
         ore_cost_ore,
         clay_cost_ore,
-        silver_cost_ore,
-        silver_cost_clay,
+        obs_cost_ore,
+        obs_cost_clay,
         geo_cost_ore,
-        geo_cost_silver,
+        geo_cost_obs,
     ):
         self.ore_cost_ore = ore_cost_ore
         self.clay_cost_ore = clay_cost_ore
-        self.silver_cost_ore = silver_cost_ore
-        self.silver_cost_clay = silver_cost_clay
+        self.obs_cost_ore = obs_cost_ore
+        self.obs_cost_clay = obs_cost_clay
         self.geo_cost_ore = geo_cost_ore
-        self.geo_cost_silver = geo_cost_silver
+        self.geo_cost_obs = geo_cost_obs
 
     def __str__(self):
         s = "ore_cost_ore: " + str(self.ore_cost_ore)
         s += "; clay_cost_ore: " + str(self.clay_cost_ore)
-        s += "; silver_cost_ore: " + str(self.silver_cost_ore)
-        s += "; silver_cost_clay: " + str(self.silver_cost_clay)
+        s += "; obs_cost_ore: " + str(self.obs_cost_ore)
+        s += "; obs_cost_clay: " + str(self.obs_cost_clay)
         s += "; geo_cost_ore: " + str(self.geo_cost_ore)
-        s += "; geo_cost_silver: " + str(self.geo_cost_silver)
+        s += "; geo_cost_obs: " + str(self.geo_cost_obs)
         return s
 
-    def can_build(self, resources, robot):
-        if robot == "O":
-            return resources.ore >= self.ore_cost_ore
-
-        if robot == "C":
-            return resources.ore >= self.clay_cost_ore
-
-        if robot == "S":
-            return (
-                resources.ore >= self.silver_cost_ore
-                and resources.clay >= self.silver_cost_clay
-            )
-
-        if robot == "G":
-            return (
-                resources.ore >= self.geo_cost_ore
-                and resources.silver >= self.geo_cost_silver
-            )
+    def potential_builds(self, resources, timeline):
+        pot = []
+        if resources.ore >= self.ore_cost_ore and "ore" not in timeline.ignore_robots:
+            pot += ["ore"]
+        if resources.ore >= self.clay_cost_ore and "clay" not in timeline.ignore_robots:
+            pot += ["clay"]
+        if (
+            resources.ore >= self.obs_cost_ore
+            and resources.clay >= self.obs_cost_clay
+            and "obs" not in timeline.ignore_robots
+        ):
+            pot += ["obs"]
+        if (
+            resources.ore >= self.geo_cost_ore
+            and resources.ore >= self.geo_cost_ore
+            and "geo" not in timeline.ignore_robots
+        ):
+            pot += ["geo"]
+        return pot
 
 
 class Resources:
-    def __init__(self, ore=0, clay=0, silver=0, geo=0):
+    def __init__(self, ore=0, clay=0, obs=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.silver = silver
+        self.obs = obs
         self.geo = geo
-        self.end_of_sequence = False
 
     def add(self, robots):
-        return Resources(
-            self.ore + robots.ore,
-            self.clay + robots.clay,
-            self.silver + robots.silver,
-            self.geo + robots.geo,
-        )
-
-    def add_mutating(self, robots):
         self.ore += robots.ore
         self.clay += robots.clay
-        self.silver += robots.silver
+        self.obs += robots.obs
         self.geo += robots.geo
 
     def remove(self, robot, blueprint):
-        if robot == "O":
-            self.ore -= blueprint.ore_cost_ore
-        if robot == "C":
-            self.ore -= blueprint.clay_cost_ore
-        if robot == "S":
-            self.ore -= blueprint.silver_cost_ore
-            self.clay -= blueprint.silver_cost_clay
-        if robot == "G":
-            self.ore -= blueprint.geo_cost_ore
-            self.silver -= blueprint.geo_cost_silver
-
-    def __str__(self):
-        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo} E:{self.end_of_sequence}"
+        ore = self.ore
+        clay = self.clay
+        obs = self.obs
+        geo = self.geo
+        if robot == "ore":
+            ore -= blueprint.ore_cost_ore
+        if robot == "clay":
+            ore -= blueprint.clay_cost_ore
+        if robot == "obs":
+            ore -= blueprint.obs_cost_ore
+            clay -= blueprint.obs_cost_clay
+        if robot == "geo":
+            ore -= blueprint.geo_cost_ore
+            obs -= blueprint.geo_cost_obs
+        return Resources(ore, clay, obs, geo)
 
 
 class Robots:
-    def __init__(self, ore=0, clay=0, silver=0, geo=0):
+    def __init__(self, ore=0, clay=0, obs=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.silver = silver
+        self.obs = obs
         self.geo = geo
 
     def add(self, robot):
-        if robot == "O":
-            self.ore += 1
-        if robot == "C":
-            self.clay += 1
-        if robot == "S":
-            self.silver += 1
-        if robot == "G":
-            self.geo += 1
+        if robot == "ore":
+            return Robots(self.ore + 1, self.clay, self.obs, self.geo)
+        if robot == "clay":
+            return Robots(self.ore, self.clay + 1, self.obs, self.geo)
+        if robot == "obs":
+            return Robots(self.ore, self.clay, self.obs + 1, self.geo)
+        if robot == "geo":
+            return Robots(self.ore, self.clay, self.obs, self.geo + 1)
 
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots, sequence=None, lookahead=0):
+    def __init__(self, blueprint, resources, robots):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.robot_order = [] if sequence is None else sequence
-        self.lookahead = lookahead
+        self.ignore_robots = set([])
 
-    def step_sequence(self):
-        if self.blueprint.can_build(self.resources, "G"):
-            next_robot = "G"
-        else:
-            if not self.robot_order:
-                self.resources.end_of_sequence = True
-                return self.resources.add_mutating(self.robots)
-            next_robot = self.robot_order[0]
-            if not self.blueprint.can_build(self.resources, next_robot):
-                return self.resources.add_mutating(self.robots)
-        self.resources.add_mutating(self.robots)
-        self.build(next_robot)
-        self.robot_order = self.robot_order[1:]
+    def futures(self):
+        pot_robots = self.blueprint.potential_builds(self.resources, self)
+        self.resources.add(self.robots)
+        futures = [self]
+        for robot in pot_robots:
+            futures.append(self.build(robot))
+            self.ignore_robots.add(robot)
+        return futures
 
     def build(self, robot):
-        self.resources.remove(robot, self.blueprint)
-        self.robots.add(robot)
-
-    def next_robot(self):
-        future = self.resources
-        for _ in range(self.lookahead):
-            future = future.add(self.robots)
-        future2 = self.resources
-        for _ in range(self.lookahead + 1):
-            future2 = future2.add(self.robots)
-        if self.blueprint.can_build(future2, "G"):
-            return "G"
-        if self.blueprint.can_build(future, "S"):
-            return "S"
-        desired_ratio = self.blueprint.silver_cost_clay / (
-            self.blueprint.silver_cost_ore
+        return Timeline(
+            self.blueprint,
+            self.resources.remove(robot, self.blueprint),
+            self.robots.add(robot),
         )
-        if (
-            self.robots.clay < self.robots.ore * desired_ratio
-            and self.blueprint.can_build(future, "C")
-        ):
-            return "C"
-        return "O"
-
-    def step_heuristic(self):
-        next_robot = self.next_robot()
-        can_build = next_robot and self.blueprint.can_build(self.resources, next_robot)
-        self.resources.add_mutating(self.robots)
-        # print(self.resources)
-
-        if not can_build:
-            return
-        self.build(next_robot)
-        # print("build " + next_robot)
-
-
-def run_sequence(blueprint, sequence):
-    global max_g, N
-
-    timeline = Timeline(blueprint, Resources(), Robots(1), sequence=sequence)
-    for _ in range(N):
-        timeline.step_sequence()
-    if timeline.resources.geo > max_g:
-        max_g = timeline.resources.geo
-
-
-def run_sequences(blueprint, s, i, j):
-    for i_ in range(3):
-        for j_ in range(3):
-            s_ = list(s)
-            if i - 1 - 2 >= 0:
-                for x in range(i_):
-                    s_[i - 1 - x] = "C"
-            if j - 1 - 2 >= 0:
-                for x in range(j_):
-                    s_[j - 1 - x] = "S"
-            run_sequence(blueprint, s_)
-            # print(s_)
-
-
-# run_sequences(0, "OOOOCCCCSSSS", 4, 8)
-# 0 / 0
-
-
-def simple_approach(blueprint, lookahead):
-    global max_g, N
-
-    timeline = Timeline(blueprint, Resources(), Robots(1), lookahead=lookahead)
-    for _ in range(N):
-        timeline.step_heuristic()
-    if timeline.resources.geo > max_g:
-        max_g = timeline.resources.geo
 
 
 def easy():
-    global max_g, N, blueprints
-    N = 24
-    N_ = N * 3 // 4
     blueprints = [Blueprint(*r) for r in t]
-
-    answer = 0
-    num = 1
+    print(blueprints[0])
 
     for blueprint in blueprints:
-        max_g = 0
-        for i in range(0, N_):
-            for j in range(i, N_ - 1):
-                for k in range(j, N_ - 1):
-                    s = ""
-                    for l in range(N_):
-                        if l < i:
-                            s += "O"
-                            continue
-                        if l <= j:
-                            s += "C"
-                            continue
-                        if l <= k:
-                            s += "S"
-                            continue
-                        s += "G"
-                    run_sequences(blueprint, s, i, j)
-        for lah in [0, 1, 2, 3]:
-            simple_approach(blueprint, lah)
-        answer += num * max_g
-        num += 1
-        print(max_g)
-    print(answer)
+        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
+        for i in range(24):
+            print(i)
+            new_timelines = []
+            for timeline in timelines:
+                new_timelines += timeline.futures()
+            timelines = new_timelines
 
 
 def hard():
     return
 
 
-teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
-    Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-teststr = ""
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
-N = blueprints = 0
 if __name__ == "__main__":
     easy()
     hard()
