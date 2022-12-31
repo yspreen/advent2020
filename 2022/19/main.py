@@ -45,45 +45,45 @@ class Blueprint:
         self,
         ore_cost_ore,
         clay_cost_ore,
-        obs_cost_ore,
-        obs_cost_clay,
+        silver_cost_ore,
+        silver_cost_clay,
         geo_cost_ore,
-        geo_cost_obs,
+        geo_cost_silver,
     ):
         self.ore_cost_ore = ore_cost_ore
         self.clay_cost_ore = clay_cost_ore
-        self.obs_cost_ore = obs_cost_ore
-        self.obs_cost_clay = obs_cost_clay
+        self.silver_cost_ore = silver_cost_ore
+        self.silver_cost_clay = silver_cost_clay
         self.geo_cost_ore = geo_cost_ore
-        self.geo_cost_obs = geo_cost_obs
+        self.geo_cost_silver = geo_cost_silver
 
     def __str__(self):
         s = "ore_cost_ore: " + str(self.ore_cost_ore)
         s += "; clay_cost_ore: " + str(self.clay_cost_ore)
-        s += "; obs_cost_ore: " + str(self.obs_cost_ore)
-        s += "; obs_cost_clay: " + str(self.obs_cost_clay)
+        s += "; silver_cost_ore: " + str(self.silver_cost_ore)
+        s += "; silver_cost_clay: " + str(self.silver_cost_clay)
         s += "; geo_cost_ore: " + str(self.geo_cost_ore)
-        s += "; geo_cost_obs: " + str(self.geo_cost_obs)
+        s += "; geo_cost_silver: " + str(self.geo_cost_silver)
         return s
 
     def potential_builds(self, resources, timeline):
         pot = []
-        if resources.ore >= self.ore_cost_ore and "ore" not in timeline.ignore_robots:
-            pot += ["ore"]
-        if resources.ore >= self.clay_cost_ore and "clay" not in timeline.ignore_robots:
-            pot += ["clay"]
+        if resources.ore >= self.ore_cost_ore and "O" not in timeline.ignore_robots:
+            pot += ["O"]
+        if resources.ore >= self.clay_cost_ore and "C" not in timeline.ignore_robots:
+            pot += ["C"]
         if (
-            resources.ore >= self.obs_cost_ore
-            and resources.clay >= self.obs_cost_clay
-            and "obs" not in timeline.ignore_robots
+            resources.ore >= self.silver_cost_ore
+            and resources.clay >= self.silver_cost_clay
+            and "S" not in timeline.ignore_robots
         ):
-            pot += ["obs"]
+            pot += ["S"]
         if (
             resources.ore >= self.geo_cost_ore
             and resources.ore >= self.geo_cost_ore
-            and "geo" not in timeline.ignore_robots
+            and "G" not in timeline.ignore_robots
         ):
-            pot += ["geo"]
+            pot += ["G"]
         return pot
 
 
@@ -105,16 +105,16 @@ class Resources:
         clay = self.clay
         obs = self.obs
         geo = self.geo
-        if robot == "ore":
+        if robot == "O":
             ore -= blueprint.ore_cost_ore
-        if robot == "clay":
+        if robot == "C":
             ore -= blueprint.clay_cost_ore
-        if robot == "obs":
-            ore -= blueprint.obs_cost_ore
-            clay -= blueprint.obs_cost_clay
-        if robot == "geo":
+        if robot == "S":
+            ore -= blueprint.silver_cost_ore
+            clay -= blueprint.silver_cost_clay
+        if robot == "G":
             ore -= blueprint.geo_cost_ore
-            obs -= blueprint.geo_cost_obs
+            obs -= blueprint.geo_cost_silver
         return Resources(ore, clay, obs, geo)
 
 
@@ -126,13 +126,13 @@ class Robots:
         self.geo = geo
 
     def add(self, robot):
-        if robot == "ore":
+        if robot == "O":
             return Robots(self.ore + 1, self.clay, self.obs, self.geo)
-        if robot == "clay":
+        if robot == "C":
             return Robots(self.ore, self.clay + 1, self.obs, self.geo)
-        if robot == "obs":
+        if robot == "S":
             return Robots(self.ore, self.clay, self.obs + 1, self.geo)
-        if robot == "geo":
+        if robot == "G":
             return Robots(self.ore, self.clay, self.obs, self.geo + 1)
 
 
