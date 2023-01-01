@@ -127,6 +127,9 @@ class Resources:
             or self.geo > other.geo
         )
 
+    def to_tuple(self):
+        return (self.ore, self.clay, self.silver, self.geo)
+
 
 class Robots:
     def __init__(self, ore=0, clay=0, silver=0, geo=0):
@@ -153,17 +156,14 @@ class Robots:
             or self.geo > other.geo
         )
 
+    def __str__(self):
+        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
+
+    def to_tuple(self):
+        return (self.ore, self.clay, self.silver, self.geo)
+
 
 class Timeline:
-    max_resource_ore = None
-    max_resource_clay = None
-    max_resource_silver = None
-    max_resource_geo = None
-    max_robot_ore = None
-    max_robot_clay = None
-    max_robot_silver = None
-    max_robot_geo = None
-
     def __init__(self, blueprint, resources, robots):
         self.blueprint = blueprint
         self.resources = resources
@@ -191,26 +191,21 @@ class Timeline:
         )
 
     def inferior_to(self, other):
+        if other.robots.geo > self.robots.geo:
+            return True
+        if other.resources.geo > self.resources.geo:
+            return True
         better = self.resources.better_than(other.resources) or self.robots.better_than(
             other.robots
         )
         return not better
 
+    def to_tuple(self):
+        return (self.resources.to_tuple(), self.robots.to_tuple())
+
 
 N = 24
-
-
-def best_timelines():
-    return [
-        Timeline.max_resource_ore,
-        Timeline.max_resource_clay,
-        Timeline.max_resource_silver,
-        Timeline.max_resource_geo,
-        Timeline.max_robot_ore,
-        Timeline.max_robot_clay,
-        Timeline.max_robot_silver,
-        Timeline.max_robot_geo,
-    ]
+m = 0
 
 
 def easy():
@@ -220,52 +215,20 @@ def easy():
 
     for i, blueprint in enumerate(blueprints):
         # print(i)
+        m = 0
         timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-        Timeline.max_resource_ore = timelines[0]
-        Timeline.max_resource_clay = timelines[0]
-        Timeline.max_resource_silver = timelines[0]
-        Timeline.max_resource_geo = timelines[0]
-        Timeline.max_robot_ore = timelines[0]
-        Timeline.max_robot_clay = timelines[0]
-        Timeline.max_robot_silver = timelines[0]
-        Timeline.max_robot_geo = timelines[0]
         for j in range(24):
             print(j)
-            new_timelines = []
+            new_timelines = set()
             for timeline in timelines:
-                new_timelines += timeline.futures()
-            timelines = []
-            for timeline in new_timelines:
-                if timeline.resources.ore > Timeline.max_resource_ore.resources.ore:
-                    Timeline.max_resource_ore = timeline
-                if timeline.resources.clay > Timeline.max_resource_clay.resources.clay:
-                    Timeline.max_resource_clay = timeline
-                if (
-                    timeline.resources.silver
-                    > Timeline.max_resource_silver.resources.silver
-                ):
-                    Timeline.max_resource_silver = timeline
-                if timeline.resources.geo > Timeline.max_resource_geo.resources.geo:
-                    Timeline.max_resource_geo = timeline
-                if timeline.robots.ore > Timeline.max_robot_ore.robots.ore:
-                    Timeline.max_robot_ore = timeline
-                if timeline.robots.clay > Timeline.max_robot_clay.robots.clay:
-                    Timeline.max_robot_clay = timeline
-                if timeline.robots.silver > Timeline.max_robot_silver.robots.silver:
-                    Timeline.max_robot_silver = timeline
-                if timeline.robots.geo > Timeline.max_robot_geo.robots.geo:
-                    Timeline.max_robot_geo = timeline
-            for timeline in new_timelines:
-                inferior = False
-                for other in best_timelines():
-                    if other == timeline:
-                        continue
-                    if timeline.inferior_to(other):
-                        inferior = True
-                        break
-                if not inferior:
-                    timelines.append(timeline)
-        m = max([timeline.resources.geo for timeline in timelines])
+                if timeline.robots.geo < m:
+                    continue
+                new_timelines |= {t.to_tuple() for t in timeline.futures()}
+            timelines = [
+                Timeline(blueprint, Resources(*res), Robots(*rob))
+                for res, rob in new_timelines
+            ]
+            m = max([t.robots.geo for t in timelines])
         print(m)
         # print(timelines[0].resources)
         s += m * (i + 1)
