@@ -66,44 +66,43 @@ class Blueprint:
         s += "; geo_cost_silver: " + str(self.geo_cost_silver)
         return s
 
-    def potential_builds(self, resources, timeline):
-        pot = []
-        if resources.ore >= self.ore_cost_ore and "O" not in timeline.ignore_robots:
-            pot += ["O"]
-        if resources.ore >= self.clay_cost_ore and "C" not in timeline.ignore_robots:
-            pot += ["C"]
-        if (
-            resources.ore >= self.silver_cost_ore
-            and resources.clay >= self.silver_cost_clay
-            and "S" not in timeline.ignore_robots
-        ):
-            pot += ["S"]
-        if (
-            resources.ore >= self.geo_cost_ore
-            and resources.ore >= self.geo_cost_ore
-            and "G" not in timeline.ignore_robots
-        ):
-            pot += ["G"]
-        return pot
+    def can_build(self, resources, robot):
+        if robot == "O":
+            return resources.ore >= self.ore_cost_ore
+        if robot == "C":
+            return resources.ore >= self.clay_cost_ore
+        if robot == "S":
+            return (
+                resources.ore >= self.silver_cost_ore
+                and resources.clay >= self.silver_cost_clay
+            )
+        if robot == "G":
+            return (
+                resources.ore >= self.geo_cost_ore
+                and resources.silver >= self.geo_cost_silver
+            )
+        assert False, f"unreachable {robot}"
 
 
 class Resources:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
 
     def add(self, robots):
-        self.ore += robots.ore
-        self.clay += robots.clay
-        self.obs += robots.obs
-        self.geo += robots.geo
+        return Resources(
+            self.ore + robots.ore,
+            self.clay + robots.clay,
+            self.silver + robots.silver,
+            self.geo + robots.geo,
+        )
 
     def remove(self, robot, blueprint):
         ore = self.ore
         clay = self.clay
-        obs = self.obs
+        silver = self.silver
         geo = self.geo
         if robot == "O":
             ore -= blueprint.ore_cost_ore
@@ -114,71 +113,124 @@ class Resources:
             clay -= blueprint.silver_cost_clay
         if robot == "G":
             ore -= blueprint.geo_cost_ore
-            obs -= blueprint.geo_cost_silver
-        return Resources(ore, clay, obs, geo)
+            silver -= blueprint.geo_cost_silver
+        return Resources(ore, clay, silver, geo)
+
+    def __str__(self):
+        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
+
+    def to_tuple(self):
+        return (self.ore, self.clay, self.silver, self.geo)
 
 
 class Robots:
-    def __init__(self, ore=0, clay=0, obs=0, geo=0):
+    def __init__(self, ore=0, clay=0, silver=0, geo=0):
         self.ore = ore
         self.clay = clay
-        self.obs = obs
+        self.silver = silver
         self.geo = geo
 
     def add(self, robot):
         if robot == "O":
-            return Robots(self.ore + 1, self.clay, self.obs, self.geo)
+            return Robots(self.ore + 1, self.clay, self.silver, self.geo)
         if robot == "C":
-            return Robots(self.ore, self.clay + 1, self.obs, self.geo)
+            return Robots(self.ore, self.clay + 1, self.silver, self.geo)
         if robot == "S":
-            return Robots(self.ore, self.clay, self.obs + 1, self.geo)
+            return Robots(self.ore, self.clay, self.silver + 1, self.geo)
         if robot == "G":
-            return Robots(self.ore, self.clay, self.obs, self.geo + 1)
+            return Robots(self.ore, self.clay, self.silver, self.geo + 1)
+
+    def to_tuple(self):
+        return (self.ore, self.clay, self.silver, self.geo)
 
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots):
+    def __init__(self, blueprint, resources, robots, next_robot, time=0):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.ignore_robots = set([])
+        self.next_robot = next_robot
+        self.time = time
+
+    def to_tuple(self):
+        return (
+            self.resources.to_tuple(),
+            self.robots.to_tuple(),
+            self.next_robot,
+            self.time,
+        )
+
+    def copy_with_robot(self, r):
+        return Timeline(self.blueprint, self.resources, self.robots, r, self.time)
 
     def futures(self):
-        pot_robots = self.blueprint.potential_builds(self.resources, self)
-        self.resources.add(self.robots)
-        futures = [self]
-        for robot in pot_robots:
-            futures.append(self.build(robot))
-            self.ignore_robots.add(robot)
-        return futures
+        self.time += 1
+        if self.blueprint.can_build(self.resources, "G"):
+            future = self.build("G")
+            future.resources = future.resources.add(self.robots)
+            return True, [future]
+        can_build = self.blueprint.can_build(self.resources, self.next_robot)
+        self.resources = self.resources.add(self.robots)
+        if not can_build:
+            return False, [self]
+        future = self.build(self.next_robot)
+        next_robots = ["O", "C", "S"] if future.robots.clay else ["O", "C"]
+        return False, [future.copy_with_robot(r) for r in next_robots]
 
     def build(self, robot):
         return Timeline(
             self.blueprint,
             self.resources.remove(robot, self.blueprint),
             self.robots.add(robot),
+            self.next_robot,
+            self.time,
         )
+
+
+N = 24
 
 
 def easy():
     blueprints = [Blueprint(*r) for r in t]
-    print(blueprints[0])
+    # print(blueprints[0])
+    s = 0
 
-    for blueprint in blueprints:
-        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-        for i in range(24):
-            print(i)
+    for i, blueprint in enumerate(blueprints):
+        print(i)
+        robots = ["O", "C"]
+        timelines = [Timeline(blueprint, Resources(), Robots(ore=1), r) for r in robots]
+        for _ in range(24):
             new_timelines = []
+            new_g_timelines = []
             for timeline in timelines:
-                new_timelines += timeline.futures()
-            timelines = new_timelines
+                new_g, new_timelines_ = timeline.futures()
+                if new_g:
+                    new_g_timelines += new_timelines_
+                else:
+                    new_timelines += new_timelines_
+            if new_g_timelines:
+                timelines = new_g_timelines
+            else:
+                timelines = new_timelines
+            timelines = set([t.to_tuple() for t in timelines])
+            timelines = [
+                Timeline(blueprint, Resources(*resources), Robots(*robots), robot, time)
+                for resources, robots, robot, time in timelines
+            ]
+        # print(timelines[0].resources)
+        m = max([timeline.resources.geo for timeline in timelines])
+        # print(m)
+        s += m * (i + 1)
+    print(s)
 
 
 def hard():
     return
 
 
-teststr = """"""
+teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
+    Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
