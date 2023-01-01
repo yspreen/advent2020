@@ -24,22 +24,6 @@ def maybeint(line):
         return None
 
 
-mv = [
-    (-1, 0),  # U
-    (1, 0),  # D
-    (0, -1),  # L
-    (0, 1),  # R
-]
-mv_3d = [
-    (-1, 0, 0),  # U
-    (1, 0, 0),  # D
-    (0, -1, 0),  # L
-    (0, 1, 0),  # R
-    (0, 0, -1),  # B
-    (0, 0, 1),  # F
-]
-
-
 class Blueprint:
     def __init__(
         self,
@@ -56,15 +40,6 @@ class Blueprint:
         self.silver_cost_clay = silver_cost_clay
         self.geo_cost_ore = geo_cost_ore
         self.geo_cost_silver = geo_cost_silver
-
-    def __str__(self):
-        s = "ore_cost_ore: " + str(self.ore_cost_ore)
-        s += "; clay_cost_ore: " + str(self.clay_cost_ore)
-        s += "; silver_cost_ore: " + str(self.silver_cost_ore)
-        s += "; silver_cost_clay: " + str(self.silver_cost_clay)
-        s += "; geo_cost_ore: " + str(self.geo_cost_ore)
-        s += "; geo_cost_silver: " + str(self.geo_cost_silver)
-        return s
 
     def can_build(self, resources, robot):
         if robot == "O":
@@ -116,17 +91,6 @@ class Resources:
             silver -= blueprint.geo_cost_silver
         return Resources(ore, clay, silver, geo)
 
-    def __str__(self):
-        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
-
-    def better_than(self, other):
-        return (
-            self.ore > other.ore
-            or self.clay > other.clay
-            or self.silver > other.silver
-            or self.geo > other.geo
-        )
-
     def to_tuple(self):
         return (self.ore, self.clay, self.silver, self.geo)
 
@@ -148,17 +112,6 @@ class Robots:
         if robot == "G":
             return Robots(self.ore, self.clay, self.silver, self.geo + 1)
 
-    def better_than(self, other):
-        return (
-            self.ore > other.ore
-            or self.clay > other.clay
-            or self.silver > other.silver
-            or self.geo > other.geo
-        )
-
-    def __str__(self):
-        return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
-
     def to_tuple(self):
         return (self.ore, self.clay, self.silver, self.geo)
 
@@ -168,9 +121,6 @@ class Timeline:
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-
-    def copy_with_robot(self, r):
-        return Timeline(self.blueprint, self.resources, self.robots, r)
 
     def futures(self):
         next_possible = []
@@ -194,16 +144,6 @@ class Timeline:
             self.resources.remove(robot, self.blueprint),
             self.robots.add(robot),
         )
-
-    def inferior_to(self, other):
-        if other.robots.geo > self.robots.geo:
-            return True
-        if other.resources.geo > self.resources.geo:
-            return True
-        better = self.resources.better_than(other.resources) or self.robots.better_than(
-            other.robots
-        )
-        return not better
 
     def to_tuple(self):
         return (self.resources.to_tuple(), self.robots.to_tuple())
