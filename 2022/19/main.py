@@ -119,6 +119,14 @@ class Resources:
     def __str__(self):
         return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
 
+    def better_than(self, other):
+        return (
+            self.ore > other.ore
+            or self.clay > other.clay
+            or self.silver > other.silver
+            or self.geo > other.geo
+        )
+
 
 class Robots:
     def __init__(self, ore=0, clay=0, silver=0, geo=0):
@@ -137,8 +145,25 @@ class Robots:
         if robot == "G":
             return Robots(self.ore, self.clay, self.silver, self.geo + 1)
 
+    def better_than(self, other):
+        return (
+            self.ore > other.ore
+            or self.clay > other.clay
+            or self.silver > other.silver
+            or self.geo > other.geo
+        )
+
 
 class Timeline:
+    max_resource_ore = None
+    max_resource_clay = None
+    max_resource_silver = None
+    max_resource_geo = None
+    max_robot_ore = None
+    max_robot_clay = None
+    max_robot_silver = None
+    max_robot_geo = None
+
     def __init__(self, blueprint, resources, robots):
         self.blueprint = blueprint
         self.resources = resources
@@ -154,7 +179,7 @@ class Timeline:
                 next_possible.append(next_robot)
         self.resources = self.resources.add(self.robots)
         futures = [self]
-        for robot in next_possible:
+        for next_robot in next_possible:
             futures.append(self.build(next_robot))
         return futures
 
@@ -165,8 +190,27 @@ class Timeline:
             self.robots.add(robot),
         )
 
+    def inferior_to(self, other):
+        better = self.resources.better_than(other.resources) or self.robots.better_than(
+            other.robots
+        )
+        return not better
+
 
 N = 24
+
+
+def best_timelines():
+    return [
+        Timeline.max_resource_ore,
+        Timeline.max_resource_clay,
+        Timeline.max_resource_silver,
+        Timeline.max_resource_geo,
+        Timeline.max_robot_ore,
+        Timeline.max_robot_clay,
+        Timeline.max_robot_silver,
+        Timeline.max_robot_geo,
+    ]
 
 
 def easy():
@@ -175,16 +219,57 @@ def easy():
     s = 0
 
     for i, blueprint in enumerate(blueprints):
-        print(i)
+        # print(i)
         timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-        for _ in range(24):
+        Timeline.max_resource_ore = timelines[0]
+        Timeline.max_resource_clay = timelines[0]
+        Timeline.max_resource_silver = timelines[0]
+        Timeline.max_resource_geo = timelines[0]
+        Timeline.max_robot_ore = timelines[0]
+        Timeline.max_robot_clay = timelines[0]
+        Timeline.max_robot_silver = timelines[0]
+        Timeline.max_robot_geo = timelines[0]
+        for j in range(24):
+            print(j)
             new_timelines = []
             for timeline in timelines:
                 new_timelines += timeline.futures()
-            timelines = new_timelines
+            timelines = []
+            for timeline in new_timelines:
+                if timeline.resources.ore > Timeline.max_resource_ore.resources.ore:
+                    Timeline.max_resource_ore = timeline
+                if timeline.resources.clay > Timeline.max_resource_clay.resources.clay:
+                    Timeline.max_resource_clay = timeline
+                if (
+                    timeline.resources.silver
+                    > Timeline.max_resource_silver.resources.silver
+                ):
+                    Timeline.max_resource_silver = timeline
+                if timeline.resources.geo > Timeline.max_resource_geo.resources.geo:
+                    Timeline.max_resource_geo = timeline
+                if timeline.robots.ore > Timeline.max_robot_ore.robots.ore:
+                    Timeline.max_robot_ore = timeline
+                if timeline.robots.clay > Timeline.max_robot_clay.robots.clay:
+                    Timeline.max_robot_clay = timeline
+                if timeline.robots.silver > Timeline.max_robot_silver.robots.silver:
+                    Timeline.max_robot_silver = timeline
+                if timeline.robots.geo > Timeline.max_robot_geo.robots.geo:
+                    Timeline.max_robot_geo = timeline
+            for timeline in new_timelines:
+                inferior = False
+                for other in best_timelines():
+                    if other == timeline:
+                        continue
+                    if timeline.inferior_to(other):
+                        inferior = True
+                        break
+                if not inferior:
+                    timelines.append(timeline)
         m = max([timeline.resources.geo for timeline in timelines])
+        print(m)
+        # print(timelines[0].resources)
         s += m * (i + 1)
-    print(s)
+    # print(s)
 
 
 def hard():
@@ -193,7 +278,7 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-teststr = ""
+# teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
