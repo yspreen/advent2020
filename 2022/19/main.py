@@ -124,19 +124,14 @@ class Timeline:
 
     def futures(self):
         next_possible = []
-        added_G = False
-        if self.blueprint.can_build(self.resources, "G"):
-            next_possible = ["G"]
-            added_G = True
-        else:
-            for next_robot in ["O", "C", "S"]:
-                if self.blueprint.can_build(self.resources, next_robot):
-                    next_possible.append(next_robot)
+        for next_robot in ["O", "C", "S", "G"]:
+            if self.blueprint.can_build(self.resources, next_robot):
+                next_possible.append(next_robot)
         self.resources = self.resources.add(self.robots)
         futures = [self]
         for next_robot in next_possible:
             futures.append(self.build(next_robot))
-        return futures, added_G
+        return futures
 
     def build(self, robot):
         return Timeline(
@@ -153,20 +148,12 @@ def run_blueprint(blueprint):
     m = 0
     timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
     for j in range(24):
-        # print(j)
+        print(j)
         new_timelines = set()
-        m_ = m
         for timeline in timelines:
-            if timeline.robots.geo < m:
-                continue
-            futures, added_G = timeline.futures()
-            if m_ != m and not added_G:
-                continue
+            futures = timeline.futures()
             tuples = {t.to_tuple() for t in futures}
             new_timelines |= tuples
-            if added_G:
-                m_ = m + 1
-        m = m_
         timelines = [
             Timeline(blueprint, Resources(*res), Robots(*rob))
             for res, rob in new_timelines
