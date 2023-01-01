@@ -174,14 +174,19 @@ class Timeline:
 
     def futures(self):
         next_possible = []
-        for next_robot in ["O", "C", "S", "G"]:
-            if self.blueprint.can_build(self.resources, next_robot):
-                next_possible.append(next_robot)
+        added_G = False
+        if self.blueprint.can_build(self.resources, "G"):
+            next_possible = ["G"]
+            added_G = True
+        else:
+            for next_robot in ["O", "C", "S"]:
+                if self.blueprint.can_build(self.resources, next_robot):
+                    next_possible.append(next_robot)
         self.resources = self.resources.add(self.robots)
         futures = [self]
         for next_robot in next_possible:
             futures.append(self.build(next_robot))
-        return futures
+        return futures, added_G
 
     def build(self, robot):
         return Timeline(
@@ -204,35 +209,44 @@ class Timeline:
         return (self.resources.to_tuple(), self.robots.to_tuple())
 
 
-N = 24
-m = 0
+def run_blueprint(blueprint):
+    m = 0
+    timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
+    for j in range(24):
+        # print(j)
+        new_timelines = set()
+        m_ = m
+        for timeline in timelines:
+            if timeline.robots.geo < m:
+                continue
+            futures, added_G = timeline.futures()
+            if m_ != m and not added_G:
+                continue
+            tuples = {t.to_tuple() for t in futures}
+            new_timelines |= tuples
+            if added_G:
+                m_ = m + 1
+        m = m_
+        timelines = [
+            Timeline(blueprint, Resources(*res), Robots(*rob))
+            for res, rob in new_timelines
+        ]
+    return max([t.resources.geo for t in timelines])
 
 
 def easy():
     blueprints = [Blueprint(*r) for r in t]
     # print(blueprints[0])
-    s = 0
 
-    for i, blueprint in enumerate(blueprints):
-        # print(i)
-        m = 0
-        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-        for j in range(24):
-            print(j)
-            new_timelines = set()
-            for timeline in timelines:
-                if timeline.robots.geo < m:
-                    continue
-                new_timelines |= {t.to_tuple() for t in timeline.futures()}
-            timelines = [
-                Timeline(blueprint, Resources(*res), Robots(*rob))
-                for res, rob in new_timelines
-            ]
-            m = max([t.robots.geo for t in timelines])
-        print(m)
-        # print(timelines[0].resources)
+    from multiprocessing import Pool
+
+    with Pool(16) as p:
+        results = p.map(run_blueprint, blueprints)
+
+    s = 0
+    for i, m in enumerate(results):
         s += m * (i + 1)
-    # print(s)
+    print(s)
 
 
 def hard():
@@ -241,7 +255,7 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
