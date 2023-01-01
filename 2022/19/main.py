@@ -119,9 +119,6 @@ class Resources:
     def __str__(self):
         return f"O:{self.ore} C:{self.clay} S:{self.silver} G:{self.geo}"
 
-    def to_tuple(self):
-        return (self.ore, self.clay, self.silver, self.geo)
-
 
 class Robots:
     def __init__(self, ore=0, clay=0, silver=0, geo=0):
@@ -140,50 +137,32 @@ class Robots:
         if robot == "G":
             return Robots(self.ore, self.clay, self.silver, self.geo + 1)
 
-    def to_tuple(self):
-        return (self.ore, self.clay, self.silver, self.geo)
-
 
 class Timeline:
-    def __init__(self, blueprint, resources, robots, next_robot, time=0):
+    def __init__(self, blueprint, resources, robots):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
-        self.next_robot = next_robot
-        self.time = time
-
-    def to_tuple(self):
-        return (
-            self.resources.to_tuple(),
-            self.robots.to_tuple(),
-            self.next_robot,
-            self.time,
-        )
 
     def copy_with_robot(self, r):
-        return Timeline(self.blueprint, self.resources, self.robots, r, self.time)
+        return Timeline(self.blueprint, self.resources, self.robots, r)
 
     def futures(self):
-        self.time += 1
-        if self.blueprint.can_build(self.resources, "G"):
-            future = self.build("G")
-            future.resources = future.resources.add(self.robots)
-            return True, [future]
-        can_build = self.blueprint.can_build(self.resources, self.next_robot)
+        next_possible = []
+        for next_robot in ["O", "C", "S", "G"]:
+            if self.blueprint.can_build(self.resources, next_robot):
+                next_possible.append(next_robot)
         self.resources = self.resources.add(self.robots)
-        if not can_build:
-            return False, [self]
-        future = self.build(self.next_robot)
-        next_robots = ["O", "C", "S"] if future.robots.clay else ["O", "C"]
-        return False, [future.copy_with_robot(r) for r in next_robots]
+        futures = [self]
+        for robot in next_possible:
+            futures.append(self.build(next_robot))
+        return futures
 
     def build(self, robot):
         return Timeline(
             self.blueprint,
             self.resources.remove(robot, self.blueprint),
             self.robots.add(robot),
-            self.next_robot,
-            self.time,
         )
 
 
@@ -197,29 +176,13 @@ def easy():
 
     for i, blueprint in enumerate(blueprints):
         print(i)
-        robots = ["O", "C"]
-        timelines = [Timeline(blueprint, Resources(), Robots(ore=1), r) for r in robots]
+        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
         for _ in range(24):
             new_timelines = []
-            new_g_timelines = []
             for timeline in timelines:
-                new_g, new_timelines_ = timeline.futures()
-                if new_g:
-                    new_g_timelines += new_timelines_
-                else:
-                    new_timelines += new_timelines_
-            if new_g_timelines:
-                timelines = new_g_timelines
-            else:
-                timelines = new_timelines
-            timelines = set([t.to_tuple() for t in timelines])
-            timelines = [
-                Timeline(blueprint, Resources(*resources), Robots(*robots), robot, time)
-                for resources, robots, robot, time in timelines
-            ]
-        # print(timelines[0].resources)
+                new_timelines += timeline.futures()
+            timelines = new_timelines
         m = max([timeline.resources.geo for timeline in timelines])
-        # print(m)
         s += m * (i + 1)
     print(s)
 
