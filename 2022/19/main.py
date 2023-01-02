@@ -167,7 +167,6 @@ def run_blueprint(blueprint):
         for j in range(N):
             time_left -= 1
             time_left_with_new_builds = (time_left * (time_left + 1)) // 2
-            # print(j)
             new_timelines = []
             for timeline in timelines:
                 max_for_timeline = (
