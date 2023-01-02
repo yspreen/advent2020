@@ -18,10 +18,37 @@ def read():
     s = re.sub(r"[a-z\=\;\,]", "", s)
     s = re.sub(r" +", " ", s)
     s = s.splitlines()
+    s.sort()
     return lmap(
         lambda line: [line[0], line[1], line[2:]],
         lmap(lambda r: lmap(maybeint, r.split(" ")), s),
     )
+
+
+def BFS():
+    options = [(0, 0, 0, 0, set())]
+    visited = {0}
+    range_N = list(range(G.shape[0]))
+    max_release = 0
+
+    while options:
+        new_o = []
+        for time, node, flow, released, visited in options:
+            for step in range_N:
+                if step in visited:
+                    continue
+                cost = G[node, step]
+                time_ = time + cost
+                if time_ >= 30:
+                    # max_release = max(max_release, released + flow * (30 - time))
+                    continue
+                flow_ = flow + flows[step]
+                released_ = released + flow * cost
+                max_release = max(max_release, released_ + flow_ * (30 - time_))
+                visited_ = visited | {step}
+                new_o.append((time_, step, flow_, released_, visited_))
+        options = new_o
+    return max_release
 
 
 def maybeint(line):
@@ -77,38 +104,38 @@ def make_G():
             G = np.delete(G, i, 1)
     for i, valve in enumerate(valves):
         idx[valve] = i
+        flows[i] = flows[valve]
+    G[G > 0] += 1  # need to open valve
 
 
 # Finds the minimum TSP tour cost.
-# m - 2D adjacency matrix representing graph
+# G - 2D adjacency matrix representing graph
 # S - The start node (0 ≤ S < N)
-def tsp(m, S):
+def tsp(S):
     N = G.shape[0]
-    print(N)
     # Initialize memo table.
     # Fill table with null values or +0
-    memo = np.zeros((N, 2 ** N), dtype=int) + inf
-    setup(m, memo, S, N)
-    solve(m, memo, S, N)
-    min_cost = find_min_cost(m, memo, S, N)
-    tour = find_optimal_tour(m, memo, S, N)
-    return (min_cost, tour)
+    memo = np.zeros((N, 2 ** N, 3), dtype=int) + inf
+    setup(memo, S, N)
+    solve(memo, S, N)
+    min_cost = find_max_release(memo, S, N)
+    return min_cost
 
 
 # Initializes the memo table by caching
 # the optimal solution from the start
 # node to every other node.
-def setup(m, memo, S, N):
+def setup(memo, S, N):
     for i in range(N):
         if i == S:
             continue
         # Store the optimal value from node S
         # to each node i (this is given as input
-        # in the adjacency matrix m).
-        memo[i, 1 << S | 1 << i] = m[S, i]
+        # in the adjacency matrix G).
+        memo[i, 1 << S | 1 << i] = [G[S, i], flows[i], 0]
 
 
-def solve(m, memo, S, N):
+def solve(memo, S, N):
     for r in range(3, N + 1):
         for subset in bit_combinations(r, N):
             if not_in(S, subset):
@@ -118,14 +145,31 @@ def solve(m, memo, S, N):
                     continue
                 # The subset state without the step node
                 state = subset ^ (1 << step)
-                min_dist = inf
+                best_choice = max_release = 0
                 for end in range(N):
                     if end == S or end == step or not_in(end, subset):
                         continue
-                    new_distance = memo[end, state] + m[end, step]
-                    if new_distance < min_dist:
-                        min_dist = new_distance
-                memo[step, subset] = min_dist
+                    prev_time, prev_flow, prev_release = memo[end, state]
+                    new_dist = G[end, step]
+                    if prev_time + new_dist >= 30:
+                        new_time = 30
+                        new_flow = prev_flow
+                        new_release = prev_release + prev_flow * (30 - prev_time)
+                        possible_release = new_release
+                    else:
+                        valve_flow = flows[step]
+                        new_time = prev_time + new_dist
+                        new_flow = prev_flow + valve_flow
+                        new_release = prev_release + prev_flow * new_dist
+                        possible_release = new_release + (30 - new_time) * new_flow
+                    if (
+                        possible_release > max_release
+                        or possible_release == max_release
+                        and (new_time < best_choice[0] or new_flow > best_choice[1])
+                    ):
+                        max_release = possible_release
+                        best_choice = [new_time, new_flow, new_release]
+                memo[step, subset] = best_choice
 
 
 # Returns true if the ith bit in 'subset' is not set
@@ -165,47 +209,24 @@ def r_combinations(s, at, r, n, subsets):
             s &= ~(1 << i)
 
 
-def find_min_cost(m, memo, S, N):
+def find_max_release(memo, S, N):
     # The end state is the bit mask with
     # N bits set to 1 (equivalently 2**N - 1)
     end_state = (1 << N) - 1
-    min_tour_cost = inf
-    for e in range(N):
-        if e == S:
+    max_release = 0
+    for end in range(N):
+        if end == S:
             continue
-        tour_cost = memo[e, end_state] + m[e, S]
-        if tour_cost < min_tour_cost:
-            min_tour_cost = tour_cost
-    return min_tour_cost
+        release = memo[end, end_state][2]
+        if release > max_release:
+            max_release = release
+    return max_release
 
 
 def easy():
     make_G()
-    print(bit_combinations(3, 4))
-    print(tsp(G, 0))
-
-
-def find_optimal_tour(m, memo, S, N):
-    lastIndex = S
-    state = (1 << N) - 1
-    # End state
-    tour = [0 for _ in range(N + 1)]
-    for i in reversed(range(1, N)):
-        index = -1
-        for j in range(N):
-            if j == S or not_in(j, state):
-                continue
-            if index == -1:
-                index = j
-            prev_dist = memo[index, state] + m[index, lastIndex]
-            new_dist = memo[i, state] + m[i, lastIndex]
-            if new_dist < prev_dist:
-                index = j
-        tour[i] = index
-        state = state ^ (1 << index)
-        lastIndex = index
-    tour[0] = tour[N] = S
-    return tour
+    print(BFS())
+    print(tsp(0))
 
 
 def hard():
