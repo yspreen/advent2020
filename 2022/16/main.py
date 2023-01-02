@@ -39,12 +39,12 @@ def BFS():
                     continue
                 cost = G[node, step]
                 time_ = time + cost
-                if time_ >= 30:
-                    # max_release = max(max_release, released + flow * (30 - time))
+                if time_ >= limit:
+                    # max_release = max(max_release, released + flow * (limit - time))
                     continue
                 flow_ = flow + flows[step]
                 released_ = released + flow * cost
-                max_release = max(max_release, released_ + flow_ * (30 - time_))
+                max_release = max(max_release, released_ + flow_ * (limit - time_))
                 visited_ = visited | {step}
                 new_o.append((time_, step, flow_, released_, visited_))
         options = new_o
@@ -109,16 +109,14 @@ def make_G():
 
 
 # Finds the minimum TSP tour cost.
-# G - 2D adjacency matrix representing graph
-# S - The start node (0 ≤ S < N)
-def tsp(S):
+def TSP():
     N = G.shape[0]
     # Initialize memo table.
     # Fill table with null values or +0
-    memo = np.zeros((N, 2 ** N, 3), dtype=int) + inf
-    setup(memo, S, N)
-    solve(memo, S, N)
-    min_cost = find_max_release(memo, S, N)
+    memo = np.zeros((N, 2 ** N, 4), dtype=int) + inf
+    setup(memo, 0, N)
+    solve(memo, 0, N)
+    min_cost = find_max_release(memo, 0, N)
     return min_cost
 
 
@@ -132,7 +130,7 @@ def setup(memo, S, N):
         # Store the optimal value from node S
         # to each node i (this is given as input
         # in the adjacency matrix G).
-        memo[i, 1 << S | 1 << i] = [G[S, i], flows[i], 0]
+        memo[i, 1 << S | 1 << i] = [G[S, i], flows[i], 0, 0]
 
 
 def solve(memo, S, N):
@@ -149,26 +147,27 @@ def solve(memo, S, N):
                 for end in range(N):
                     if end == S or end == step or not_in(end, subset):
                         continue
-                    prev_time, prev_flow, prev_release = memo[end, state]
+                    prev_time, prev_flow, prev_release, _ = memo[end, state]
                     new_dist = G[end, step]
-                    if prev_time + new_dist >= 30:
-                        new_time = 30
+                    if prev_time + new_dist >= limit:
+                        new_time = limit
                         new_flow = prev_flow
-                        new_release = prev_release + prev_flow * (30 - prev_time)
+                        new_release = prev_release + prev_flow * (limit - prev_time)
                         possible_release = new_release
                     else:
                         valve_flow = flows[step]
                         new_time = prev_time + new_dist
                         new_flow = prev_flow + valve_flow
                         new_release = prev_release + prev_flow * new_dist
-                        possible_release = new_release + (30 - new_time) * new_flow
-                    if (
-                        possible_release > max_release
-                        or possible_release == max_release
-                        and (new_time < best_choice[0] or new_flow > best_choice[1])
-                    ):
+                        possible_release = new_release + (limit - new_time) * new_flow
+                    if possible_release > max_release:
                         max_release = possible_release
-                        best_choice = [new_time, new_flow, new_release]
+                        best_choice = [
+                            new_time,
+                            new_flow,
+                            new_release,
+                            possible_release,
+                        ]
                 memo[step, subset] = best_choice
 
 
@@ -217,20 +216,53 @@ def find_max_release(memo, S, N):
     for end in range(N):
         if end == S:
             continue
-        release = memo[end, end_state][2]
+        release = memo[end, end_state][3]
         if release > max_release:
             max_release = release
     return max_release
 
 
+limit = 30
+
+
 def easy():
     make_G()
     print(BFS())
-    print(tsp(0))
+
+
+def inside_bit_combination(A, flows, bits, outside=False):
+    included = [0]
+    for idx in range(1, A.shape[0]):
+        is_out = not_in(idx - 1, bits)
+        if outside:
+            if is_out:
+                included += [idx]
+        else:
+            if not is_out:
+                included += [idx]
+    return A[included, :][:, included], [flows[x] for x in included], included
 
 
 def hard():
-    return
+    global G, limit, flows
+    N = G.shape[0]
+    G_ = G
+    flows_ = [flows[i] for i in range(N)]
+    seen_rhs = set()
+    limit -= 4
+
+    max_result = 0
+    for split in [N // 2]:
+        for subs in bit_combinations(split, N - 1):
+            G, flows, lhs = inside_bit_combination(G_, flows_, subs)
+            if tuple(lhs) in seen_rhs:
+                continue
+            first_part = TSP()
+            G, flows, rhs = inside_bit_combination(G_, flows_, subs, True)
+            seen_rhs.add(tuple(rhs))
+            second_part = TSP()
+            max_result = max(max_result, first_part + second_part)
+    print(max_result)
 
 
 teststr = """Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
