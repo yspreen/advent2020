@@ -126,15 +126,14 @@ class Timeline:
         self.resources = resources
         self.robots = robots
 
-    def futures(self, max_geodes, time_left):
-        if time_left + self.resources.geo < max_geodes:
-            return [], False
+    def futures(self, max_geodes, time_left, time_left_with_new_builds):
+        if (
+            time_left * self.robots.geo + time_left_with_new_builds + self.resources.geo
+            < max_geodes
+        ):
+            return []
         next_possible = set()
-        did_build_geode = False
-        if self.blueprint.can_build(self.resources, "G"):
-            next_possible.add("G")
-            did_build_geode = True
-        for next_robot in {"O", "C", "S"}:
+        for next_robot in {"O", "C", "S", "G"}:
             if self.blueprint.can_build(self.resources, next_robot):
                 next_possible.add(next_robot)
         self.resources = self.resources.add(self.robots)
@@ -146,10 +145,8 @@ class Timeline:
                 continue
             if next_robot == "S" and self.resources.silver >= self.blueprint.max_silver:
                 continue
-            if next_robot != "G" and time_left + self.resources.geo - 1 < max_geodes:
-                continue
             futures.append(self.build(next_robot))
-        return futures, did_build_geode
+        return futures
 
     def build(self, robot):
         return Timeline(
@@ -168,20 +165,21 @@ def run_blueprint(blueprint):
     time_left = N
     for j in range(N):
         time_left -= 1
+        time_left_with_new_builds = (time_left * (time_left + 1)) // 2
         # print(j)
         new_timelines = set()
-        prev_max_geodes = max_geodes
         for timeline in timelines:
-            futures, did_build_geode = timeline.futures(max_geodes, time_left)
-            if did_build_geode:
-                max_geodes = prev_max_geodes + 1
+            max_for_timeline = timeline.resources.geo + time_left * timeline.robots.geo
+            if max_for_timeline > max_geodes:
+                max_geodes = max_for_timeline
+            futures = timeline.futures(max_geodes, time_left, time_left_with_new_builds)
             tuples = {t.to_tuple() for t in futures}
             new_timelines |= tuples
         timelines = [
             Timeline(blueprint, Resources(*res), Robots(*rob))
             for res, rob in new_timelines
         ]
-    return max([t.resources.geo for t in timelines])
+    return max([t.resources.geo for t in timelines] + [0])
 
 
 N = 24
