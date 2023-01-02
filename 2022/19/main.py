@@ -98,9 +98,6 @@ class Resources:
             silver -= blueprint.geo_cost_silver
         return Resources(ore, clay, silver, geo)
 
-    def to_tuple(self):
-        return (self.ore, self.clay, self.silver, self.geo)
-
 
 class Robots:
     def __init__(self, ore=0, clay=0, silver=0, geo=0):
@@ -119,15 +116,13 @@ class Robots:
         if robot == "G":
             return Robots(self.ore, self.clay, self.silver, self.geo + 1)
 
-    def to_tuple(self):
-        return (self.ore, self.clay, self.silver, self.geo)
-
 
 class Timeline:
     def __init__(self, blueprint, resources, robots):
         self.blueprint = blueprint
         self.resources = resources
         self.robots = robots
+        self.dont_build_next = set()
 
     def futures(self, max_geodes, time_left, time_left_with_new_builds, max_ore):
         if (
@@ -136,10 +131,11 @@ class Timeline:
         ):
             return []
         next_possible = set()
-        for next_robot in {"O", "C", "S", "G"}:
+        for next_robot in {"O", "C", "S", "G"} - self.dont_build_next:
             if self.blueprint.can_build(self.resources, next_robot):
                 next_possible.add(next_robot)
         self.resources = self.resources.add(self.robots)
+        self.dont_build_next |= next_possible
         futures = [self]
         for next_robot in next_possible:
             if next_robot == "O" and (
@@ -161,9 +157,6 @@ class Timeline:
             self.robots.add(robot),
         )
 
-    def to_tuple(self):
-        return (self.resources.to_tuple(), self.robots.to_tuple())
-
 
 def run_blueprint(blueprint):
     N = blueprint.N
@@ -175,22 +168,17 @@ def run_blueprint(blueprint):
             time_left -= 1
             time_left_with_new_builds = (time_left * (time_left + 1)) // 2
             # print(j)
-            new_timelines = set()
+            new_timelines = []
             for timeline in timelines:
                 max_for_timeline = (
                     timeline.resources.geo + time_left * timeline.robots.geo
                 )
                 if max_for_timeline > max_geodes:
                     max_geodes = max_for_timeline
-                futures = timeline.futures(
+                new_timelines += timeline.futures(
                     max_geodes, time_left, time_left_with_new_builds, max_ore
                 )
-                tuples = {t.to_tuple() for t in futures}
-                new_timelines |= tuples
-            timelines = [
-                Timeline(blueprint, Resources(*res), Robots(*rob))
-                for res, rob in new_timelines
-            ]
+            timelines = new_timelines
         new_best = max([t.resources.geo for t in timelines] + [0])
         if new_best == current_best:
             return new_best
@@ -221,7 +209,7 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-# teststr = ""
+teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
