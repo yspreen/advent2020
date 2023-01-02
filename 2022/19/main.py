@@ -161,7 +161,7 @@ class Timeline:
 def run_blueprint(blueprint):
     N = blueprint.N
     current_best = max_geodes = 0
-    for max_ore in range(1, N):
+    for max_ore in range(1 if N > 24 else 4, N):
         timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
         time_left = N
         for j in range(N):
