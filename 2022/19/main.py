@@ -45,8 +45,8 @@ class Blueprint:
         self.geo_cost_silver = geo_cost_silver
 
         self.max_silver = geo_cost_silver * N
-        self.max_ore = geo_cost_ore * N + self.max_silver * silver_cost_ore
-        self.max_clay = self.max_silver * silver_cost_ore
+        self.max_ore = geo_cost_ore * N // 2 + self.max_silver * silver_cost_ore // 2
+        self.max_clay = self.max_silver * silver_cost_ore // 2
 
     def can_build(self, resources, robot):
         if robot == "O":
@@ -129,7 +129,7 @@ class Timeline:
         self.resources = resources
         self.robots = robots
 
-    def futures(self, max_geodes, time_left, time_left_with_new_builds):
+    def futures(self, max_geodes, time_left, time_left_with_new_builds, max_ore):
         if (
             time_left * self.robots.geo + time_left_with_new_builds + self.resources.geo
             < max_geodes
@@ -142,7 +142,10 @@ class Timeline:
         self.resources = self.resources.add(self.robots)
         futures = [self]
         for next_robot in next_possible:
-            if next_robot == "O" and self.resources.ore >= self.blueprint.max_ore:
+            if next_robot == "O" and (
+                self.resources.ore >= self.blueprint.max_ore
+                or self.robots.ore == max_ore
+            ):
                 continue
             if next_robot == "C" and self.resources.clay >= self.blueprint.max_clay:
                 continue
@@ -164,26 +167,35 @@ class Timeline:
 
 def run_blueprint(blueprint):
     N = blueprint.N
-    max_geodes = 0
-    timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
-    time_left = N
-    for j in range(N):
-        time_left -= 1
-        time_left_with_new_builds = (time_left * (time_left + 1)) // 2
-        # print(j)
-        new_timelines = set()
-        for timeline in timelines:
-            max_for_timeline = timeline.resources.geo + time_left * timeline.robots.geo
-            if max_for_timeline > max_geodes:
-                max_geodes = max_for_timeline
-            futures = timeline.futures(max_geodes, time_left, time_left_with_new_builds)
-            tuples = {t.to_tuple() for t in futures}
-            new_timelines |= tuples
-        timelines = [
-            Timeline(blueprint, Resources(*res), Robots(*rob))
-            for res, rob in new_timelines
-        ]
-    return max([t.resources.geo for t in timelines] + [0])
+    current_best = max_geodes = 0
+    for max_ore in range(1, N):
+        timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
+        time_left = N
+        for j in range(N):
+            time_left -= 1
+            time_left_with_new_builds = (time_left * (time_left + 1)) // 2
+            # print(j)
+            new_timelines = set()
+            for timeline in timelines:
+                max_for_timeline = (
+                    timeline.resources.geo + time_left * timeline.robots.geo
+                )
+                if max_for_timeline > max_geodes:
+                    max_geodes = max_for_timeline
+                futures = timeline.futures(
+                    max_geodes, time_left, time_left_with_new_builds, max_ore
+                )
+                tuples = {t.to_tuple() for t in futures}
+                new_timelines |= tuples
+            timelines = [
+                Timeline(blueprint, Resources(*res), Robots(*rob))
+                for res, rob in new_timelines
+            ]
+        new_best = max([t.resources.geo for t in timelines] + [0])
+        if new_best == current_best:
+            return new_best
+        current_best = new_best
+    return current_best
 
 
 def easy():
@@ -209,7 +221,7 @@ def hard():
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
     Blueprint 2:       Each ore robot costs 2 ore.       Each clay robot costs 3 ore.       Each obsidian robot costs 3 ore and 8 clay.       Each geode robot costs 3 ore and 12 obsidian."""
-teststr = ""
+# teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")
