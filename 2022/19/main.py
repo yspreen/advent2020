@@ -9,6 +9,7 @@ from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
+from multiprocessing import Pool
 
 
 def read():
@@ -27,6 +28,7 @@ def maybeint(line):
 class Blueprint:
     def __init__(
         self,
+        N,
         ore_cost_ore,
         clay_cost_ore,
         silver_cost_ore,
@@ -34,6 +36,7 @@ class Blueprint:
         geo_cost_ore,
         geo_cost_silver,
     ):
+        self.N = N
         self.ore_cost_ore = ore_cost_ore
         self.clay_cost_ore = clay_cost_ore
         self.silver_cost_ore = silver_cost_ore
@@ -160,6 +163,7 @@ class Timeline:
 
 
 def run_blueprint(blueprint):
+    N = blueprint.N
     max_geodes = 0
     timelines = [Timeline(blueprint, Resources(), Robots(ore=1))]
     time_left = N
@@ -182,15 +186,8 @@ def run_blueprint(blueprint):
     return max([t.resources.geo for t in timelines] + [0])
 
 
-N = 24
-
-
 def easy():
-    blueprints = [Blueprint(*r) for r in t]
-    # blueprints = [blueprints[0]]
-    # print(blueprints[0])
-
-    from multiprocessing import Pool
+    blueprints = [Blueprint(24, *r) for r in t]
 
     with Pool(16) as p:
         results = p.map(run_blueprint, blueprints)
@@ -202,7 +199,12 @@ def easy():
 
 
 def hard():
-    return
+    blueprints = [Blueprint(32, *r) for r in t]
+
+    with Pool(16) as p:
+        results = p.map(run_blueprint, blueprints[:3])
+
+    print(prod(results))
 
 
 teststr = """    Blueprint 1:       Each ore robot costs 4 ore.       Each clay robot costs 2 ore.       Each obsidian robot costs 3 ore and 14 clay.       Each geode robot costs 2 ore and 7 obsidian.
