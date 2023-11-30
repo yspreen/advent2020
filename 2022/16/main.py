@@ -89,9 +89,7 @@ def make_G():
                     G[idx[start], idx[path]] = min(
                         G[idx[start], idx[path]], G[idx[start], idx[valve]] + 1
                     )
-                    G[idx[path], idx[start]] = min(
-                        G[idx[path], idx[start]], G[idx[start], idx[valve]] + 1
-                    )
+                    G[idx[path], idx[start]] = G[idx[start], idx[path]]
             next_valves = next_valves_
 
     for i in reversed(range(len(valves))[1:]):
@@ -186,6 +184,15 @@ def bit_tuple_num(bits):
 
 bit_combinations_cache = {}
 
+"""
+(r=1, n=3):
+ > [0b100, 0b010, 0b001,]
+
+(r=2, n=3):
+ > [0b011, 0b101, 0b110,]
+
+"""
+
 
 def bit_combinations(r, n):
     if (r, n) in bit_combinations_cache:
@@ -252,16 +259,15 @@ def hard():
     limit -= 4
 
     max_result = 0
-    for split in [N // 2]:
-        for subs in bit_combinations(split, N - 1):
-            G, flows, lhs = inside_bit_combination(G_, flows_, subs)
-            if tuple(lhs) in seen_rhs:
-                continue
-            first_part = TSP()
-            G, flows, rhs = inside_bit_combination(G_, flows_, subs, True)
-            seen_rhs.add(tuple(rhs))
-            second_part = TSP()
-            max_result = max(max_result, first_part + second_part)
+    for subs in bit_combinations(N // 2, N - 1):
+        G, flows, lhs = inside_bit_combination(G_, flows_, subs)
+        if tuple(lhs) in seen_rhs:
+            continue
+        lhs_score = TSP()
+        G, flows, rhs = inside_bit_combination(G_, flows_, subs, True)
+        seen_rhs.add(tuple(rhs))
+        rhs_score = TSP()
+        max_result = max(max_result, lhs_score + rhs_score)
     print(max_result)
 
 
