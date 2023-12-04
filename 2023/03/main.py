@@ -10,9 +10,9 @@ from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
 
-SYM = -1
+DOT = -1
+SYM = -2
 GEAR = -3
-DOT = -2
 
 
 def read():
@@ -52,18 +52,18 @@ def easy():
         if (x, y) in seen:
             return 0
         seen.add((x, y))
-        while y_min > 0 and t[x, y_min - 1] > SYM:
+        while y_min > 0 and t[x, y_min - 1] >= 0:
             y_min -= 1
             seen.add((x, y_min))
-        while y_max < t.shape[1] - 1 and t[x, y_max + 1] > SYM:
+        while y_max < t.shape[1] - 1 and t[x, y_max + 1] >= 0:
             y_max += 1
             seen.add((x, y_max))
         return int("".join(map(lambda i: str(int(i)), t[x, y_min : y_max + 1])))
 
-    for x, y in list(zip(*np.where(t == SYM))) + list(zip(*np.where(t == GEAR))):
+    for x, y in list(zip(*np.where(t < DOT))):
         for mv_x, mv_y in mv:
             x_, y_ = x + mv_x, y + mv_y
-            if 0 <= x_ < t.shape[0] and 0 <= y_ < t.shape[1] and t[x_, y_] > SYM:
+            if 0 <= x_ < t.shape[0] and 0 <= y_ < t.shape[1] and t[x_, y_] >= 0:
                 result += add_num(x_, y_)
     print(result)
 
@@ -74,10 +74,10 @@ def hard():
     def add_num(x, y, seen):
         y_min = y_max = y
         seen.add((x, y))
-        while y_min > 0 and t[x, y_min - 1] > SYM:
+        while y_min > 0 and t[x, y_min - 1] >= 0:
             y_min -= 1
             seen.add((x, y_min))
-        while y_max < t.shape[1] - 1 and t[x, y_max + 1] > SYM:
+        while y_max < t.shape[1] - 1 and t[x, y_max + 1] >= 0:
             y_max += 1
             seen.add((x, y_max))
         return int("".join(map(lambda i: str(int(i)), t[x, y_min : y_max + 1])))
@@ -87,7 +87,7 @@ def hard():
         numbers = []
         for mv_x, mv_y in mv:
             x_, y_ = x + mv_x, y + mv_y
-            if 0 <= x_ < t.shape[0] and 0 <= y_ < t.shape[1] and t[x_, y_] > SYM:
+            if 0 <= x_ < t.shape[0] and 0 <= y_ < t.shape[1] and t[x_, y_] >= 0:
                 if (x_, y_) in seen:
                     continue
                 numbers.append(add_num(x_, y_, seen))
