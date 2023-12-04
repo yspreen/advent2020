@@ -73,8 +73,6 @@ def hard():
 
     def add_num(x, y, seen):
         y_min = y_max = y
-        if (x, y) in seen:
-            return 1
         seen.add((x, y))
         while y_min > 0 and t[x, y_min - 1] > SYM:
             y_min -= 1
@@ -90,9 +88,9 @@ def hard():
         for mv_x, mv_y in mv:
             x_, y_ = x + mv_x, y + mv_y
             if 0 <= x_ < t.shape[0] and 0 <= y_ < t.shape[1] and t[x_, y_] > SYM:
+                if (x_, y_) in seen:
+                    continue
                 numbers.append(add_num(x_, y_, seen))
-                if numbers[-1] == 1:
-                    numbers.pop()
         if len(numbers) != 2:
             continue
         result += numbers[0] * numbers[1]
