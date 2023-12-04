@@ -14,7 +14,13 @@ from hashlib import md5, sha256
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
-    return lmap(lambda r: lmap(int, r.split("\t")), s)
+    return lmap(
+        lambda r: lmap(
+            lambda i: lmap(int, i.strip().replace("  ", " ").split(" ")),
+            r.split(":")[1].strip().split("|"),
+        ),
+        s,
+    )
 
 
 def maybeint(line):
@@ -75,11 +81,35 @@ def BFS(start, can_walk, goal, cost_fn=None):
 
 
 def easy():
-    print(t)
+    score = 0
+    for win, nums in t:
+        win = set(win)
+        wins = 1
+        for n in nums:
+            if n in win:
+                wins *= 2
+        if wins > 1:
+            score += wins // 2
+    print(score)
 
 
 def hard():
-    return
+    cards = [1 for _ in t]
+    idx = -1
+    for win, nums in t:
+        idx += 1
+        win = set(win)
+        wins = 0
+        for n in nums:
+            if n in win:
+                wins += 1
+        mult = cards[idx]
+
+        for i in range(wins):
+            if idx + i + 1 >= len(t):
+                break
+            cards[idx + i + 1] += mult
+    print(sum(cards))
 
 
 teststr = """"""
