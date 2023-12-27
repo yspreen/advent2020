@@ -2,7 +2,7 @@ import numpy as np
 import re
 import pathlib
 import json
-from functools import reduce
+from functools import reduce, cache
 from string import ascii_lowercase
 from math import prod, gcd, sqrt
 from itertools import permutations, product
@@ -97,24 +97,85 @@ def is_possible(line, nums):
     return True
 
 
-def possibilities(line, nums, idx=0):
-    # print(line)
-    if idx == len(line):
-        return 1 if is_possible(line, nums) else 0
-    if line[idx] != "?":
-        return possibilities(line, nums, idx + 1)
-    if not is_possible(line, nums):
-        return 0
-    return possibilities(
-        line[:idx] + "." + line[idx + 1 :], nums, idx + 1
-    ) + possibilities(line[:idx] + "#" + line[idx + 1 :], nums, idx + 1)
-
-
 def easy():
     arrange = 0
     for line, nums in t:
-        arrange += possibilities(line, nums)
+
+        def possibilities(line, idx=0):
+            # print(line)
+            if idx == len(line):
+                return 1 if is_possible(line, nums) else 0
+            if line[idx] != "?":
+                return possibilities(line, idx + 1)
+            if not is_possible(line, nums):
+                return 0
+            return possibilities(
+                line[:idx] + "." + line[idx + 1 :], idx + 1
+            ) + possibilities(line[:idx] + "#" + line[idx + 1 :], idx + 1)
+
+        arrange += possibilities(line)
     print(arrange)
+
+
+class NextState:
+    def __init__(self, group_open, group_count, next_counts):
+        self.group_open = group_open
+        self.group_count = group_count
+        self.next_counts = next_counts
+
+    def as_tuple(self):
+        return (self.group_open, self.group_count, self.next_counts)
+
+    def next_nums(self, char):
+        res = self.next_nums_(char)
+        # print(self.as_tuple(), res.as_tuple(), char)
+        return res
+
+    def next_nums_(self, char):
+        s = NextState(*self.as_tuple())
+        if char == ".":
+            if s.group_open:
+                if s.group_count == 0:
+                    s.group_open = False
+                    return s
+                else:
+                    return impossible_state
+            return s
+        if s.group_open:
+            if s.group_count <= 0:
+                return impossible_state
+            s.group_count -= 1
+            return s
+        if not s.next_counts:
+            return impossible_state
+        s.group_open = True
+        s.group_count = s.next_counts[0] - 1
+        s.next_counts = s.next_counts[1:]
+        return s
+
+    def is_possible(self, line):
+        if self.group_open and self.group_count > 0:
+            return is_possible(line, (self.group_count, *self.next_counts))
+        return is_possible(line, self.next_counts)
+
+    def __hash__(self):
+        return hash(self.as_tuple())
+
+
+impossible_state = NextState(False, 0, (-1,))
+
+
+@cache
+def sub_possibilities(line, state):
+    if not line:
+        return 1 if state.is_possible(line) else 0
+    if line[0] != "?":
+        return sub_possibilities(line[1:], state.next_nums(line[0]))
+    if not state.is_possible(line):
+        return 0
+    return sub_possibilities(line[1:], state.next_nums(".")) + sub_possibilities(
+        line[1:], state.next_nums("#")
+    )
 
 
 def hard():
@@ -122,7 +183,7 @@ def hard():
     for line, nums in t:
         line = f"{line}?{line}?{line}?{line}?{line}"
         nums = nums + nums + nums + nums + nums
-        arrange += possibilities(line, nums)
+        arrange += sub_possibilities(line, NextState(0, 0, tuple(nums)))
     print(arrange)
 
 
