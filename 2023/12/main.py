@@ -32,31 +32,24 @@ def calc(pattern, counts):
     new_possibilities = {}
     for c in pattern:
         for pos, count in possibilities.items():
-            if pos > endpos:
-                continue
             if c == "." or c == "?":
                 if teststr[pos] == ".":
                     dict_add(new_possibilities, pos, count)
-                elif teststr[pos + 1] != ".":
-                    pass
-                else:
+                elif pos <= endpos and teststr[pos + 1] == ".":
                     dict_add(new_possibilities, pos + 1, count)
             if c == "#" or c == "?":
-                if pos == endpos:
-                    continue
-                if teststr[pos + 1] != "#":
-                    pass
-                else:
+                if pos < endpos and teststr[pos + 1] == "#":
                     dict_add(new_possibilities, pos + 1, count)
         possibilities = new_possibilities
         new_possibilities = {}
-    return sum(possibilities.values())
+    return possibilities.get(endpos - 1, 0) + possibilities.get(endpos, 0)
 
 
 def easy():
     count = 0
     for pattern, counts in t:
         count += calc(pattern, counts)
+    print(count)
 
 
 def hard():
@@ -64,8 +57,8 @@ def hard():
     for line, nums in t:
         line = f"{line}?{line}?{line}?{line}?{line}"
         nums = nums + nums + nums + nums + nums
-        print(calc(line, nums))
-    # print(count)
+        count += calc(line, nums)
+    print(count)
 
 
 teststr = """???.### 1,1,3
