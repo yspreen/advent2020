@@ -23,7 +23,7 @@ def read():
     return [np.array(lmap(lambda r: lmap(int, r), block.splitlines())) for block in s]
 
 
-def mirrors(A, col):
+def mirrors(A, col, errors=0):
     A_rev = A[:, ::-1]
     A = A[:, : col + 1]
     A_rev = A_rev[:, : -col - 1]
@@ -31,16 +31,16 @@ def mirrors(A, col):
     A = A[:, -min_dim:]
     A_rev = A_rev[:, -min_dim:]
 
-    return np.all(A == A_rev)
+    return np.sum(A != A_rev) == errors
 
 
-def easy():
+def run(err):
     horizontals = []
     verticals = []
     for A in t:
         found = False
         for i in range(A.shape[1] - 1):
-            if mirrors(A, i):
+            if mirrors(A, i, err):
                 horizontals.append(i + 1)
                 found = True
                 break
@@ -48,14 +48,18 @@ def easy():
             continue
         A = A.T
         for i in range(A.shape[1] - 1):
-            if mirrors(A, i):
+            if mirrors(A, i, err):
                 verticals.append(i + 1)
                 break
     print(sum(horizontals) + 100 * sum(verticals))
 
 
+def easy():
+    run(0)
+
+
 def hard():
-    return
+    run(1)
 
 
 teststr = """#.##..##.
