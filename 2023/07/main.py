@@ -98,7 +98,7 @@ def run(hand_score):
 
 
 teststr = ""
-if environ["AOC_SOLVE"] == "1":
+if environ.get("AOC_SOLVE", "") == "1":
     teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))

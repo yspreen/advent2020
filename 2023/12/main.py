@@ -68,7 +68,7 @@ teststr = """???.### 1,1,3
 ????.#...#... 4,1,1
 ????.######..#####. 1,6,5
 ?###???????? 3,2,1"""
-if environ["AOC_SOLVE"] == "1":
+if environ.get("AOC_SOLVE", "") == "1":
     teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))

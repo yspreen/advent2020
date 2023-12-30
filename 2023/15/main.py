@@ -43,7 +43,7 @@ def hard():
 
 
 teststr = """rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"""
-if environ["AOC_SOLVE"] == "1":
+if environ.get("AOC_SOLVE", "") == "1":
     teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
