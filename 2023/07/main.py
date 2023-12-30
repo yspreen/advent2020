@@ -34,6 +34,9 @@ def repl_card(hand):
     return result
 
 
+from os import environ
+
+
 def read():
     with open(DIR / "input") as f:
         s = (f.read() if teststr == "" else teststr).splitlines()
@@ -95,6 +98,8 @@ def run(hand_score):
 
 
 teststr = ""
+if environ["AOC_SOLVE"] == "1":
+    teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 t = read()

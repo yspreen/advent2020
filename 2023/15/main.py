@@ -9,6 +9,7 @@ from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
+from os import environ
 
 
 def read():
@@ -42,6 +43,8 @@ def hard():
 
 
 teststr = """rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"""
+if environ["AOC_SOLVE"] == "1":
+    teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 inf = float("inf")

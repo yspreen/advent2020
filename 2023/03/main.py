@@ -13,6 +13,7 @@ from hashlib import md5, sha256
 DOT = -1
 SYM = -2
 GEAR = -3
+from os import environ
 
 
 def read():
@@ -98,6 +99,8 @@ def hard():
 
 
 teststr = """"""
+if environ["AOC_SOLVE"] == "1":
+    teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 t = read()
