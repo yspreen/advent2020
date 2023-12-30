@@ -34,12 +34,17 @@ def same_dir(pos, new_pos, origin, max_length=3):
     return c == max_length
 
 
+max_move = 3
+min_move = 0
+
+
 def neighbors(state):
     (x, y, d, c) = state
     pos = (x, y)
     n = []
 
     backwards = {
+        "": "",
         "U": "D",
         "D": "U",
         "L": "R",
@@ -48,7 +53,9 @@ def neighbors(state):
 
     for k, v in mv.items():
         c_ = c + 1 if k == d else 1
-        if c_ == 4:
+        if c_ > max_move:
+            continue
+        if c < min_move and d and k != d:
             continue
         if k == backwards:
             continue
@@ -102,33 +109,22 @@ def easy():
     start = (0, 0, "D", 0)
     origin, costs, cost, end = dijkstra_search(start)
 
-    # A = np.zeros_like(t)
-    # p = end
-    # while p != start:
-    #     A[p[:2]] = 1
-    #     p = origin[p]
-    # A[p[:2]] = 1
-    # print(A)
     print(cost)
 
 
 def hard():
-    return
+    global min_move, max_move
+
+    min_move = 4
+    max_move = 10
+
+    start = (0, 0, "", 0)
+    origin, costs, cost, end = dijkstra_search(start)
+
+    print(cost)
 
 
-teststr = """2413432311323
-3215453535623
-3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533"""
+teststr = """"""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
 
