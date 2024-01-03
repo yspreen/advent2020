@@ -39,7 +39,28 @@ def easy():
 
 
 def hard():
-    return
+    boxes = [[] for _ in range(256)]
+    for line in t:
+        has_dash = line.endswith("-")
+        if has_dash:
+            label = line[:-1]
+        else:
+            label = line.split("=")[0]
+            amount = int(line.split("=")[1])
+        box = hash(label)
+        if has_dash:
+            boxes[box] = list(filter(lambda i: i[0] != label, boxes[box]))
+        else:
+            if label in map(lambda i: i[0], boxes[box]):
+                idx = list(map(lambda i: i[0], boxes[box])).index(label)
+                boxes[box][idx] = (label, amount)
+            else:
+                boxes[box].append((label, amount))
+    v = 0
+    for box_no, box in enumerate(boxes, 1):
+        for lens_no, lens in enumerate(box, 1):
+            v += box_no * lens_no * lens[1]
+    print(v)
 
 
 teststr = """rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"""
