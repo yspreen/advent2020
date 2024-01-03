@@ -81,14 +81,35 @@ def BFS(start, can_walk, goal, cost_fn=None):
     return None
 
 
-def count_up(A):
-    for x, y in zip(*np.where(A == 2)):
+def move(A, dir):
+    for x, y in list(zip(*np.where(A == 2)))[:: -1 if dir in ["D", "R"] else 1]:
         old_x = x
-        while x > 0 and A[x - 1, y] == 0:
-            x -= 1
-        A[old_x, y] = 0
+        old_y = y
+        if dir == "U":
+            while x > 0 and A[x - 1, y] == 0:
+                x -= 1
+        if dir == "D":
+            while x < A.shape[0] - 1 and A[x + 1, y] == 0:
+                x += 1
+        if dir == "L":
+            while y > 0 and A[x, y - 1] == 0:
+                y -= 1
+        if dir == "R":
+            while y < A.shape[1] - 1 and A[x, y + 1] == 0:
+                y += 1
+        A[old_x, old_y] = 0
         A[x, y] = 2
+    return A
 
+
+def spin(A):
+    move(A, "U")
+    move(A, "L")
+    move(A, "D")
+    move(A, "R")
+
+
+def count(A):
     answer = 0
     for x, y in zip(*np.where(A[::-1] == 2)):
         answer += x + 1
@@ -97,14 +118,38 @@ def count_up(A):
 
 
 def easy():
-    print(count_up(np.array(t)))  # U
-    # print(count_up(np.array(t)[::-1]))  # D
-    # print(count_up(np.array(t).T))  # L
-    # print(count_up(np.array(t).T[::-1]))  # R
+    print(count(move(np.array(t), "U")))
+
+
+def hash(A):
+    a = A.flatten()
+    a[a != 2] = 0
+    a[a == 2] = 1
+    v = 0
+    for i in a:
+        v *= 2
+        v += int(i)
+    return v
 
 
 def hard():
-    return
+    A = t
+    a = b = i = 0
+    scores = {i: count(A)}
+    seen = {hash(A): i}
+    while True:
+        spin(A)
+        i += 1
+        score = count(A)
+        scores[i] = score
+        h = hash(A)
+        if h in seen:
+            b = seen[h]
+            a = i - seen[h]
+            break
+        seen[h] = i
+
+    print(scores[(1000000000 - b) % a + b])
 
 
 teststr = """O....#....
