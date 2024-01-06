@@ -39,18 +39,6 @@ mv = {
 }
 
 
-def calculate_polygon_area(points):
-    n = len(points)
-    area = 0.0
-
-    for i in range(n - 1):
-        area += points[i][0] * points[i + 1][1]
-        area -= points[i + 1][0] * points[i][1]
-
-    area = abs(area) / 2.0
-    return area + calculate_perimeter(points) / 2 + 1
-
-
 def calculate_distance(point1, point2):
     """Calculate the distance between two points."""
     return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
@@ -65,6 +53,18 @@ def calculate_perimeter(points):
         perimeter += calculate_distance(points[i], points[i + 1])
 
     return perimeter
+
+
+def calculate_polygon_area(points):
+    n = len(points)
+    area = 0.0
+
+    for i in range(n - 1):
+        area += points[i][0] * points[i + 1][1]
+        area -= points[i + 1][0] * points[i][1]
+
+    area = abs(area) / 2.0
+    return area + calculate_perimeter(points) / 2 + 1
 
 
 def easy():
@@ -85,8 +85,7 @@ def hard():
     for _, _, code in t:
         d = {"0": "R", "1": "D", "2": "L", "3": "U"}[code[-1]]
         c = int(code[1:-1], 16)
-        for _ in range(c):
-            p = (p[0] + mv[d][0], p[1] + mv[d][1])
+        p = (p[0] + c * mv[d][0], p[1] + c * mv[d][1])
         ps.append(p)
     print(int(calculate_polygon_area(ps)))
 
