@@ -79,11 +79,11 @@ class Head:
         if c == "-":
             if self.dir == "U" or self.dir == "D":
                 dirs = ["L", "R"]
-        return [Head(self.pos, d, set(self.history)) for d in dirs]
+        return [Head(self.pos, d, self.history) for d in dirs]
 
 
 def easy():
-    heads = [Head((0, 0))]
+    heads = [Head((0, -1))]
     visited = {(0, 0)}
 
     for h in heads:
