@@ -34,7 +34,7 @@ mv = {
 
 
 class Head:
-    def __init__(self, pos, dir="R", history=None):
+    def __init__(self, pos, dir, history=None):
         self.pos = pos
         self.dir = dir
         self.history = set() if history is None else history
@@ -82,18 +82,31 @@ class Head:
         return [Head(self.pos, d, self.history) for d in dirs]
 
 
-def easy():
-    heads = [Head((0, -1))]
-    visited = {(0, 0)}
+def count(x, y, d):
+    heads = [Head((x, y), d)]
+    visited = set()
 
     for h in heads:
         heads.extend(h.step())
         visited.add(h.pos)
-    print(len(visited))
+    return len(visited)
+
+
+def easy():
+    print(count(0, -1, "R"))
 
 
 def hard():
-    return
+    c = 0
+    for i in range(len(t)):
+        c = max(c, count(i, -1, "R"))
+    for i in range(len(t)):
+        c = max(c, count(i, len(t), "L"))
+    for i in range(len(t[0])):
+        c = max(c, count(-1, i, "D"))
+    for i in range(len(t[0])):
+        c = max(c, count(len(t[0]), i, "U"))
+    print(c)
 
 
 teststr = """.|...\\....
