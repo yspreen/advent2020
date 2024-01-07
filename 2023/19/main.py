@@ -14,22 +14,40 @@ from os import environ
 
 class Rule:
     def __init__(self, s):
-        self.condition = None
+        self.test = None
         self.go_to = s.split(":")[-1]
         if ":" not in s:
             return
-        self.condition = ("xmas".find(s[0]), s[1], int(s.split(":")[0][2:]))
+        self.test = ("xmas".find(s[0]), s[1], int(s.split(":")[0][2:]))
 
     def __repr__(self):
-        return f"{self.go_to}: {self.condition}"
+        return f"{self.go_to}: {self.test}"
 
     def matches(self, part):
-        if not self.condition:
+        if not self.test:
             return True
-        if self.condition[1] == "<":
-            return part[self.condition[0]] < self.condition[2]
-        if self.condition[1] == ">":
-            return part[self.condition[0]] > self.condition[2]
+        if self.test[1] == "<":
+            return part[self.test[0]] < self.test[2]
+        if self.test[1] == ">":
+            return part[self.test[0]] > self.test[2]
+
+    def step(self, head, flow, idx):
+        o = []
+        if self.test[1] == "<":
+            head_ = [list(i) for i in head]
+            head_[self.test[0]][1] = min(head_[self.test[0]][1], self.test[2])
+            o += [(head_, self.go_to, 0)]
+            head_ = [list(i) for i in head]
+            head_[self.test[0]][0] = max(head_[self.test[0]][0], self.test[2] - 1)
+            o += [(head_, flow, idx + 1)]
+        else:
+            head_ = [list(i) for i in head]
+            head_[self.test[0]][0] = max(head_[self.test[0]][0], self.test[2])
+            o += [(head_, self.go_to, 0)]
+            head_ = [list(i) for i in head]
+            head_[self.test[0]][1] = min(head_[self.test[0]][1], self.test[2] + 1)
+            o += [(head_, flow, idx + 1)]
+        return o
 
 
 def read():
@@ -61,7 +79,27 @@ def easy():
 
 
 def hard():
-    return
+    heads = [([[0, 4001] for _ in "xmas"], "in", 0)]
+    done = []
+
+    for head, flow, idx in heads:
+        if flow == "A":
+            done.append(head)
+            continue
+        if flow == "R":
+            continue
+        rule = rules[flow][idx]
+        if rule.test is None:
+            heads.append((head, rule.go_to, 0))
+            continue
+        heads.extend(rule.step(head, flow, idx))
+    comb = 0
+    for option in done:
+        mult = 1
+        for lower, upper in option:
+            mult *= upper - lower - 1
+        comb += mult
+    print(comb)
 
 
 teststr = """px{a<2006:qkq,m>2090:A,rfg}
