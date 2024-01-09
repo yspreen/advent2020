@@ -98,19 +98,14 @@ def inputs_of(outputs):
 def hard():
     state = [0 for _ in t]
     counters = inputs_of(inputs_of(inputs_of({"rx"})))
-    reached = {}
+    r = 1
     for i in range(1, 1000000):
         if not counters:
-            break
+            return print(r)
         _, fired = run(state)
-        if counters & fired:
-            for c in counters & fired:
-                reached[c] = i
-                counters.remove(c)
-    r = 1
-    for _, v in reached.items():
-        r = lcm(r, v)
-    print(r)
+        for c in counters & fired:
+            r = lcm(r, i)
+            counters.remove(c)
 
 
 teststr = """broadcaster -> a
