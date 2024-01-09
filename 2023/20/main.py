@@ -4,12 +4,13 @@ import pathlib
 import json
 from functools import reduce
 from string import ascii_lowercase
-from math import prod, gcd, sqrt
+from math import prod, gcd, sqrt, lcm
 from itertools import permutations, product
 from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
 from os import environ
+from time import sleep
 
 
 class Node:
@@ -67,17 +68,18 @@ def read():
 def run(state):
     pulses = [("broadcaster", "l", "")]
     counts = [0, 0]
-    rx = False
+    conj_fired = set()
     while pulses:
         pulses_ = []
         for name, pulse, orig in pulses:
             counts[0 if pulse == "l" else 1] += 1
+            if orig in t and t[orig].kind == "&" and pulse == "l":
+                conj_fired.add(orig)
             if name not in t:
-                rx = rx or pulse == "l"
                 continue
             pulses_.extend(t[name].run(pulse, orig, state))
         pulses = pulses_
-    return tuple(counts), rx
+    return tuple(counts), conj_fired
 
 
 def easy():
@@ -89,12 +91,26 @@ def easy():
     print(prod(counts))
 
 
+def inputs_of(outputs):
+    return set(node for node in t if (outputs & set(t[node].out)))
+
+
 def hard():
     state = [0 for _ in t]
-    for i in range(1, 99999999999):
-        _, rx = run(state)
-        if rx:
-            return print(i)
+    counters = inputs_of(inputs_of(inputs_of({"rx"})))
+    reached = {}
+    for i in range(1, 1000000):
+        if not counters:
+            break
+        _, fired = run(state)
+        if counters & fired:
+            for c in counters & fired:
+                reached[c] = i
+                counters.remove(c)
+    r = 1
+    for _, v in reached.items():
+        r = lcm(r, v)
+    print(r)
 
 
 teststr = """broadcaster -> a
