@@ -104,7 +104,7 @@ def hard():
             return print(r)
         _, fired = run(state)
         for c in counters & fired:
-            r = lcm(r, i)
+            r *= i
             counters.remove(c)
 
 
