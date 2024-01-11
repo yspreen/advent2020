@@ -10,6 +10,7 @@ from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
 from os import environ
+from sortedcontainers import SortedSet
 
 
 def read():
@@ -61,7 +62,8 @@ def neighbors(x, y, step):
 def DFS(start, goal, step):
     longest = 0
     stack = llist([(start, 1)])
-    visited = set()
+    visited = SortedSet()
+    seen = set()
 
     while stack:
         current, path_len = stack.pop()
@@ -69,6 +71,11 @@ def DFS(start, goal, step):
         if current not in visited:
             stack.append((current, path_len))
             visited.add(current)
+
+            state = (tuple(visited), current)
+            if state in seen:
+                continue
+            seen.add(state)
 
             if current == goal and path_len > longest:
                 longest = path_len
