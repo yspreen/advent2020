@@ -86,7 +86,6 @@ mv = [
 ]
 
 
-@cache
 def neighbors(x, y, step):
     if step == 1:
         if t[x][y] == "v":
@@ -146,13 +145,15 @@ def run(step):
             if n not in visited:
                 ps.append(n)
                 visited.add(n)
-    graph = consolidate_graph(graph)
+    if step == 2:
+        graph = consolidate_graph(graph)
+    else:
+        graph = {k: lmap(lambda i: (i, 1), v) for k, v in graph.items()}
     print(DFS((0, 1), (N - 1, M - 2), graph))
 
 
 def main():
-    run(1)
-    run(2)
+    [run(i) for i in [1, 2]]
 
 
 teststr = """#.#####################
