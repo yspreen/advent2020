@@ -17,10 +17,10 @@ from collections import defaultdict
 def consolidate_graph(graph):
     """
     Consolidates an undirected graph by collapsing linear paths between intersections into single edges
-    with associated distances.
+    with associated distances and considers only the shortest path between two intersections.
 
     :param graph: A dictionary representing the graph, where keys are nodes and values are lists of neighbors.
-    :return: A new graph with consolidated paths and intersections only.
+    :return: A new graph with consolidated paths, intersections only, and shortest paths.
     """
 
     def is_intersection(node):
@@ -55,12 +55,17 @@ def consolidate_graph(graph):
 
     for node in graph:
         if is_intersection(node):
-            consolidated_graph[node] = []
+            paths = {}
             for neighbor in graph[node]:
                 if neighbor != node:  # Avoid looping back to the same node
                     end_node, distance = find_next_intersection(neighbor, node)
-                    if end_node != node:  # Avoid adding the same node
-                        consolidated_graph[node].append((end_node, distance + 1))
+                    if end_node != node and (
+                        end_node not in paths or paths[end_node] < distance + 1
+                    ):
+                        paths[end_node] = distance + 1
+            consolidated_graph[node] = [
+                (end_node, dist) for end_node, dist in paths.items()
+            ]
 
     return consolidated_graph
 
