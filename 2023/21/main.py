@@ -75,7 +75,7 @@ def hard():
     x = []
     y = []
     for i in range(3):
-        i = 65 + ((i + 1) * 131)
+        i = N // 2 + ((i + 1) * N)
         x.append(i)
         y.append(BFS(start, can_walk_hard, i))
     poly = np.poly1d(np.polyfit(x, y, 2))
