@@ -68,27 +68,18 @@ def BFS(start, can_walk, steps):
 
 
 def easy():
-    start = None
-    for x, row in enumerate(t):
-        try:
-            y = row.index("S")
-            start = (x, y)
-            break
-        except Exception:
-            continue
-    print((BFS(start, can_walk, 64)))
+    print(BFS(start, can_walk, 64))
 
 
 def hard():
-    start = None
-    for x, row in enumerate(t):
-        try:
-            y = row.index("S")
-            start = (x, y)
-            break
-        except Exception:
-            continue
-    print(len(BFS(start, can_walk_hard, 26501365)))
+    x = []
+    y = []
+    for i in range(3):
+        i = 65 + ((i + 1) * 131)
+        x.append(i)
+        y.append(BFS(start, can_walk_hard, i))
+    poly = np.poly1d(np.polyfit(x, y, 2))
+    print(int(poly(26501365)))
 
 
 teststr = """...........
@@ -110,6 +101,14 @@ inf = float("inf")
 t = read()
 N = len(t)
 M = len(t[0])
+start = None
+for x, row in enumerate(t):
+    try:
+        y = row.index("S")
+        start = (x, y)
+        break
+    except Exception:
+        continue
 if __name__ == "__main__":
     easy()
     hard()
