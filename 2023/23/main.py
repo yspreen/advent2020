@@ -38,14 +38,14 @@ mv = [
 def neighbors(x, y, step):
     if step == 1:
         if t[x][y] == "v":
-            return [(x + 1, y)]
+            return {(x + 1, y)}
         if t[x][y] == "^":
-            return [(x - 1, y)]
+            return {(x - 1, y)}
         if t[x][y] == ">":
-            return [(x, y + 1)]
+            return {(x, y + 1)}
         if t[x][y] == "<":
-            return [(x, y - 1)]
-    n = []
+            return {(x, y - 1)}
+    n = set()
     for d_x, d_y in mv:
         x_ = x + d_x
         y_ = y + d_y
@@ -55,35 +55,28 @@ def neighbors(x, y, step):
             continue
         if t[x_][y_] == "#":
             continue
-        n.append((x_, y_))
+        n.add((x_, y_))
     return n
 
 
 def DFS(start, goal, step):
     longest = 0
     stack = llist([(start, 1)])
-    visited = SortedSet()
-    seen = set()
+    visited = set()
 
     while stack:
-        current, path_len = stack.pop()
+        current, path_len = stack.last.value
 
         if current not in visited:
-            stack.append((current, path_len))
             visited.add(current)
-
-            state = (tuple(visited), current)
-            if state in seen:
-                continue
-            seen.add(state)
 
             if current == goal and path_len > longest:
                 longest = path_len
 
-            for neighbor in neighbors(*current, step):
-                if neighbor not in visited:
-                    stack.append((neighbor, path_len + 1))
+            for neighbor in neighbors(*current, step) - visited:
+                stack.append((neighbor, path_len + 1))
         else:
+            stack.pop()
             visited.remove(current)
 
     return longest
