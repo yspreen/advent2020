@@ -24,3 +24,4 @@ typing_extensions==4.0.1
 vulture==2.3
 wrapt==1.13.3
 z3-solver==4.8.13.0
+sortedcontainers==2.4.0
