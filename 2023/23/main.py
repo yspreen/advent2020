@@ -11,6 +11,58 @@ from copy import deepcopy
 from hashlib import md5, sha256
 from os import environ
 from sortedcontainers import SortedSet
+from collections import defaultdict
+
+
+def consolidate_graph(graph):
+    """
+    Consolidates an undirected graph by collapsing linear paths between intersections into single edges
+    with associated distances.
+
+    :param graph: A dictionary representing the graph, where keys are nodes and values are lists of neighbors.
+    :return: A new graph with consolidated paths and intersections only.
+    """
+
+    def is_intersection(node):
+        """
+        Determines if a node is an intersection (more than two neighbors or a dead end).
+
+        :param node: The node to check.
+        :return: True if the node is an intersection, False otherwise.
+        """
+        return len(graph[node]) != 2
+
+    def find_next_intersection(start, prev_node):
+        """
+        Recursive function to find the next intersection starting from a given node.
+
+        :param start: The starting node of the path.
+        :param prev_node: The previous node in the path to avoid backtracking.
+        :return: A tuple of the next intersection node and the total distance.
+        """
+        for neighbor in graph[start]:
+            if neighbor != prev_node:
+                if is_intersection(neighbor):
+                    return neighbor, 1
+                else:
+                    next_intersection, distance = find_next_intersection(
+                        neighbor, start
+                    )
+                    return next_intersection, distance + 1
+        return start, 0  # Dead end
+
+    consolidated_graph = {}
+
+    for node in graph:
+        if is_intersection(node):
+            consolidated_graph[node] = []
+            for neighbor in graph[node]:
+                if neighbor != node:  # Avoid looping back to the same node
+                    end_node, distance = find_next_intersection(neighbor, node)
+                    if end_node != node:  # Avoid adding the same node
+                        consolidated_graph[node].append((end_node, distance + 1))
+
+    return consolidated_graph
 
 
 def read():
@@ -59,9 +111,9 @@ def neighbors(x, y, step):
     return n
 
 
-def DFS(start, goal, step):
+def DFS(start, goal, graph):
     longest = 0
-    stack = llist([(start, 1)])
+    stack = llist([(start, 0)])
     visited = set()
 
     while stack:
@@ -73,8 +125,10 @@ def DFS(start, goal, step):
             if current == goal and path_len > longest:
                 longest = path_len
 
-            for neighbor in neighbors(*current, step) - visited:
-                stack.append((neighbor, path_len + 1))
+            for neighbor, cost in graph[current]:
+                if neighbor in visited:
+                    continue
+                stack.append((neighbor, path_len + cost))
         else:
             stack.pop()
             visited.remove(current)
@@ -82,9 +136,23 @@ def DFS(start, goal, step):
     return longest
 
 
+def run(step):
+    graph = {}
+    ps = [(0, 1)]
+    visited = set(ps)
+    for p in ps:
+        for n in neighbors(*p, step):
+            graph[p] = graph.get(p, []) + [n]
+            if n not in visited:
+                ps.append(n)
+                visited.add(n)
+    graph = consolidate_graph(graph)
+    print(DFS((0, 1), (N - 1, M - 2), graph))
+
+
 def main():
-    for part in [1, 2]:
-        print(DFS((0, 1), (N - 1, M - 2), part) - 1)
+    run(1)
+    run(2)
 
 
 teststr = """#.#####################
