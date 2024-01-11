@@ -119,9 +119,25 @@ class Dep:
         self.idx = idx
         self.lower = set()
         self.upper = set()
+        self.unstable = False
 
     def __repr__(self):
         return str({"i": self.idx, "l": self.lower, "u": self.upper})
+
+    def simulate_falls(self, dep, fallen=None):
+        if fallen and (self.lower - fallen):
+            return False, fallen
+        fallen = set() if fallen is None else fallen
+        fallen.add(self.idx)
+
+        while True:
+            count = len(fallen)
+            for other in self.upper:
+                dep[other].simulate_falls(dep, fallen)
+            if count == len(fallen):
+                break
+
+        return True, fallen
 
 
 def get_dep(t):
@@ -135,24 +151,25 @@ def get_dep(t):
                 continue
             dep[i].lower.add(lower)
             dep[lower].upper.add(i)
+    for d in dep.values():
+        d.unstable = len(d.lower) == 1
     return dep
 
 
-def easy():
+def main():
     move_all_down(t)
     dep = get_dep(t)
-    c = 0
+    stable = 0
+    falls = 0
     for d in dep.values():
-        c += 1
+        falls += len(d.simulate_falls(dep)[1]) - 1
+        stable += 1
         for upper in d.upper:
-            if len(dep[upper].lower) == 1:
-                c -= 1
+            if dep[upper].unstable:
+                stable -= 1
                 break
-    print(c)
-
-
-def hard():
-    return
+    print(stable)
+    print(falls)
 
 
 teststr = """1,0,1~1,2,1
@@ -169,5 +186,4 @@ lmap = lambda *a: list(map(*a))
 inf = float("inf")
 t = read()
 if __name__ == "__main__":
-    easy()
-    hard()
+    main()
