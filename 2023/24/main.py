@@ -1,6 +1,8 @@
+#!/usr/bin/env sage -python
+
 import pathlib
 from os import environ
-from sympy import symbols, Eq, solve
+from sage.all import var, solve
 
 
 def read():
@@ -14,24 +16,23 @@ def collides(a, b):
     bpx, bpy, bpz, bvx, bvy, bvz = b
 
     # Define new symbols for t_a and t_b
-    t_a, t_b = symbols("t_a t_b")
+    var("t_a t_b")
 
     # Redefine the equations with t_a and t_b
-    equation1_new = Eq(apx + avx * t_a, bpx + bvx * t_b)
-    equation2_new = Eq(apy + avy * t_a, bpy + bvy * t_b)
+    equation1_new = Eq(apx + avx * t_a == bpx + bvx * t_b)
+    equation2_new = Eq(apy + avy * t_a == bpy + bvy * t_b)
 
     # Solve the new set of equations
-    solution_new = solve((equation1_new, equation2_new), (t_a, t_b))
+    solution_new = solve([equation1_new, equation2_new], t_a, t_b)
 
     # Extract the solutions for t_a and t_b
     if not solution_new:
         return False
-    t_a_solution, t_b_solution = solution_new[t_a], solution_new[t_b]
+    t_a_solution, t_b_solution = [sol.rhs() for sol in solution_new[0]]
     if t_a_solution < 0 or t_b_solution < 0:
         return False
 
     # Calculate the intersection point using either line's equation
-    # Using line a's equation for demonstration
     x = apx + avx * t_a_solution
     y = apy + avy * t_a_solution
 
@@ -69,27 +70,29 @@ def easy():
 
 
 def hard():
-    s_px, s_py, s_pz, s_vx, s_vy, s_vz = symbols("s_px s_py s_pz s_vx s_vy s_vz")
+    s_px, s_py, s_pz, s_vx, s_vy, s_vz = var("s_px s_py s_pz s_vx s_vy s_vz")
     equations = []
     vars = [s_px, s_py, s_pz, s_vx, s_vy, s_vz]
     i = 0
     for apx, apy, apz, avx, avy, avz in t_b:
-        t_i = symbols(f"t_{number_to_letters(i)}")
+        t_i = var(f"t_{number_to_letters(i)}")
         i += 1
-        equations.append(Eq(apx + avx * t_i, s_px + s_vx * t_i))
-        equations.append(Eq(apy + avy * t_i, s_py + s_vy * t_i))
-        equations.append(Eq(apz + avz * t_i, s_pz + s_vz * t_i))
+        equations += [
+            apx + avx * t_i == s_px + s_vx * t_i,
+            apy + avy * t_i == s_py + s_vy * t_i,
+            apz + avz * t_i == s_pz + s_vz * t_i,
+        ]
         vars.append(t_i)
 
     # Solve the new set of equations
-    solution_new = solve(tuple(equations), tuple(vars))
+    solution_new = solve(equations, vars)
 
-    # Extract the solutions for t_b and t_b
+    # Check the solution
     if not solution_new:
         return
 
     for s in [s_px, s_py, s_pz, s_vx, s_vy, s_vz]:
-        print(solution_new[s])
+        print(solution_new[0][s].rhs())
 
 
 teststr = """19, 13, 30 @ -2,  1, -2
@@ -97,7 +100,7 @@ teststr = """19, 13, 30 @ -2,  1, -2
 20, 25, 34 @ -2, -2, -4
 12, 31, 28 @ -1, -2, -1
 20, 19, 15 @  1, -5, -3"""
-if environ.get("AOC_SOLVE", "1") == "1":
+if environ.get("AOC_SOLVE", "") == "1":
     teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
