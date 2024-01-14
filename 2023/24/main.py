@@ -1,8 +1,6 @@
-#!/usr/bin/env sage -python
-
 import pathlib
 from os import environ
-from sage.all import var, solve
+import math
 
 
 def read():
@@ -70,29 +68,12 @@ def easy():
 
 
 def hard():
-    s_px, s_py, s_pz, s_vx, s_vy, s_vz = var("s_px s_py s_pz s_vx s_vy s_vz")
-    equations = []
-    vars = [s_px, s_py, s_pz, s_vx, s_vy, s_vz]
-    i = 0
+    d = {}
     for apx, apy, apz, avx, avy, avz in t_b:
-        t_i = var(f"t_{number_to_letters(i)}")
-        i += 1
-        equations += [
-            apx + avx * t_i == s_px + s_vx * t_i,
-            apy + avy * t_i == s_py + s_vy * t_i,
-            apz + avz * t_i == s_pz + s_vz * t_i,
-        ]
-        vars.append(t_i)
-
-    # Solve the new set of equations
-    solution_new = solve(equations, vars)
-
-    # Check the solution
-    if not solution_new:
-        return
-
-    for s in [s_px, s_py, s_pz, s_vx, s_vy, s_vz]:
-        print(solution_new[0][s].rhs())
+        m = math.sqrt(avx**2 + avy**2 + avz**2) / 1e10
+        v = (int(avx / m), int(avy / m), int(avz / m))
+        d[v] = d.get(v, 0) + 1
+    print(d)
 
 
 teststr = """19, 13, 30 @ -2,  1, -2
