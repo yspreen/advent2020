@@ -67,13 +67,39 @@ def easy():
     print(c)
 
 
+def distance_pair(t, i, j, x):
+    i_px, i_py, i_pz, i_vx, i_vy, i_vz = t[i]
+    j_px, j_py, j_pz, j_vx, j_vy, j_vz = t[j]
+    return (
+        abs((i_px + x * i_vx) - (j_px + x * j_vx))
+        + abs((i_py + x * i_vy) - (j_py + x * j_vy))
+        + abs((i_pz + x * i_vz) - (j_pz + x * j_vz))
+    )
+
+
+def calc_distance(t, time):
+    d = 0
+    for i in range(len(t)):
+        for j in range(i + 1, len(t)):
+            d += distance_pair(t, i, j, time)
+    return d
+
+
 def hard():
-    d = {}
-    for apx, apy, apz, avx, avy, avz in t_b:
-        m = math.sqrt(avx**2 + avy**2 + avz**2) / 1e10
-        v = (int(avx / m), int(avy / m), int(avz / m))
-        d[v] = d.get(v, 0) + 1
-    print(d)
+    digits = len(str(t[0][0]))
+    best = 0
+    for d in range(digits)[::-1]:
+        min = (0, 99e99)
+        for i in range(20):
+            i -= 10
+            i *= d
+            new_d = calc_distance(t, time=i + best)
+            if new_d < min[1]:
+                min = (i, new_d)
+        print(min)
+        best += min[0]
+
+    print(best)
 
 
 teststr = """19, 13, 30 @ -2,  1, -2
@@ -85,8 +111,8 @@ if environ.get("AOC_SOLVE", "") == "1":
     teststr = ""
 DIR = pathlib.Path(__file__).parent.absolute()
 lmap = lambda *a: list(map(*a))
-t_b = read()
-N = len(t_b)
+t = read()
+N = len(t)
 if __name__ == "__main__":
     # easy()
     hard()
