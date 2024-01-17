@@ -1,6 +1,5 @@
 import pathlib
 from os import environ
-from z3 import Solver, Real, And, sat
 
 
 def read():
@@ -62,14 +61,18 @@ def can_collide(delta_vx, delta_vy):
     x, y = collide_xy(am, ac, bm, bc)
     if x is None:
         return False
+
+    fails = 0
+
     for bpx, bpy, _, bvx, bvy, _ in t[2:]:
         bvx -= delta_vx
         bvy -= delta_vy
         bm, bc = vec_to_mc(bpx, bpy, bvx, bvy)
         y_ = bm * x + bc
         if abs(y_ - y) > 1:
-            return False
-    return True
+            fails += 1
+
+    return fails < 5
 
 
 def easy():
@@ -79,6 +82,17 @@ def easy():
             if collides(t[i], t[j]):
                 c += 1
     print(c)
+
+
+def print_answer_for(vx, vy, vz, ta):
+    apx, apy, apz, avx, avy, avz = t[0]
+    x = apx + ta * avx
+    y = apy + ta * avy
+    z = apz + ta * avz
+    x -= ta * vx
+    y -= ta * vy
+    z -= ta * vz
+    print(int(x + y + z))
 
 
 def hard():
@@ -106,7 +120,8 @@ def hard():
     tb = (x - bpx) / bvx
 
     vz = int(((bpz + tb * bvz) - (apz + ta * avz)) / (tb - ta))
-    print(vx, vy, vz)
+
+    print_answer_for(vx, vy, vz, ta)
 
 
 teststr = """19, 13, 30 @ -2,  1, -2
