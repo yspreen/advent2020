@@ -2,7 +2,7 @@ import numpy as np
 import re
 import pathlib
 import json
-from functools import reduce
+from functools import reduce, cmp_to_key
 from string import ascii_lowercase
 from math import prod, gcd, sqrt
 from itertools import permutations, product
@@ -10,7 +10,6 @@ from llist import dllist as llist
 from copy import deepcopy
 from hashlib import md5, sha256
 from os import environ
-from functools import cmp_to_key
 
 
 def read():
