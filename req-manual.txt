@@ -1,0 +1,10 @@
+black
+Cython
+httpx
+llist
+numpy
+Pillow
+sympy
+scipy
+z3-solver
+vulture
