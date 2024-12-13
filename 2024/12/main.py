@@ -89,34 +89,31 @@ def easy():
             blob_for_pos[(x, y)] = blob_idx
             cells_for_blob[blob_idx] = set([(x, y)])
 
-    did_join = True
-    while did_join:
-        did_join = False
-        for x in range(len(t)):
-            for y in range(len(t[0])):
-                blob_idx = blob_for_pos[(x, y)]
-                for dir in range(4):
-                    dx, dy = mv[dir]
-                    new_x, new_y = x + dx, y + dy
-                    if new_x < 0 or new_y < 0 or new_x >= len(t) or new_y >= len(t[0]):
-                        continue
-                    if t[x][y] != t[new_x][new_y]:
-                        continue
-                    if joined[(x, y)].d[dir]:
-                        continue
-                    new_blob_idx = blob_for_pos[(new_x, new_y)]
-                    did_join = True
-                    if new_blob_idx != blob_idx:
-                        cells_for_blob[blob_idx] |= cells_for_blob[new_blob_idx]
-                        for pos in cells_for_blob[new_blob_idx]:
-                            blob_for_pos[pos] = blob_idx
-                        del cells_for_blob[new_blob_idx]
+    for x in range(len(t)):
+        for y in range(len(t[0])):
+            blob_idx = blob_for_pos[(x, y)]
+            for dir in range(4):
+                dx, dy = mv[dir]
+                new_x, new_y = x + dx, y + dy
+                if new_x < 0 or new_y < 0 or new_x >= len(t) or new_y >= len(t[0]):
+                    continue
+                if t[x][y] != t[new_x][new_y]:
+                    continue
+                if joined[(x, y)].d[dir]:
+                    continue
+                new_blob_idx = blob_for_pos[(new_x, new_y)]
 
-                    joined[(x, y)].d[dir] = True
-                    joined[(x, y)].p -= 1
+                if new_blob_idx != blob_idx:
+                    cells_for_blob[blob_idx] |= cells_for_blob[new_blob_idx]
+                    for pos in cells_for_blob[new_blob_idx]:
+                        blob_for_pos[pos] = blob_idx
+                    del cells_for_blob[new_blob_idx]
 
-                    joined[(new_x, new_y)].d[(dir + 2) % 4] = True
-                    joined[(new_x, new_y)].p -= 1
+                joined[(x, y)].d[dir] = True
+                joined[(x, y)].p -= 1
+
+                joined[(new_x, new_y)].d[(dir + 2) % 4] = True
+                joined[(new_x, new_y)].p -= 1
 
     # calculate sum of p for all cells per blob:
     p_sum = {}
