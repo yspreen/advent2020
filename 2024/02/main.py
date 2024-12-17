@@ -105,13 +105,9 @@ def is_safe_kinda(line):
     if is_safe(line[1:]) or is_safe(line[:1] + line[2:]):
         return True
     ascending = first_diff > 0
-    for i in range(2, len(line)):
+    for i in range(3, len(line)):
         diff = line[i] - line[i - 1]
-        if (diff > 0) != ascending:
-            return is_safe(line[: i - 1] + line[i:]) or is_safe(
-                line[:i] + line[i + 1 :]
-            )
-        if diff == 0 or abs(diff) > 3:
+        if (diff > 0) != ascending or diff == 0 or abs(diff) > 3:
             return is_safe(line[: i - 1] + line[i:]) or is_safe(
                 line[:i] + line[i + 1 :]
             )
