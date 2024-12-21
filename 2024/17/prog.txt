@@ -1,0 +1,167 @@
+A = 3498063853884169
+B = 0
+C = 0
+
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+ 0: B = A % 8
+ 2: B = B ^ 5
+ 4: C = floor(A / 2 ** B)
+ 6: B = B ^ 6
+ 8: A = floor(A / 2 ** 3)
+10: B = B ^ C
+12: print(B % 8)
+14: if A != 0:
+14:   jump to 0
+16: break
