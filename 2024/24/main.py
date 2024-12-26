@@ -149,10 +149,12 @@ def hard():
             for lhs, op, rhs, _ in t[1]:
                 if (out == lhs or out == rhs) and op != "OR":
                     swap.add(out)
+                    break
         if op == "XOR":
             for lhs, op, rhs, _ in t[1]:
                 if (out == lhs or out == rhs) and op == "OR":
                     swap.add(out)
+                    break
 
     print(",".join(sorted(swap)[:-1]))
 
