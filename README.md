@@ -1,3 +1,5 @@
+500 / 500 stars. Incomplete list of calendars in ascii format below:
+
 ### Questions?
 
 Reach out on twitter [@spreen_co](https://twitter.com/spreen_co).
